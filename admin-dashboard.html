@@ -131,8 +131,39 @@
             } catch (err) { alert(err.message); }
         });
 
-                               document.getElementById('courseMapForm').addEventListener('submit', async (e) => {
+                               // admin-dashboard.html এর নিচের অংশটি দিয়ে রিপ্লেস করুন
+document.getElementById('courseMapForm').addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    // ডাটাবেজের জন্য সঠিক কী জেনারেশন (Year - Term - Session)
+    const yr = document.getElementById('mapYear').value; // '1st Year'
+    const term = document.getElementById('mapTerm').value; // 'Spring'
+    const sessYear = document.getElementById('mapSessYear').value; // '2026'
+    
+    // Key ফরম্যাট: "1st Year - Spring 2026"
+    const key = `${yr} - ${term} ${sessYear}`;
+    
+    const payload = {
+        code: document.getElementById('mapCourseCode').value.trim().toUpperCase(),
+        title: document.getElementById('mapCourseTitle').value.trim(),
+        teacher: document.getElementById('mapCourseTeacher').value.trim()
+    };
+
+    try {
+        const docRef = doc(db, "course_mappings", key);
+        const snap = await getDoc(docRef);
+        
+        if (snap.exists()) {
+            await updateDoc(docRef, { courses: arrayUnion(payload) });
+        } else {
+            await setDoc(docRef, { courses: [payload] });
+        }
+        alert("কোর্স সফলভাবে ম্যাপ করা হয়েছে। Key: " + key);
+        document.getElementById('courseMapForm').reset();
+    } catch (err) {
+        alert("এরর: " + err.message);
+    }
+});
     
     // Key ফরম্যাট (স্টুডেন্ট পোর্টালে যা ব্যবহৃত হচ্ছে তার সাথে হুবহু মিল)
     const key = `${document.getElementById('mapYear').value} - ${document.getElementById('mapTermNum').value} (${document.getElementById('mapTerm').value} ${document.getElementById('mapSessYear').value})`;
