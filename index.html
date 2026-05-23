@@ -302,6 +302,7 @@
 
         let latestMappedCourses = [];
         let resourcesSnapshot = null;
+        let renderCourseGridTimer = null;
 
         function getCombinedTrimesterKey() {
             const yr = document.getElementById('filterYear').value;
@@ -310,57 +311,86 @@
             return `${yr} - ${termNum} (${sessionFull})`;
         }
 
+        function buildResourcesByCourse(combinedTrimesterKey) {
+            const byCourse = {};
+            if (!resourcesSnapshot) return byCourse;
+            resourcesSnapshot.forEach(resDoc => {
+                const rData = resDoc.data();
+                if (rData.semester !== combinedTrimesterKey) return;
+                const code = rData.courseCode;
+                if (!byCourse[code]) byCourse[code] = [];
+                byCourse[code].push(rData);
+            });
+            return byCourse;
+        }
+
+        function scheduleRenderCourseGrid() {
+            clearTimeout(renderCourseGridTimer);
+            renderCourseGridTimer = setTimeout(renderCourseGrid, 120);
+        }
+
         function renderCourseGrid() {
             const currentLang = localStorage.getItem('preferredLang') || 'en';
             const combinedTrimesterKey = getCombinedTrimesterKey();
-            courseGrid.innerHTML = '';
+            const resourcesByCourse = buildResourcesByCourse(combinedTrimesterKey);
+            const isMyOwnSemester = Boolean(studentCurrentTrimesterKey) && combinedTrimesterKey === studentCurrentTrimesterKey;
+            const canUpload = Boolean(loggedInUserUID) && isMyOwnSemester;
+            const cards = [];
 
             if (latestMappedCourses.length === 0) {
                 courseGrid.innerHTML = `<p class="text-xs text-gray-400 col-span-3 p-6 text-center border border-dashed rounded-xl w-full">${currentLang === 'bn' ? 'এই সিলেক্টেড সেমিস্টারে কোনো লাইভ কোর্স এখনো অ্যাডমিন প্যানেল থেকে তৈরি করা হয়নি।' : 'No courses mapped for this combined filter session by admin yet.'}</p>`;
                 return;
             }
 
-            latestMappedCourses.forEach(course => {
-                let sharedItemsHTML = "";
-                if (resourcesSnapshot) {
-                    resourcesSnapshot.forEach(resDoc => {
-                        const rData = resDoc.data();
-                        if (rData.courseCode === course.code && rData.semester === combinedTrimesterKey) {
-                            let icon = "fa-file-pdf text-red-500";
-                            if (rData.type && rData.type.includes("Video")) icon = "fa-video text-blue-500";
-                            if (rData.type && rData.type.includes("Audio")) icon = "fa-microphone text-purple-500";
-                            if (rData.type && rData.type.includes("Image")) icon = "fa-image text-amber-500";
-                            sharedItemsHTML += `
-                                <a href="${rData.url}" target="_blank" class="flex justify-between items-center p-2 bg-indigo-50/50 border border-indigo-100 rounded-md hover:bg-indigo-100 transition text-[11px] font-medium text-gray-700">
-                                    <span class="truncate"><i class="fa-solid ${icon} mr-1"></i> ${rData.title} <span class="text-[9px] text-gray-400 font-normal">(By: ${rData.author})</span></span>
-                                    <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-indigo-500 shrink-0"></i>
-                                </a>`;
-                        }
-                    });
-                }
+            latestMappedCourses.forEach((course, courseIndex) => {
+                const files = resourcesByCourse[course.code] || [];
+                let sharedItemsHTML = files.map(rData => {
+                    let icon = "fa-file-pdf text-red-500";
+                    if (rData.type && rData.type.includes("Video")) icon = "fa-video text-blue-500";
+                    if (rData.type && rData.type.includes("Audio")) icon = "fa-microphone text-purple-500";
+                    if (rData.type && rData.type.includes("Image")) icon = "fa-image text-amber-500";
+                    return `
+                        <a href="${rData.url}" target="_blank" class="flex justify-between items-center p-2 bg-indigo-50/50 border border-indigo-100 rounded-md hover:bg-indigo-100 transition text-[11px] font-medium text-gray-700">
+                            <span class="truncate"><i class="fa-solid ${icon} mr-1"></i> ${rData.title} <span class="text-[9px] text-gray-400 font-normal">(By: ${rData.author})</span></span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-indigo-500 shrink-0"></i>
+                        </a>`;
+                }).join("");
+                if (!sharedItemsHTML) sharedItemsHTML = `<p class="text-[10px] text-gray-400 italic p-1">${currentLang === 'bn' ? 'এখনো কোনো শেয়ার নেই।' : 'No shared files.'}</p>`;
 
-                if (sharedItemsHTML === "") sharedItemsHTML = `<p class="text-[10px] text-gray-400 italic p-1">No shared files.</p>`;
-                const isMyOwnSemester = (combinedTrimesterKey === studentCurrentTrimesterKey);
-                const btnColorClass = isMyOwnSemester ? "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-600 hover:text-white shadow-sm font-bold" : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed text-center";
-                const safeTitle = (course.title || "").replace(/'/g, "\\'");
+                const btnColorClass = canUpload
+                    ? "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-600 hover:text-white shadow-sm font-bold"
+                    : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-80";
+                const lockHint = !loggedInUserUID
+                    ? (currentLang === 'bn' ? 'আপলোডের জন্য লগইন করুন' : 'Login to upload')
+                    : (currentLang === 'bn' ? 'শুধু আপনার রানিং সেমিস্টারে আপলোড' : 'Upload only in your running semester');
 
-                courseGrid.innerHTML += `
-                        <div class="border border-gray-200 rounded-xl p-4 bg-gray-50 flex flex-col justify-between hover:shadow-md hover:border-indigo-600 transition duration-200">
-                            <div>
-                                <div class="flex justify-between items-start">
-                                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded">${course.code}</span>
-                                    <span class="text-[9px] bg-slate-200 font-bold px-1.5 py-0.5 rounded text-slate-700">Active Course</span>
-                                </div>
-                                <h4 class="text-base font-extrabold text-gray-800 mt-2">${course.title}</h4>
-                                <p class="text-xs text-gray-500 mt-1 mb-3"><i class="fa-solid fa-user-tie mr-1 text-slate-400"></i>${currentLang === 'bn' ? 'ফ্যাকাল্টি' : 'Faculty'}: ${course.teacher}</p>
-                                <div class="space-y-1.5 border-t border-dashed pt-2.5">${sharedItemsHTML}</div>
+                cards.push(`
+                    <div class="border border-gray-200 rounded-xl p-4 bg-gray-50 flex flex-col justify-between hover:shadow-md hover:border-indigo-600 transition duration-200">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded">${course.code}</span>
+                                <span class="text-[9px] bg-slate-200 font-bold px-1.5 py-0.5 rounded text-slate-700">${currentLang === 'bn' ? 'সক্রিয় কোর্স' : 'Active Course'}</span>
                             </div>
-                            <div class="mt-4 pt-2.5 flex">
-                                <button onclick="triggerLockedUploadFlow('${course.code}', '${safeTitle}', ${isMyOwnSemester})" class="w-full ${btnColorClass} border text-center text-xs py-2 rounded-lg transition flex items-center justify-center gap-1"><i class="fa-solid fa-plus-circle"></i> ${currentLang === 'bn' ? 'নোট / লিংক যোগ করুন' : 'Add Resource Link'}</button>
-                            </div>
-                        </div>`;
+                            <h4 class="text-base font-extrabold text-gray-800 mt-2">${course.title}</h4>
+                            <p class="text-xs text-gray-500 mt-1 mb-3"><i class="fa-solid fa-user-tie mr-1 text-slate-400"></i>${currentLang === 'bn' ? 'ফ্যাকাল্টি' : 'Faculty'}: ${course.teacher}</p>
+                            <div class="space-y-1.5 border-t border-dashed pt-2.5">${sharedItemsHTML}</div>
+                        </div>
+                        <div class="mt-4 pt-2.5 flex">
+                            <button type="button" data-upload-course="${courseIndex}" ${canUpload ? "" : `disabled title="${lockHint}"`}
+                                class="w-full ${btnColorClass} border text-center text-xs py-2 rounded-lg transition flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-plus-circle"></i> ${currentLang === 'bn' ? 'নোট / লিংক যোগ করুন' : 'Add Resource Link'}
+                            </button>
+                        </div>
+                    </div>`);
             });
+            courseGrid.innerHTML = cards.join("");
         }
+
+        courseGrid.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-upload-course]');
+            if (!btn || btn.disabled) return;
+            triggerLockedUploadFlow(parseInt(btn.dataset.uploadCourse, 10));
+        });
 
         async function updateFiltersAndListen() {
             const key = getCombinedTrimesterKey();
@@ -376,7 +406,7 @@
 
         onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snapshot) => {
             resourcesSnapshot = snapshot;
-            renderCourseGrid();
+            scheduleRenderCourseGrid();
         });
 
         document.getElementById('filterYear').addEventListener('change', updateFiltersAndListen);
@@ -384,18 +414,31 @@
         document.getElementById('filterSession').addEventListener('change', updateFiltersAndListen);
         updateFiltersAndListen();
 
-        window.triggerLockedUploadFlow = (courseCode, courseTitle, isAllowed) => {
-            if(!isAllowed) { alert("🔴 এক্সেস লক! আপনি শুধু আপনার নিজের রানিং সেমিস্টারের ফাইল আপলোড করতে পারবেন। অন্য সেমিস্টারের ফাইল শুধুমাত্র দেখার অনুমতি রয়েছে।"); return; }
-            document.getElementById('shareAuthor').value = auth.currentUser.displayName || "";
-            document.getElementById('shareTitle').value = `${courseTitle} - `;
+        window.triggerLockedUploadFlow = (courseIndex) => {
+            const currentLang = localStorage.getItem('preferredLang') || 'en';
+            if (!auth.currentUser) {
+                alert(currentLang === 'bn' ? 'আপলোড করতে প্রথমে লগইন করুন।' : 'Please login first to upload.');
+                window.location.href = './login.html';
+                return;
+            }
+            const combinedTrimesterKey = getCombinedTrimesterKey();
+            if (combinedTrimesterKey !== studentCurrentTrimesterKey) {
+                alert(currentLang === 'bn'
+                    ? '🔴 এক্সেস লক! আপনি শুধু আপনার নিজের রানিং সেমিস্টারের ফাইল আপলোড করতে পারবেন। অন্য সেমিস্টার শুধু দেখা যাবে।'
+                    : '🔴 Locked! You can only upload in your own running semester. Other semesters are view-only.');
+                return;
+            }
+            const course = latestMappedCourses[courseIndex];
+            if (!course) return;
+
+            document.getElementById('shareAuthor').value = auth.currentUser.displayName || auth.currentUser.email || "";
+            document.getElementById('shareTitle').value = `${course.title} - `;
             document.getElementById('lockedSemLabel').innerText = studentCurrentTrimesterKey;
-            document.getElementById('resourceShareForm').dataset.lockedCode = courseCode;
-            
-            // স্টেট ও ভেরিয়েবল ক্লিয়ার
-            base64UploadedFileString = ""; 
-            document.getElementById('shareFileField').value = ""; 
+            document.getElementById('resourceShareForm').dataset.lockedCode = course.code;
+            base64UploadedFileString = "";
+            document.getElementById('shareFileField').value = "";
             document.getElementById('shareUrl').value = "";
-            switchUploadMethod('file'); 
+            switchUploadMethod('file');
             openShareModal();
         };
 
@@ -462,7 +505,9 @@
             if (userDoc.exists()) {
                     const uData = userDoc.data(); if (uData.role === 'admin') { window.location.replace("./admin-dashboard.html"); return; }
                     const uYear = uData.profileYear || "1st Year"; const uTermNum = uData.profileTermNum || "1st Trimester"; const uSess = uData.profileTerm || "Spring"; const uSessYear = uData.profileSessionYear || "2026";
-                    studentCurrentTrimesterKey = `${uYear} - ${uTermNum} (${uSess} ${uSessYear})`;
+                    studentCurrentTrimesterKey = uData.trimester && uData.trimester.includes("(")
+                        ? uData.trimester
+                        : `${uYear} - ${uTermNum} (${uSess} ${uSessYear})`;
                     document.getElementById('displayStudentCurrentSem').innerText = uData.profileYear ? `${uYear} - ${uTermNum}` : "Profile Incomplete!";
 
                     if(!uData.phone || !uData.bloodGroup || !uData.emergencyPhone || !uData.profileYear || !uData.profileTermNum) {
@@ -486,7 +531,8 @@
                     document.getElementById('filterYear').value = uYear;
                     document.getElementById('filterTermNum').value = uTermNum;
                     document.getElementById('filterSession').value = `${uSess} ${uSessYear}`;
-                    updateFiltersAndListen();
+                    await updateFiltersAndListen();
+                    renderCourseGrid();
             }
         });
 
