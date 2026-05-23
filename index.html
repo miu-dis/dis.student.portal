@@ -258,7 +258,8 @@
                 sm_edit_title: "Edit Study Material", sm_save: "Save changes", alertResourceUpdated: "Resource updated successfully!", alertUploading: "Uploading file, please wait...",
                 alertNotOwner: "You can only edit or delete resources you uploaded.",
                 fileLinkMissing: "File link missing — please upload again.",
-                alertInvalidFileUrl: "Upload failed: no valid file URL. Check Supabase config (anon key) and public bucket."
+                alertInvalidFileUrl: "Upload failed: no valid file URL. Check Supabase config (anon key) and public bucket.",
+                alertOpenFileFailed: "Could not open file. Delete and upload again, or check Supabase Storage bucket."
             },
             bn: {
                 navTitle: "ডিআইএস স্টাডি পোর্টাল", btnNavLogin: "লগইন / রেজিস্টার", btnMyProfile: "আমার প্রোফাইল", btnLogout: "লগআউট",
@@ -292,7 +293,8 @@
                 sm_edit_title: "স্টাডি মেটেরিয়াল এডিট", sm_save: "সংরক্ষণ করুন", alertResourceUpdated: "রিসোর্স আপডেট হয়েছে!", alertUploading: "ফাইল আপলোড হচ্ছে, অপেক্ষা করুন...",
                 alertNotOwner: "শুধু নিজের আপলোড করা রিসোর্স এডিট বা ডিলিট করতে পারবেন।",
                 fileLinkMissing: "ফাইল লিংক নেই — আবার আপলোড করুন।",
-                alertInvalidFileUrl: "আপলোড সফ্য হয়নি: সঠিক URL তৈরি হয়নি। Supabase-এ anon key ও Public বাকেট চেক করুন।"
+                alertInvalidFileUrl: "আপলোড সফ্য হয়নি: সঠিক URL তৈরি হয়নি। Supabase-এ anon key ও Public বাকেট চেক করুন।",
+                alertOpenFileFailed: "ফাইল খোলা যায়নি। মুছে আবার আপলোড করুন অথবা Supabase Storage চেক করুন।"
             }
         };
         window.portalTranslations = translations;
@@ -386,7 +388,7 @@
 
     <script type="module">
         import { auth, db } from "./assets/js/app.js";
-        import { uploadPortalFile, deletePortalFile, getPortalFilePublicUrl } from "./assets/js/fileStorage.js";
+        import { uploadPortalFile, deletePortalFile, openResourceFile } from "./assets/js/fileStorage.js";
         import { onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { collection, onSnapshot, query, orderBy, doc, getDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -406,14 +408,14 @@
             return String(text || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
         }
 
-        function getResourceViewUrl(rData) {
-            const u = (rData.url || "").trim();
-            if (u.startsWith("http") || u.startsWith("data:")) return u;
-            if (rData.storagePath && rData.urlType !== "external") {
-                const rebuilt = getPortalFilePublicUrl(rData.storagePath);
-                if (rebuilt.startsWith("http")) return rebuilt;
+        function hasViewableResource(rData) {
+            if (rData.urlType === "external") {
+                const u = (rData.url || "").trim();
+                return u.startsWith("http") || u.startsWith("data:");
             }
-            return "";
+            if (rData.storagePath) return true;
+            const u = (rData.url || "").trim();
+            return u.startsWith("http") || u.startsWith("data:");
         }
 
         function canManageResource(rData) {
@@ -425,16 +427,11 @@
         }
 
         function renderResourceItemHTML(rData, t) {
-            const viewUrl = getResourceViewUrl(rData);
-            const isImage = (rData.type && rData.type.includes("Image")) || (viewUrl && (viewUrl.startsWith("data:image") || /\.(png|jpe?g|gif|webp)(\?|$)/i.test(viewUrl)));
+            const canView = hasViewableResource(rData);
             let icon = "fa-file-pdf text-red-500";
             if (rData.type && rData.type.includes("Video")) icon = "fa-video text-blue-500";
             if (rData.type && rData.type.includes("Audio")) icon = "fa-microphone text-purple-500";
             if (rData.type && rData.type.includes("Image")) icon = "fa-image text-amber-500";
-
-            const preview = (isImage && viewUrl)
-                ? `<a href="${viewUrl}" target="_blank" class="block mt-1"><img src="${viewUrl}" alt="preview" class="max-h-24 rounded border object-contain bg-white w-full"></a>`
-                : "";
 
             const manageBtns = canManageResource(rData) ? `
                 <div class="flex gap-1 shrink-0 ml-1">
@@ -442,26 +439,21 @@
                     <button type="button" data-delete-resource="${rData.id}" class="text-[9px] px-1.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 hover:bg-red-600 hover:text-white font-bold">${t('btnDelete')}</button>
                 </div>` : "";
 
-            const titleBlock = viewUrl
-                ? `<a href="${viewUrl}" target="_blank" rel="noopener" class="flex-1 font-medium text-gray-800 hover:text-indigo-700 min-w-0">
-                        <i class="fa-solid ${icon} mr-1"></i>
-                        <span class="break-words">${escapeHtml(rData.title)}</span>
-                        <span class="text-[9px] text-gray-400 block">(${t('byAuthor')} ${escapeHtml(rData.author)})</span>
-                   </a>`
-                : `<div class="flex-1 min-w-0">
-                        <i class="fa-solid ${icon} mr-1"></i>
-                        <span class="break-words font-medium text-gray-800">${escapeHtml(rData.title)}</span>
-                        <span class="text-[9px] text-red-500 block">${t('fileLinkMissing')}</span>
-                   </div>`;
+            const viewBtn = canView
+                ? `<button type="button" data-view-resource="${rData.id}" class="inline-block mt-1 text-[9px] text-indigo-600 font-bold underline hover:text-indigo-900">${t('btnViewFile')}</button>`
+                : `<span class="inline-block mt-1 text-[9px] text-red-500">${t('fileLinkMissing')}</span>`;
 
             return `
                 <div class="p-2 bg-indigo-50/50 border border-indigo-100 rounded-md text-[11px]">
                     <div class="flex justify-between items-start gap-1">
-                        ${titleBlock}
+                        <div class="flex-1 min-w-0 font-medium text-gray-800">
+                            <i class="fa-solid ${icon} mr-1"></i>
+                            <span class="break-words">${escapeHtml(rData.title)}</span>
+                            <span class="text-[9px] text-gray-400 block">(${t('byAuthor')} ${escapeHtml(rData.author)})</span>
+                        </div>
                         ${manageBtns}
                     </div>
-                    ${preview}
-                    ${viewUrl ? `<a href="${viewUrl}" target="_blank" rel="noopener" class="inline-block mt-1 text-[9px] text-indigo-600 font-bold underline">${t('btnViewFile')}</a>` : ''}
+                    ${viewBtn}
                 </div>`;
         }
 
@@ -635,10 +627,21 @@
         window.refreshShareModalLabels = refreshShareModalLabels;
         window.triggerLockedUploadFlow = triggerLockedUploadFlow;
 
-        courseGrid.addEventListener('click', (e) => {
+        courseGrid.addEventListener('click', async (e) => {
             const uploadBtn = e.target.closest('[data-upload-course]');
             if (uploadBtn && !uploadBtn.disabled) {
                 triggerLockedUploadFlow(parseInt(uploadBtn.dataset.uploadCourse, 10));
+                return;
+            }
+            const viewBtn = e.target.closest('[data-view-resource]');
+            if (viewBtn) {
+                e.preventDefault();
+                try {
+                    const snap = await getDoc(doc(db, "resources", viewBtn.dataset.viewResource));
+                    if (!snap.exists()) return;
+                    const ok = await openResourceFile({ id: snap.id, ...snap.data() });
+                    if (!ok) alert(window.portalT('alertOpenFileFailed'));
+                } catch (err) { alert(err.message); }
                 return;
             }
             const editBtn = e.target.closest('[data-edit-resource]');
