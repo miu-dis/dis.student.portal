@@ -29,49 +29,93 @@
         </div>
     </nav>
 
-    <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white py-12 text-center shadow-inner">
+    <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white py-8 text-center shadow-inner">
         <div class="container mx-auto px-4">
-            <h2 id="heroTitle" class="text-3xl md:text-4xl font-extrabold mb-3">Islamic Studies Study Portal</h2>
-            <p id="heroSubtitle" class="text-emerald-100 text-lg max-w-xl mx-auto">An open platform for classmates to share notes, video lectures, and academic resources.</p>
+            <h2 id="heroTitle" class="text-2xl md:text-3xl font-extrabold mb-2">Islamic Studies Study Portal</h2>
+            <p id="heroSubtitle" class="text-emerald-100 text-sm max-w-xl mx-auto">An open platform for classmates to share notes, video lectures, and academic resources.</p>
         </div>
     </header>
 
-    <main class="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        <div class="lg:col-span-1 space-y-8">
-            <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-emerald-600">
-                <h3 id="lblNoticeBoard" class="text-xl font-bold text-gray-900 mb-4 flex items-center">📢 Notice Board</h3>
-                <div id="noticeList" class="space-y-4 overflow-y-auto max-h-60 p-1">
-                    <div class="p-3 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg">
-                        <p class="text-sm font-semibold text-gray-800">Loading notices...</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-amber-500">
-                <h3 id="lblDailyRoutine" class="text-xl font-bold text-gray-900 mb-4 flex items-center">⏳ Daily Routine Update</h3>
-                <div id="dailyRoutineList" class="space-y-3 overflow-y-auto max-h-80 p-1">
-                    <p class="text-sm text-gray-500">Loading today's updates...</p>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-teal-600">
-                <h3 id="lblPermanentRoutine" class="text-xl font-bold text-gray-900 mb-4 flex items-center">📅 Permanent Routine Board</h3>
-                <div id="permanentRoutineList" class="space-y-3 overflow-y-auto max-h-80 p-1">
-                    <p class="text-sm text-gray-500">Loading main board...</p>
-                </div>
+    <main class="container mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl shadow-md p-5 border-t-4 border-emerald-600">
+            <h3 id="lblNoticeBoard" class="text-lg font-bold text-gray-900 mb-3 flex items-center">📢 Notice Board</h3>
+            <div id="noticeList" class="space-y-3 overflow-y-auto max-h-48 p-1">
+                <p class="text-xs text-gray-400">Loading notices...</p>
             </div>
         </div>
 
-        <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+        <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-5 border-t-4 border-amber-500">
+            <h3 id="lblDailyRoutine" class="text-lg font-bold text-gray-900 mb-3 flex items-center">⏳ Daily Routine Update (আজকের সাময়িক রুটিন)</h3>
+            <div id="dailyRoutineList" class="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto max-h-48 p-1">
+                <p class="text-xs text-gray-400">Loading today's temporary updates...</p>
+            </div>
+        </div>
+    </main>
+
+    <section class="container mx-auto px-4 pb-12">
+        <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-teal-600">
+            <div class="border-b pb-3 mb-6">
+                <h3 id="lblPermanentRoutine" class="text-xl font-bold text-emerald-800 flex items-center">
+                    <i class="fa-solid fa-calendar-days mr-2 text-teal-600"></i> Permanent Weekly Schedule Routine Board (স্থায়ী সাপ্তাহিক মাস্টার রুটিন)
+                </h3>
+                <p class="text-xs text-gray-500 mt-1">সব বারের ক্লাস শিডিউল একনজরে নিচে সাজানো রয়েছে।</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="weeklyRoutineGrid">
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                    <h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 flex justify-between items-center">
+                        <span>Saturday (শনিবার)</span> <i class="fa-solid fa-clock-seven text-xs"></i>
+                    </h4>
+                    <div id="day-Saturday" class="space-y-2 text-xs text-gray-500">No classes scheduled.</div>
+                </div>
+
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                    <h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 flex justify-between items-center">
+                        <span>Sunday (রবিবার)</span> <i class="fa-solid fa-clock-seven text-xs"></i>
+                    </h4>
+                    <div id="day-Sunday" class="space-y-2 text-xs text-gray-500">No classes scheduled.</div>
+                </div>
+
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                    <h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 flex justify-between items-center">
+                        <span>Monday (সোমবার)</span> <i class="fa-solid fa-clock-seven text-xs"></i>
+                    </h4>
+                    <div id="day-Monday" class="space-y-2 text-xs text-gray-500">No classes scheduled.</div>
+                </div>
+
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                    <h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 flex justify-between items-center">
+                        <span>Tuesday (মঙ্গলবার)</span> <i class="fa-solid fa-clock-seven text-xs"></i>
+                    </h4>
+                    <div id="day-Tuesday" class="space-y-2 text-xs text-gray-500">No classes scheduled.</div>
+                </div>
+
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                    <h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 flex justify-between items-center">
+                        <span>Wednesday (বুধবার)</span> <i class="fa-solid fa-clock-seven text-xs"></i>
+                    </h4>
+                    <div id="day-Wednesday" class="space-y-2 text-xs text-gray-500">No classes scheduled.</div>
+                </div>
+
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                    <h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 flex justify-between items-center">
+                        <span>Thursday (বৃহস্পতিবার)</span> <i class="fa-solid fa-clock-seven text-xs"></i>
+                    </h4>
+                    <div id="day-Thursday" class="space-y-2 text-xs text-gray-500">No classes scheduled.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-4 pb-12">
+        <div class="bg-white rounded-xl shadow-md p-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 border-b border-gray-200 gap-2">
-                <h3 id="lblCourses" class="text-2xl font-bold text-emerald-800 mb-2 md:mb-0">Academic Courses</h3>
+                <h3 id="lblCourses" class="text-2xl font-bold text-emerald-800 mb-2 md:mb-0">Academic Courses & Handnotes</h3>
                 <select id="semesterFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none">
                     <option value="all" id="optAllSem">All Semesters</option>
                     <option value="1-1">1st Year - 1st Semester</option>
                 </select>
             </div>
-
             <div id="courseGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 flex flex-col justify-between hover:shadow-md transition">
                     <div>
@@ -86,8 +130,7 @@
                 </div>
             </div>
         </div>
-
-    </main>
+    </section>
 
     <script>
         const translations = {
@@ -97,17 +140,11 @@
                 lblNoticeBoard: "📢 Notice Board", lblDailyRoutine: "⏳ Daily Routine Update",
                 lblPermanentRoutine: "📅 Permanent Board", lblCourses: "Academic Courses", optAllSem: "All Semesters"
             },
-            ar: {
-                dir: "rtl", navTitle: "بوابة الدراسة DIS", btnNavLogin: "تسجيل الدخول / التسجيل",
-                heroTitle: "بوابة الدراسة لقسم الدراسات الإسلامية", heroSubtitle: "منصة مفتوحة للزملاء لمشاركة الملاحظات ومحاضرات الفيديو والموارد الأكاديمية.",
-                lblNoticeBoard: "📢 لوحة الإعلانات", lblDailyRoutine: "⏳ تحديث الجدول اليومي",
-                lblPermanentRoutine: "📅 جدول المواد الثابت", lblCourses: "المواد الأكاديمية", optAllSem: "جميع الفصول الدراسية"
-            },
             bn: {
                 dir: "ltr", navTitle: "ডিআইএস স্টাডি পোর্টাল", btnNavLogin: "লগইন / রেজিস্টার",
-                heroTitle: "ইসলামিক স্টাডিজ বিভাগ পোর্টাল", heroSubtitle: "সহপাঠীদের মাঝে ক্লাস নোট, ভিডিও লেকচার এবং একাডেমিক তথ্য শেয়ার করার উন্মুক্ত প্ল্যাটফর্ম।",
-                lblNoticeBoard: "📢 নোটিশ বোর্ড", lblDailyRoutine: "⏳ আজকের সাময়িক রুটিন",
-                lblPermanentRoutine: "📅 স্থায়ী মূল রুটিন বোর্ড", lblCourses: "একাডেমিক কোর্সসমূহ", optAllSem: "সব সেমিস্টার"
+                heroTitle: "ইসলামিক স্টাডিজ বিভাগ পোর্টাল", heroSubtitle: "সহপাঠীদের মাঝে ক্লাস নোট, ভিডিও লেকচার এবং একাডেমিক তথ্য শেয়ার করার উন্মুক্ত প্ল্যাটফর্ম।",
+                lblNoticeBoard: "📢 নোটিশ বোর্ড", lblDailyRoutine: "⏳ আজকের সাময়িক রুটিন",
+                lblPermanentRoutine: "📅 স্থায়ী সাপ্তাহিক মাস্টার রুটিন", lblCourses: "একাডেমিক কোর্সসমূহ", optAllSem: "সব সেমিস্টার"
             }
         };
 
@@ -116,17 +153,8 @@
         const navLogoTitle = document.getElementById('navLogoTitle');
 
         function applyLanguage(lang) {
-            const t = translations[lang];
+            const t = translations[lang] || translations['en'];
             document.body.dir = t.dir;
-            if(t.dir === "rtl") {
-                document.body.classList.add('text-right');
-                navContainer.classList.add('flex-row-reverse');
-                navLogoTitle.classList.add('flex-row-reverse', 'space-x-reverse');
-            } else {
-                document.body.classList.remove('text-right');
-                navContainer.classList.remove('flex-row-reverse');
-                navLogoTitle.classList.remove('flex-row-reverse', 'space-x-reverse');
-            }
             document.getElementById('navTitle').innerText = t.navTitle;
             if(document.getElementById('btnNavLogin')) document.getElementById('btnNavLogin').innerText = t.btnNavLogin;
             document.getElementById('heroTitle').innerText = t.heroTitle;
@@ -154,82 +182,96 @@
         import { collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const dailyContainer = document.getElementById('dailyRoutineList');
-        const permanentContainer = document.getElementById('permanentRoutineList');
-        const noticeContainer = document.getElementById('noticeList');
+        const daysWithClasses = { Saturday: false, Sunday: false, Monday: false, Tuesday: false, Wednesday: false, Thursday: false };
 
-        // ১. রুটিন ডাটা লাইভ পুশ লিসেনার
+        // রিয়েলটাইম রুটিন ডেটাবেজ লিসেনার
         onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
             dailyContainer.innerHTML = '';
-            permanentContainer.innerHTML = '';
+            
+            // সপ্তাহের প্রতিটা বারের কন্টেইনার আগে ফাঁকা বা রিসেট করে নেওয়া
+            Object.keys(daysWithClasses).forEach(day => {
+                document.getElementById(`day-${day}`).innerHTML = '';
+                daysWithClasses[day] = false;
+            });
+
             let hasDaily = false;
-            let hasPermanent = false;
 
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 const currentLang = localStorage.getItem('preferredLang') || 'en';
                 
-                // জেন্ডার টেক্সট ট্রান্সলেশন
-                let genderLabel = data.gender === 'Male' ? 'Male' : 'Female';
-                if(currentLang === 'bn') genderLabel = data.gender === 'Male' ? 'ভাইদের শাখা' : 'বোনদের শাখা';
-                if(currentLang === 'ar') genderLabel = data.gender === 'Male' ? 'قسم البنين' : 'قسم البنات';
+                let genderLabel = data.gender === 'Male' ? (currentLang === 'bn' ? 'ভাইদের শাখা' : 'Male') : (currentLang === 'bn' ? 'বোনদের শাখা' : 'Female');
 
-                const card = `
-                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl shadow-sm space-y-1">
-                        <div class="flex justify-between items-start">
-                            <h4 class="font-bold text-emerald-800 text-sm">${data.subject}</h4>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${data.gender === 'Male' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${genderLabel}</span>
+                // কম্প্যাক্ট টেবিল/ক্যালেন্ডার কার্ড ডিজাইন (একনজরে দেখার জন্য)
+                const cardHTML = `
+                    <div class="p-2.5 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-emerald-600 transition">
+                        <div class="flex justify-between items-center mb-1">
+                            <h5 class="font-extrabold text-emerald-800 text-sm">${data.subject}</h5>
+                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${data.gender === 'Male' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${genderLabel}</span>
                         </div>
-                        <div class="text-xs text-gray-600 grid grid-cols-2 gap-1">
-                            <p><b>Code:</b> ${data.courseCode}</p>
-                            <p><b>Room:</b> ${data.room}</p>
-                            <p><b>Batch:</b> ${data.batchNumber}</p>
-                            <p><b>Teacher:</b> ${data.teacherCode}</p>
+                        <div class="grid grid-cols-2 text-[11px] text-gray-600 gap-y-0.5 border-t border-dashed pt-1 mt-1">
+                            <p><i class="fa-solid fa-barcode text-gray-400 mr-1"></i><b>Code:</b> ${data.courseCode}</p>
+                            <p><i class="fa-solid fa-door-open text-gray-400 mr-1"></i><b>Room:</b> ${data.room}</p>
+                            <p><i class="fa-solid fa-user-tie text-gray-400 mr-1"></i><b>Tch:</b> ${data.teacherCode}</p>
+                            <p class="font-bold text-slate-700"><i class="fa-regular fa-clock text-emerald-600 mr-1"></i>${data.timeSlot}</p>
                         </div>
-                        <p class="text-xs font-bold text-slate-700 pt-1 border-t border-dashed border-slate-200"><i class="fa-regular fa-clock text-emerald-600 mr-1"></i> ${data.timeSlot}</p>
                     </div>
                 `;
 
+                // ১. যদি বোর্ড টাইপ 'daily' (সাময়িক) হয়
                 if (data.boardType === 'daily') {
-                    dailyContainer.innerHTML += card;
+                    dailyContainer.innerHTML += cardHTML;
                     hasDaily = true;
-                } else if (data.boardType === 'permanent') {
-                    permanentContainer.innerHTML += card;
-                    hasPermanent = true;
+                } 
+                // ২. যদি বোর্ড টাইপ 'permanent' (স্থায়ী) হয় এবং একটি নির্দিষ্ট বার সিলেক্ট থাকে
+                else if (data.boardType === 'permanent' && data.classDay && data.classDay !== "N/A") {
+                    const targetDayBox = document.getElementById(`day-${data.classDay}`);
+                    if (targetDayBox) {
+                        targetDayBox.innerHTML += cardHTML;
+                        daysWithClasses[data.classDay] = true;
+                    }
                 }
             });
 
-            if(!hasDaily) dailyContainer.innerHTML = '<p class="text-xs text-gray-400 p-2">No active daily adjustments.</p>';
-            if(!hasPermanent) permanentContainer.innerHTML = '<p class="text-xs text-gray-400 p-2">No permanent schedule uploaded.</p>';
+            // খালি বারের নোটিশ হ্যান্ডলিং
+            Object.keys(daysWithClasses).forEach(day => {
+                if (!daysWithClasses[day]) {
+                    document.getElementById(`day-${day}`).innerHTML = '<p class="text-xs text-gray-400 text-center py-2 bg-white/40 border border-dashed rounded-lg">No classes on this day.</p>';
+                }
+            });
+
+            if(!hasDaily) dailyContainer.innerHTML = '<p class="text-xs text-gray-400 col-span-2 p-2">No active daily adjustments for today.</p>';
         });
 
-        // ২. নোটিশ বোর্ড লাইভ পুশ লিসেনার
+        // নোটিশ বোর্ড লিসেনার
+        const noticeContainer = document.getElementById('noticeList');
         onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
             noticeContainer.innerHTML = '';
             if(snapshot.empty) {
-                noticeContainer.innerHTML = '<p class="text-xs text-gray-400 p-2">No notices found.</p>';
+                noticeContainer.innerHTML = '<p class="text-xs text-gray-400 p-1">No urgent notices found.</p>';
                 return;
             }
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 noticeContainer.innerHTML += `
-                    <div class="p-3 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm">
-                        <p class="text-sm font-medium text-gray-800">${data.content}</p>
+                    <div class="p-2.5 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm text-xs">
+                        <p class="font-medium text-gray-800">${data.content}</p>
                     </div>
                 `;
             });
         });
 
-        // ৩. ইউজার অথেনটিকেশন স্টেট হ্যান্ডেলার
+        // অথেনটিকেশন স্টেট হ্যান্ডেলার (লগআউট/প্যানেল বাটন)
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const currentLang = localStorage.getItem('preferredLang') || 'en';
-                const logoutText = currentLang === 'bn' ? 'লগআউট' : (currentLang === 'ar' ? 'تسجيل الخروج' : 'Logout');
-                const panelText = currentLang === 'bn' ? 'স্টুডেন্ট প্যানেল' : (currentLang === 'ar' ? 'لوحة الطلاب' : 'Student Panel');
+                const logoutText = currentLang === 'bn' ? 'লগআউট' : 'Logout';
+                const panelText = currentLang === 'bn' ? 'স্টুডেন্ট প্যানেল' : 'Student Panel';
 
                 document.getElementById('navAuthButtons').innerHTML = `
-                    <div class="flex items-center space-x-4 gap-2">
-                        <span class="text-sm bg-emerald-900 px-3 py-1 rounded-full text-emerald-200">${panelText}</span>
-                        <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg font-semibold transition shadow text-sm">${logoutText}</button>
+                    <div class="flex items-center space-x-3 gap-1">
+                        <span class="text-xs bg-emerald-900 px-3 py-1.5 rounded-full font-semibold text-emerald-200">${panelText}</span>
+                        <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg font-semibold transition shadow text-xs">${logoutText}</button>
                     </div>
                 `;
                 document.getElementById('logoutBtn').addEventListener('click', () => {
