@@ -28,7 +28,7 @@
     </nav>
 
     <div id="warningBanner" class="bg-red-600 text-white font-bold p-3 text-center hidden animate-bounce text-xs md:text-sm shadow-md">
-        ⚠️ Profile Incomplete!
+        ⚠️ আপনার প্রোফাইলটি অসম্পূর্ণ! অনুগ্রহ করে 'My Profile' বাটনে ক্লিক করে তথ্য সম্পূর্ণ করুন।
     </div>
 
     <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white py-8 text-center shadow-inner">
@@ -51,7 +51,7 @@
 
     <section class="container mx-auto px-4 pb-12">
         <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-teal-600">
-            <div class="border-b pb-3 mb-6"><h3 id="lblPermanentRoutine" class="text-xl font-bold text-emerald-800">📅 Permanent Weekly Schedule</h3></div>
+            <div class="border-b pb-3 mb-6"><h3 id="lblPermanentRoutine" class="text-xl font-bold text-emerald-800">📅 Permanent Weekly Schedule Board</h3></div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="weeklyRoutineGrid">
                 <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Saturday">Saturday</h4><div id="day-Saturday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
                 <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Sunday">Sunday</h4><div id="day-Sunday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
@@ -67,18 +67,18 @@
         <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-indigo-600">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 border-b border-gray-200 gap-3">
                 <div>
-                    <h3 id="lblCourses" class="text-2xl font-bold text-emerald-800 mb-0.5">Class Shared Resources & Handnotes</h3>
-                    <p class="text-xs text-gray-500 font-medium">সহপাঠীদের শেয়ার করা ড্রাইভ লিংক, ছবি, অডিও ও ভিডিও লেকচারের ভাণ্ডার।</p>
+                    <h3 id="lblCourses" class="text-2xl font-bold text-emerald-800 mb-0.5">Academic Resources Directory</h3>
+                    <p class="text-xs text-gray-500 font-medium" id="lblSubTitleCourses">সব সেমিস্টারের ফাইল দেখার উম্মুক্ত আর্কাইভ (আপলোড শুধুমাত্র নিজের সেমিস্টারে লকিং)।</p>
                 </div>
                 
-                <div class="flex items-center space-x-2 w-full md:w-auto gap-2">
+                <div class="flex items-center space-x-2 w-full md:w-auto gap-2 justify-end">
                     <select id="semesterFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg p-2.5 font-semibold text-emerald-800 outline-none"></select>
-                    <button id="btnShareResource" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2.5 rounded-lg shadow transition shrink-0"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Share Resource</button>
+                    <span id="displayStudentCurrentSem" class="bg-indigo-50 text-indigo-800 font-bold text-xs px-3 py-2 rounded-lg border border-indigo-200">Syncing Profile...</span>
                 </div>
             </div>
             
             <div id="courseGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <p class="text-xs text-gray-400 p-2">Loading shared resource database...</p>
+                <p class="text-xs text-gray-400 p-2">Loading academic course archive...</p>
             </div>
         </div>
     </section>
@@ -88,38 +88,28 @@
             <h3 id="sm_title" class="text-lg font-bold text-indigo-900 mb-4 border-b pb-2 flex items-center"><i class="fa-solid fa-folder-plus mr-2"></i> Share Study Material / Link</h3>
             <form id="resourceShareForm" class="space-y-3 text-xs">
                 <div>
-                    <label id="sm_name" class="block font-semibold text-gray-600 mb-1">Contributor Name (আপনার নাম)</label>
+                    <label id="sm_name" class="block font-semibold text-gray-600 mb-1">Contributor Name</label>
                     <input type="text" id="shareAuthor" required class="w-full p-2 border rounded">
                 </div>
                 <div>
-                    <label id="sm_topic" class="block font-semibold text-gray-600 mb-1">Topic / Subject Title (নোট বা লেকচারের নাম)</label>
+                    <label id="sm_topic" class="block font-semibold text-gray-600 mb-1">Topic / Subject Title</label>
                     <input type="text" id="shareTitle" required class="w-full p-2 border rounded" placeholder="e.g. উসুল আল-শাশী ১ম পরিচ্ছেদ নোট">
                 </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label id="sm_type" class="block font-semibold text-gray-600 mb-1">Resource Type (ধরণ)</label>
-                        <select id="shareType" required class="w-full p-2 border rounded bg-white">
-                            <option value="PDF/Handnote">PDF / Handnote</option>
-                            <option value="Video Lecture">Video / YouTube Link</option>
-                            <option value="Audio/Voice">Audio / Voice Clip</option>
-                            <option value="Image/Document">Image / Document</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label id="sm_sem" class="block font-semibold text-gray-600 mb-1">Target Trimester</label>
-                        <select id="shareSemester" required class="w-full p-2 border rounded bg-white">
-                            <option value="1st Year - 1st Sem">1st Year - 1st Sem</option>
-                            <option value="1st Year - 2nd Sem">1st Year - 2nd Sem</option>
-                            <option value="1st Year - 3rd Sem">1st Year - 3rd Sem</option>
-                            <option value="2nd Year - 1st Sem">2nd Year - 1st Sem</option>
-                            <option value="2nd Year - 2nd Sem">2nd Year - 2nd Sem</option>
-                            <option value="2nd Year - 3rd Sem">2nd Year - 3rd Sem</option>
-                        </select>
-                    </div>
+                <div>
+                    <label id="sm_type" class="block font-semibold text-gray-600 mb-1">Resource Type</label>
+                    <select id="shareType" required class="w-full p-2 border rounded bg-white">
+                        <option value="PDF/Handnote">PDF / Handnote</option>
+                        <option value="Video Lecture">Video / YouTube Link</option>
+                        <option value="Audio/Voice">Audio / Voice Clip</option>
+                        <option value="Image/Document">Image / Document</option>
+                    </select>
+                </div>
+                <div class="bg-indigo-50 p-2.5 rounded-lg text-indigo-900 font-medium text-[11px] border border-indigo-200">
+                    🔒 এই ফাইলটি অটোমেটিক আপনার নিজের রানিং সেমিস্টার <b id="lockedSemLabel">...</b> এ লক হয়ে পাবলিশ হবে।
                 </div>
                 <div>
-                    <label id="sm_url" class="block font-semibold text-gray-600 mb-1">Resource Cloud Link (ড্রাইভ, ইউটিউব বা অডিও লিংক)</label>
-                    <input type="url" id="shareUrl" required class="w-full p-2 border border-indigo-300 rounded focus:outline-indigo-600 text-blue-600 font-mono" placeholder="https://drive.google.com/... অথবা https://youtube.com/...">
+                    <label id="sm_url" class="block font-semibold text-gray-600 mb-1">Resource Cloud Link</label>
+                    <input type="url" id="shareUrl" required class="w-full p-2 border border-indigo-300 rounded text-blue-600 font-mono" placeholder="https://drive.google.com/...">
                 </div>
                 <div class="flex justify-end space-x-2 pt-2 border-t">
                     <button type="button" onclick="closeShareModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold transition" id="sm_cancel">Cancel</button>
@@ -132,17 +122,49 @@
     <div id="profileModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative max-h-[90vh] overflow-y-auto">
             <h3 id="m_title" class="text-lg font-bold text-emerald-800 mb-4 border-b pb-2 flex items-center"><i class="fa-solid fa-id-card mr-2"></i> My Personal Profile Card</h3>
+            
             <form id="profileEditForm" class="space-y-3 text-xs">
                 <div class="flex items-center space-x-4 bg-slate-50 p-2.5 rounded-xl border border-dashed">
-                    <img id="avatarPreview" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="h-16 w-16 rounded-full object-cover border-2 border-emerald-700" alt="Avatar">
+                    <img id="avatarPreview" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="h-16 w-16 rounded-full object-cover border-2 border-emerald-700 shadow-sm" alt="Avatar">
                     <div><label id="m_pic" class="block font-semibold text-gray-700 mb-1">Upload Profile Picture</label><input type="file" id="profilePicFile" accept="image/*" class="w-full text-xs text-gray-500"></div>
                 </div>
+
                 <div class="grid grid-cols-2 gap-2">
-                    <div><label id="m_name" class="block font-semibold text-gray-600 mb-0.5">Full Name</label><input type="text" id="editProfileName" required class="w-full p-2 border rounded text-gray-700"></div>
+                    <div class="col-span-2"><label id="m_name" class="block font-semibold text-gray-600 mb-0.5">Full Name</label><input type="text" id="editProfileName" required class="w-full p-2 border rounded text-gray-700"></div>
                     <div><label id="m_uid" class="block font-semibold text-gray-600 mb-0.5">University ID (UID)</label><input type="text" id="editProfileUID" required class="w-full p-2 border rounded text-gray-700"></div>
                     <div><label id="m_batch" class="block font-semibold text-gray-600 mb-0.5">Batch Number</label><input type="text" id="editProfileBatch" required class="w-full p-2 border rounded text-gray-700"></div>
-                    <div><label id="m_trim" class="block font-semibold text-gray-600 mb-0.5">Trimester</label><input type="text" id="editProfileSemester" required class="w-full p-2 border rounded text-gray-700"></div>
                 </div>
+
+                <div class="bg-slate-100 p-3 rounded-xl border space-y-2">
+                    <p id="m_academic_title" class="font-bold text-slate-700 text-[11px]"><i class="fa-solid fa-graduation-cap mr-1"></i> Academic Session Status</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] text-gray-500 font-semibold">Year (বর্ষ)</label>
+                            <select id="editProfileYear" required class="w-full p-1.5 border rounded bg-white text-gray-700">
+                                <option value="1st Year">1st Year</option><option value="2nd Year">2nd Year</option><option value="3rd Year">3rd Year</option><option value="4th Year">4th Year</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-gray-500 font-semibold">Trimester Term (সেমিস্টার নং)</label>
+                            <select id="editProfileTermNum" required class="w-full p-1.5 border rounded bg-white text-gray-700">
+                                <option value="1st Trimester">1st Trimester</option><option value="2nd Trimester">2nd Trimester</option><option value="3rd Trimester">3rd Trimester</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-gray-500 font-semibold">Admission Session (সেশন)</label>
+                            <select id="editProfileTerm" required class="w-full p-1.5 border rounded bg-white text-gray-700">
+                                <option value="Spring">Spring</option><option value="Summer">Summer</option><option value="Fall">Fall</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-gray-500 font-semibold">Session Year (সাল)</label>
+                            <select id="editProfileSessionYear" required class="w-full p-1.5 border rounded bg-white text-gray-700">
+                                <option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-200 space-y-2.5">
                     <p id="m_emg_title" class="font-bold text-amber-800 text-[11px]">⚠️ Emergency Data</p>
                     <div><label id="m_phone" class="block font-semibold text-gray-700 mb-0.5">My Mobile Number</label><input type="tel" id="editProfilePhone" required class="w-full p-2 border border-gray-300 rounded"></div>
@@ -156,16 +178,15 @@
                     <div><label id="m_emg_name" class="block font-semibold text-gray-700 mb-0.5">Emergency Contact Name</label><input type="text" id="editProfileEmergencyName" required class="w-full p-2 border border-gray-300 rounded"></div>
                     <div><label id="m_emg_phone" class="block font-semibold text-gray-700 mb-0.5">Emergency Contact Mobile No</label><input type="tel" id="editProfileEmergencyPhone" required class="w-full p-2 border border-gray-300 rounded"></div>
                 </div>
+
                 <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-200 space-y-2">
                     <p id="m_pass_title" class="font-bold text-blue-800 text-[11px]">🔒 Change Password</p>
-                    <div>
-                        <label id="m_pass" class="block font-semibold text-gray-700 mb-0.5">New Password</label>
-                        <div class="relative">
-                            <input type="password" id="newProfilePassword" class="w-full p-2 border border-gray-300 rounded pr-10" placeholder="Min. 6 characters">
-                            <button type="button" onclick="toggleProfilePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"><i id="eyeIconProfile" class="fa-solid fa-eye-slash"></i></button>
-                        </div>
+                    <div class="relative">
+                        <input type="password" id="newProfilePassword" class="w-full p-2 border border-gray-300 rounded pr-10" placeholder="Min. 6 characters">
+                        <button type="button" onclick="toggleProfilePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"><i id="eyeIconProfile" class="fa-solid fa-eye-slash"></i></button>
                     </div>
                 </div>
+
                 <div class="flex justify-end space-x-2 pt-2 border-t">
                     <button type="button" id="btnCancelProfile" onclick="closeProfileModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold transition">Cancel</button>
                     <button type="submit" id="btnSaveProfileText" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-semibold transition">Save Profile Info</button>
@@ -175,27 +196,26 @@
     </div>
 
     <script>
-        function toggleProfilePassword() {
-            const input = document.getElementById('newProfilePassword'); const icon = document.getElementById('eyeIconProfile');
-            if (input.type === "password") { input.type = "text"; icon.className = "fa-solid fa-eye"; } else { input.type = "password"; icon.className = "fa-solid fa-eye-slash"; }
-        }
-
         const translations = {
             en: {
-                navTitle: "DIS Study Portal", btnNavLogin: "Login / Register", warningBanner: "⚠️ Profile Incomplete! Mobile & Blood group mandatory.",
-                heroTitle: "Islamic Studies Study Portal", heroSubtitle: "An open platform for classmates to share resources.", lblNoticeBoard: "📢 Notice Board",
-                lblDailyRoutine: "⏳ Daily Routine Update", lblPermanentRoutine: "📅 Permanent Weekly Schedule Board", lblCourses: "Class Shared Resources & Handnotes",
-                sat: "Saturday", sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", fri: "Friday", filterAll: "All Semesters (সব সেমিস্টার)",
-                btnShareResource: "Share Resource", sm_title: "Share Study Material / Link", sm_name: "Contributor Name", sm_topic: "Topic / Subject Title",
-                sm_type: "Resource Type", sm_sem: "Target Trimester", sm_url: "Resource Cloud Link", sm_cancel: "Cancel", sm_submit: "Publish Live"
+                navTitle: "DIS Study Portal", btnNavLogin: "Login / Register", warningBanner: "⚠️ Profile Incomplete! Mandatory fields are empty.",
+                heroTitle: "Islamic Studies Study Portal", heroSubtitle: "Academic matrix open directory server.", lblNoticeBoard: "📢 Notice Board",
+                lblDailyRoutine: "⏳ Daily Routine Update", lblPermanentRoutine: "📅 Permanent Weekly Schedule Board", lblCourses: "Class Shared Resources Archive",
+                sat: "Saturday", sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", fri: "Friday",
+                m_title: "My Personal Profile Card", m_pic: "Upload Profile Picture", m_name: "Full Name", m_uid: "University ID (UID)",
+                m_batch: "Batch Number", m_academic_title: "Academic Trimester Status (Year/Term/Session/Year)", m_emg_title: "⚠️ Emergency Data (Compulsory)", m_phone: "My Mobile Number",
+                m_emg_name: "Emergency Contact Name", m_emg_phone: "Emergency Contact Mobile No", m_pass_title: "🔒 Change Password (Optional)",
+                btnCancelProfile: "Cancel", btnSaveProfileText: "Save Profile Info", sm_title: "Share Study Material / Link", sm_name: "Contributor Name", sm_topic: "Topic / Subject Title", sm_type: "Resource Type", sm_cancel: "Cancel", sm_submit: "Publish Live"
             },
             bn: {
-                navTitle: "ডিআইএস স্টাডি পোর্টাল", btnNavLogin: "লগইন / রেজিস্টার", warningBanner: "⚠️ আপনার প্রোফাইলটি অসম্পূর্ণ! এমার্জেন্সি কন্টাক্ট এবং ব্লাড গ্রুপ পূরণ করা বাধ্যতামূলক।",
-                heroTitle: "ইসলামিক স্টাডিজ বিভাগ পোর্টাল", heroSubtitle: "সহপাঠীদের মাঝে ক্লাস নোট এবং লেকচার শেয়ার করার উন্মুক্ত প্ল্যাটফর্ম।", lblNoticeBoard: "📢 নোটিশ বোর্ড",
-                lblDailyRoutine: "⏳ আজকের সাময়িক রুটিন", lblPermanentRoutine: "📅 স্থায়ী সাপ্তাহিক মাস্টার রুটিন বোর্ড", lblCourses: "ক্লাস শেয়ারড রিসোর্স ও হ্যান্ডনোটসমূহ",
-                sat: "Saturday (শনিবার)", sun: "Sunday (রবিবার)", mon: "Monday (সোমবার)", tue: "Tuesday (মঙ্গলবার)", wed: "Wednesday (বুধবার)", fri: "Friday (শুক্রবার)", filterAll: "সব সেমিস্টার",
-                btnShareResource: "নোট/লিংক শেয়ার করুন", sm_title: "স্টাডি মেটেরিয়াল / লিংক শেয়ার করুন", sm_name: "আপনার নাম", sm_topic: "নোট বা লেকচারের নাম",
-                sm_type: "রিসোর্সের ধরণ", sm_sem: "সেমিস্টার সিলেক্ট করুন", sm_url: "রিসোর্স ক্লাউড লিংক", sm_cancel: "বাতিল", sm_submit: "লাইভ পাবলিশ করুন"
+                navTitle: "ডিআইএস স্টাডি পোর্টাল", btnNavLogin: "লগইন / রেজিস্টার", warningBanner: "⚠️ আপনার প্রোফাইলটি অসম্পূর্ণ! অনুগ্রহ করে 'My Profile' বাটনে ক্লিক করে তথ্য সম্পূর্ণ করুন।",
+                heroTitle: "ইসলামিক স্টাডিজ বিভাগ পোর্টাল", heroSubtitle: "সহপাঠীদের মাঝে ক্লাস নোট এবং লেকচার শেয়ার করার উন্মুক্ত আর্কাইভ।", lblNoticeBoard: "📢 নোটিশ বোর্ড",
+                lblDailyRoutine: "⏳ আজকের সাময়িক রুটিন", lblPermanentRoutine: "📅 স্থায়ী সাপ্তাহিক মাস্টার রুটিন বোর্ড", lblCourses: "একাডেমিক কোর্স ও শেয়ারড রিসোর্স আর্কাইভ",
+                sat: "Saturday (শনিবার)", sun: "Sunday (রবিবার)", mon: "Monday (সোমবার)", tue: "Tuesday (মঙ্গলবার)", wed: "Wednesday (বুধবার)", fri: "Friday (শুক্রবার)",
+                m_title: "আমার প্রোফাইল ইনফো কার্ড", m_pic: "প্রোফাইল পিকচার আপলোড (ঐচ্ছিক)", m_name: "পূর্ণ নাম", m_uid: "ইউনিভার্সিটি আইডি (UID)",
+                m_batch: "ব্যাচ নম্বর", m_academic_title: "একাডেমিক সেশন (বর্ষ / সেমিস্টার নং / সেশন / সাল)", m_emg_title: "⚠️ জরুরী কন্টাক্ট তথ্য (বাধ্যতামূলক)", m_phone: "আমার মোবাইল নম্বর",
+                m_emg_name: "জরুরী যোগাযোগ ব্যক্তির নাম", m_emg_phone: "জরুরী যোগাযোগ মোবাইল নম্বর", m_pass_title: "🔒 পাসওয়ার্ড পরিবর্তন (ঐচ্ছিক)",
+                btnCancelProfile: "বাতিল করুন", btnSaveProfileText: "প্রোফাইল সেভ করুন", sm_title: "স্টাডি মেটেরিয়াল / লিংক শেয়ার করুন", sm_name: "আপনার নাম", sm_topic: "নোট বা লেকচারের নাম", sm_type: "রিসোর্সের ধরণ", sm_cancel: "বাতিল", sm_submit: "লাইভ পাবলিশ করুন"
             }
         };
 
@@ -210,20 +230,24 @@
             document.getElementById('lblDailyRoutine').innerText = t.lblDailyRoutine;
             document.getElementById('lblPermanentRoutine').innerText = t.lblPermanentRoutine;
             document.getElementById('lblCourses').innerText = t.lblCourses;
-            if(document.getElementById('btnShareResource')) document.getElementById('btnShareResource').innerText = t.btnShareResource;
 
             document.getElementById('dayLabel-Saturday').innerText = t.sat; document.getElementById('dayLabel-Sunday').innerText = t.sun;
             document.getElementById('dayLabel-Monday').innerText = t.mon; document.getElementById('dayLabel-Tuesday').innerText = t.tue;
             document.getElementById('dayLabel-Wednesday').innerText = t.wed; document.getElementById('dayLabel-Friday').innerText = t.fri;
 
-            // শেয়ার মডাল টেক্সট সিঙ্ক
+            document.getElementById('m_title').innerHTML = `<i class="fa-solid fa-id-card mr-2"></i> ` + t.m_title;
+            document.getElementById('m_pic').innerText = t.m_pic; document.getElementById('m_name').innerText = t.m_name;
+            document.getElementById('m_uid').innerText = t.m_uid; document.getElementById('m_batch').innerText = t.m_batch;
+            document.getElementById('m_academic_title').innerHTML = `<i class="fa-solid fa-graduation-cap mr-1"></i> ` + t.m_academic_title;
+            document.getElementById('m_emg_title').innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> ` + t.m_emg_title;
+            document.getElementById('m_phone').innerText = t.m_phone; document.getElementById('m_emg_name').innerText = t.m_emg_name;
+            document.getElementById('m_emg_phone').innerText = t.m_emg_phone; document.getElementById('m_pass_title').innerHTML = `<i class="fa-solid fa-lock mr-1"></i> ` + t.m_pass_title;
+            document.getElementById('btnCancelProfile').innerText = t.btnCancelProfile; document.getElementById('btnSaveProfileText').innerText = t.btnSaveProfileText;
+
             document.getElementById('sm_title').innerHTML = `<i class="fa-solid fa-folder-plus mr-2"></i> ` + t.sm_title;
             document.getElementById('sm_name').innerText = t.sm_name; document.getElementById('sm_topic').innerText = t.sm_topic;
-            document.getElementById('sm_type').innerText = t.sm_type; document.getElementById('sm_sem').innerText = t.sm_sem;
-            document.getElementById('sm_url').innerText = t.sm_url; document.getElementById('sm_cancel').innerText = t.sm_cancel;
+            document.getElementById('sm_type').innerText = t.sm_type; document.getElementById('sm_cancel').innerText = t.sm_cancel;
             document.getElementById('sm_submit').innerText = t.sm_submit;
-
-            document.getElementById('semesterFilter').innerHTML = `<option value="all">${t.filterAll}</option><option value="1st Year - 1st Sem">1st Year - 1st Sem</option><option value="1st Year - 2nd Sem">1st Year - 2nd Sem</option><option value="1st Year - 3rd Sem">1st Year - 3rd Sem</option><option value="2nd Year - 1st Sem">2nd Year - 1st Sem</option><option value="2nd Year - 2nd Sem">2nd Year - 2nd Sem</option><option value="2nd Year - 3rd Sem">2nd Year - 3rd Sem</option>`;
         }
 
         const langSelector = document.getElementById('langSelector');
@@ -234,6 +258,8 @@
 
         window.openShareModal = () => { document.getElementById('shareModal').className = "fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm"; };
         window.closeShareModal = () => { document.getElementById('shareModal').className = "fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50"; };
+        function toggleProfilePassword() { const input = document.getElementById('newProfilePassword'); const icon = document.getElementById('eyeIconProfile'); if (input.type === "password") { input.type = "text"; icon.className = "fa-solid fa-eye"; } else { input.type = "password"; icon.className = "fa-solid fa-eye-slash"; } }
+        window.toggleProfilePassword = toggleProfilePassword;
     </script>
 
     <script type="module">
@@ -242,57 +268,90 @@
         import { collection, onSnapshot, query, orderBy, doc, getDoc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         let loggedInUserUID = null; let isProfileIncomplete = false; let base64PicString = "";
+        let studentCurrentTrimesterKey = ""; // স্টুডেন্টের রানিং লক কী (যেমন: "1st Year - 2nd Trimester (Spring 2026)")
         const dailyContainer = document.getElementById('dailyRoutineList');
         const courseGrid = document.getElementById('courseGrid');
         const daysWithClasses = { Saturday: false, Sunday: false, Monday: false, Tuesday: false, Wednesday: false, Friday: false };
 
-        // ১. ফায়ারস্টোর ক্লাউড থেকে আসা লাইভ রিসোর্স লোডার (ডাইনামিক ফিল্টার সহ)
-        function listenToLiveResources(selectedSemester) {
+        // ১. গ্লোবাল আর্কাইভ ফিল্টার লুপ (সবাই সবার ফাইল দেখতে পারবে)
+        async function listenToGlobalArchiveStream(selectedTrimesterKey) {
+            // সিলেক্টেড সেমিস্টারে কোন কোন কোর্স আছে তা অ্যাডমিন ডক থেকে নেওয়া
+            const mapDoc = await getDoc(doc(db, "course_mappings", selectedTrimesterKey));
+            let mappedCourses = [];
+            if(mapDoc.exists()) mappedCourses = mapDoc.data().courses || [];
+
             onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snapshot) => {
                 courseGrid.innerHTML = '';
-                let hasData = false;
                 const currentLang = localStorage.getItem('preferredLang') || 'en';
 
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    if(selectedSemester !== "all" && data.semester !== selectedSemester) return;
+                if(mappedCourses.length === 0) {
+                    courseGrid.innerHTML = `<p class="text-xs text-gray-400 col-span-3 p-6 text-center border border-dashed rounded-xl w-full">${currentLang === 'bn' ? 'এই সেমিস্টারের কোনো সিল্যাবস বা কোর্স অ্যাডমিন প্যানেল থেকে ম্যাপ করা হয়নি।' : 'No active courses mapped for this semester session by admin yet.'}</p>`;
+                    return;
+                }
 
-                    hasData = true;
-                    // রিসোর্সের ধরণ অনুযায়ী আইকন ম্যাপিং
-                    let icon = "fa-file-pdf text-red-500";
-                    if(data.type.includes("Video")) icon = "fa-video text-blue-500";
-                    if(data.type.includes("Audio")) icon = "fa-microphone text-purple-500";
-                    if(data.type.includes("Image")) icon = "fa-image text-amber-500";
+                mappedCourses.forEach(course => {
+                    let sharedItemsHTML = "";
+                    snapshot.forEach(resDoc => {
+                        const rData = resDoc.data();
+                        if(rData.courseCode === course.code && rData.semester === selectedTrimesterKey) {
+                            let icon = "fa-file-pdf text-red-500";
+                            if(rData.type.includes("Video")) icon = "fa-video text-blue-500";
+                            if(rData.type.includes("Audio")) icon = "fa-microphone text-purple-500";
+                            if(rData.type.includes("Image")) icon = "fa-image text-amber-500";
+
+                            sharedItemsHTML += `
+                                <a href="${rData.url}" target="_blank" class="flex justify-between items-center p-2 bg-indigo-50/50 border border-indigo-100 rounded-md hover:bg-indigo-100 transition text-[11px] font-medium text-gray-700">
+                                    <span class="truncate"><i class="fa-solid ${icon} mr-1"></i> ${rData.title} <span class="text-[9px] text-gray-400 font-normal">(By: ${rData.author})</span></span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-indigo-500 shrink-0"></i>
+                                </a>`;
+                        }
+                    });
+
+                    if(sharedItemsHTML === "") sharedItemsHTML = `<p class="text-[10px] text-gray-400 italic p-1">No shared files ready.</p>`;
+
+                    // আপলোড লক মেকানিজম ভ্যালিডেশন চেক
+                    const isMyOwnSemester = (selectedTrimesterKey === studentCurrentTrimesterKey);
+                    const btnColorClass = isMyOwnSemester ? "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-600 hover:text-white" : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed";
 
                     courseGrid.innerHTML += `
-                        <div class="border border-gray-200 rounded-xl p-4 bg-gray-50 flex flex-col justify-between hover:shadow-md hover:border-indigo-600 transition animate-in fade-in duration-200">
+                        <div class="border border-gray-200 rounded-xl p-4 bg-gray-50 flex flex-col justify-between hover:shadow-md hover:border-indigo-600 transition duration-200">
                             <div>
                                 <div class="flex justify-between items-start">
-                                    <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1"><i class="fa-solid ${icon}"></i> ${data.type}</span>
-                                    <span class="text-[9px] text-slate-400 font-medium">${data.semester}</span>
+                                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded">${course.code}</span>
+                                    <span class="text-[9px] bg-slate-200 font-bold px-1.5 py-0.5 rounded text-slate-700">${course.termGroup || 'Active'}</span>
                                 </div>
-                                <h4 class="text-base font-extrabold text-gray-800 mt-2">${data.title}</h4>
-                                <p class="text-xs text-gray-500 mt-1"><i class="fa-solid fa-circle-user mr-1 text-slate-400"></i>Shared by: <b>${data.author}</b></p>
+                                <h4 class="text-base font-extrabold text-gray-800 mt-2">${course.title}</h4>
+                                <p class="text-xs text-gray-500 mt-1 mb-3"><i class="fa-solid fa-user-tie mr-1 text-slate-400"></i>${currentLang === 'bn' ? 'ফ্যাকাল্টি' : 'Faculty'}: ${course.teacher}</p>
+                                <div class="space-y-1.5 border-t border-dashed pt-2.5">
+                                    ${sharedItemsHTML}
+                                </div>
                             </div>
-                            <div class="mt-4 pt-3 border-t border-gray-200 flex justify-end">
-                                <a href="${data.url}" target="_blank" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white text-center font-bold text-xs py-2 rounded-lg transition flex items-center justify-center gap-1.5 shadow-sm">
-                                    <i class="fa-solid fa-arrow-up-right-from-square"></i> ${currentLang === 'bn' ? 'ওপেন ফাইল / লিংক' : 'Open Resource Link'}
-                                </a>
+                            <div class="mt-4 pt-2.5 flex">
+                                <button onclick="triggerLockedUploadFlow('${course.code}', '${course.title}', ${isMyOwnSemester})" class="w-full ${btnColorClass} border text-center font-bold text-xs py-1.5 rounded-lg transition flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-plus-circle"></i> ${currentLang === 'bn' ? 'নোট / লিংক যোগ করুন' : 'Add Resource Link'}
+                                </button>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
-
-                if(!hasData) {
-                    courseGrid.innerHTML = `<p class="text-xs text-gray-400 col-span-3 p-6 text-center border border-dashed rounded-xl w-full">${currentLang === 'bn' ? 'এই সেমিস্টারের কোনো নোট বা লিংক এখনো কন্ট্রিবিউট করা হয়নি।' : 'No active study resources shared for this semester yet.'}</p>`;
-                }
             });
         }
 
-        // সেমিস্টার ফিল্টার লিসেনার অ্যাকশন
-        document.getElementById('semesterFilter').addEventListener('change', (e) => { listenToLiveResources(e.target.value); });
+        // ২. আপলোড লক বাটন প্রোটেকশন গেটওয়ে ট্র্যাকার
+        window.triggerLockedUploadFlow = (courseCode, courseTitle, isAllowed) => {
+            if(!isAllowed) {
+                alert("🔴 এক্সেস লক! আপনি শুধু আপনার নিজের রানিং সেমিস্টারের ফাইল আপলোড করতে পারবেন। অন্য সেমিস্টারের ফাইল শুধুমাত্র দেখার অনুমতি রয়েছে।");
+                return;
+            }
+            document.getElementById('shareTitle').value = `${courseTitle} - `;
+            document.getElementById('lockedSemLabel').innerText = studentCurrentTrimesterKey;
+            document.getElementById('resourceShareForm').dataset.lockedCode = courseCode;
+            openShareModal();
+        };
 
-        // ২. স্টুডেন্টদের নতুন রিসোর্স ক্লাউডে রাইট করা (Submit Handler)
+        // ড্রপডাউন আর্কাইভ লিসেনার ফিল্টার চেঞ্জার
+        document.getElementById('semesterFilter').addEventListener('change', (e) => { listenToGlobalArchiveStream(e.target.value); });
+
+        // ৩. স্টুডেন্ট ফাইল ক্লাউড কন্ট্রিবিউশন আপলোডার
         document.getElementById('resourceShareForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             try {
@@ -300,64 +359,125 @@
                     author: document.getElementById('shareAuthor').value.trim(),
                     title: document.getElementById('shareTitle').value.trim(),
                     type: document.getElementById('shareType').value,
-                    semester: document.getElementById('shareSemester').value,
+                    courseCode: document.getElementById('resourceShareForm').dataset.lockedCode,
+                    semester: studentCurrentTrimesterKey, // অটো লকড ব্যাকএন্ড কী
                     url: document.getElementById('shareUrl').value.trim(),
                     createdAt: new Date().toISOString()
                 });
-                alert("Thank you! Your resource has been published live.");
+                alert("Published Live successfully onto your running trimester board!");
                 document.getElementById('resourceShareForm').reset();
                 closeShareModal();
-            } catch (err) { alert("Upload error: " + err.message); }
+            } catch (err) { alert(err.message); }
         });
 
-        // ৩. রুটিন ও নোটিশ লিসেনার (পূর্বের কোড বহাল)
+        // ৪. রুটিন ও নোটিশ লিসেনার (১০০% সচল)
         onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
-            dailyContainer.innerHTML = '';
-            Object.keys(daysWithClasses).forEach(day => { const el = document.getElementById(`day-${day}`); if(el) el.innerHTML = ''; daysWithClasses[day] = false; });
-            let hasDaily = false;
+            dailyContainer.innerHTML = ''; Object.keys(daysWithClasses).forEach(day => { const el = document.getElementById(`day-${day}`); if(el) el.innerHTML = ''; daysWithClasses[day] = false; });
             snapshot.forEach((doc) => {
                 const data = doc.data(); const currentLang = localStorage.getItem('preferredLang') || 'en';
                 let genderLabel = data.gender === 'Male' ? (currentLang === 'bn' ? 'ভাইদের শাখা' : 'Male') : (currentLang === 'bn' ? 'বোনদের শাখা' : 'Female');
-                const cardHTML = `<div class="p-2.5 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-emerald-600 transition"><div class="flex justify-between items-center mb-0.5"><h5 class="font-extrabold text-emerald-800 text-sm">${data.subject}</h5><span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${data.gender === 'Male' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${genderLabel}</span></div><div class="mb-1 text-[11px] text-amber-700 font-bold"><i class="fa-solid fa-users text-amber-500 mr-1"></i>${currentLang === 'bn' ? 'ব্যাচ' : 'Batch'}: ${data.batchNumber}</div><div class="grid grid-cols-2 text-[11px] text-gray-600 gap-y-0.5 border-t border-dashed pt-1 mt-1"><p><b>Code:</b> ${data.courseCode}</p><p><b>Room:</b> ${data.room}</p><p class="text-emerald-700 font-bold col-span-2"><b>Teacher:</b> ${data.teacherCode}</p><p class="font-bold text-slate-700 col-span-2 mt-0.5"><i class="fa-regular fa-clock text-emerald-600 mr-1"></i>${data.timeSlot}</p></div></div>`;
+                const cardHTML = `<div class="p-2.5 bg-white border border-slate-200 rounded-lg shadow-sm text-xs"><div class="flex justify-between items-center mb-0.5"><h5 class="font-extrabold text-emerald-800 text-sm">${data.subject}</h5><span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${data.gender === 'Male' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${genderLabel}</span></div><div class="mb-1 text-[11px] text-amber-700 font-bold">Batch: ${data.batchNumber}</div><div class="grid grid-cols-2 text-[11px] text-gray-600 gap-y-0.5 border-t border-dashed pt-1 mt-1"><p><b>Code:</b> ${data.courseCode}</p><p><b>Room:</b> ${data.room}</p><p class="text-emerald-700 font-bold col-span-2"><b>Teacher:</b> ${data.teacherCode}</p><p class="font-bold text-slate-700 col-span-2 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${data.timeSlot}</p></div></div>`;
                 if (data.boardType === 'daily') { dailyContainer.innerHTML += cardHTML; hasDaily = true; } 
                 else if (data.boardType === 'permanent' && data.classDay && data.classDay !== "N/A") { const el = document.getElementById(`day-${data.classDay}`); if (el) { el.innerHTML += cardHTML; daysWithClasses[data.classDay] = true; } }
             });
             Object.keys(daysWithClasses).forEach(day => { if (!daysWithClasses[day]) document.getElementById(`day-${day}`).innerHTML = '<p class="text-xs text-gray-400 text-center py-2 bg-white/40 border border-dashed rounded-lg">No classes.</p>'; });
-            if(!hasDaily) dailyContainer.innerHTML = '<p class="text-xs text-gray-400 col-span-2 p-2">No active daily updates.</p>';
+        });
+        onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
+            const noticeContainer = document.getElementById('noticeList'); noticeContainer.innerHTML = '';
+            snapshot.forEach((doc) => { const data = doc.data(); noticeContainer.innerHTML += `<div class="p-2.5 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm text-xs"><p class="font-medium text-gray-800">${data.content}</p></div>`; });
         });
 
-        // ৪. সিকিউরিটি গার্ড এবং বাটন অ্যাক্টিভেশন
+        // ৫. অল-ইন-ওয়ান ৪-বক্স ড্রপডাউন সেমিস্টার কী সিঙ্ক জেনারেটর
+        function buildDynamicTrimesterOptionsList() {
+            const filter = document.getElementById('semesterFilter');
+            filter.innerHTML = '';
+            const years = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+            const terms = ["1st Trimester", "2nd Trimester", "3rd Trimester"];
+            const sessions = ["Spring", "Summer", "Fall"];
+            
+            // ২০২৬ থেকে ২০৩০ সালের জন্য গ্লোবাল আর্কাইভ ম্যাপ ড্রপডাউন জেনারেট করা
+            for(let year of [2026, 2027, 2028]) {
+                sessions.forEach(sess => {
+                    years.forEach(yr => {
+                        terms.forEach(termNum => {
+                            const key = `${yr} - ${termNum} (${sess} ${year})`;
+                            const opt = document.createElement('option');
+                            opt.value = key; opt.innerText = key;
+                            filter.appendChild(opt);
+                        });
+                    });
+                });
+            }
+        }
+
+        // ৬. প্রোফাইল ভ্যালিডেশন এবং সেশন এসাইনমেন্ট
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 loggedInUserUID = user.uid;
                 const userDoc = await getDoc(doc(db, "users", loggedInUserUID));
+                
                 if(userDoc.exists()) {
                     const uData = userDoc.data();
                     if (uData.role === 'admin') { window.location.replace("./admin-dashboard.html"); return; }
-                    if(!uData.phone || !uData.bloodGroup || !uData.emergencyPhone) { isProfileIncomplete = true; document.getElementById('warningBanner').classList.remove('hidden'); }
+
+                    // নতুন ৪-বক্স মেকানিজম কি কম্পোজিশন (লকিং কী রেডি)
+                    const uYear = uData.profileYear || "1st Year";
+                    const uTermNum = uData.profileTermNum || "1st Trimester";
+                    const uSess = uData.profileTerm || "Spring";
+                    const uSessYear = uData.profileSessionYear || "2026";
+                    
+                    studentCurrentTrimesterKey = `${uYear} - ${uTermNum} (${uSess} ${uSessYear})`;
+                    document.getElementById('displayStudentCurrentSem').innerText = uData.profileYear ? studentCurrentTrimesterKey : "Profile Incomplete!";
+
+                    if(!uData.phone || !uData.bloodGroup || !uData.emergencyPhone || !uData.profileYear || !uData.profileTermNum) {
+                        isProfileIncomplete = true; document.getElementById('warningBanner').classList.remove('hidden');
+                    }
 
                     const currentLang = localStorage.getItem('preferredLang') || 'en';
                     const pulseClass = isProfileIncomplete ? 'bg-red-600 hover:bg-red-700 animate-pulse text-white' : 'bg-emerald-950 hover:bg-emerald-900 text-emerald-200';
                     document.getElementById('navAuthButtons').innerHTML = `<div class="flex items-center space-x-2 gap-1"><button id="openProfileEditBtn" class="${pulseClass} px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-user mr-1"></i> ${currentLang === 'bn' ? 'আমার প্রোফাইল' : 'My Profile'}</button><button id="logoutBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg font-semibold transition text-xs">${currentLang === 'bn' ? 'লগআউট' : 'Logout'}</button></div>`;
 
-                    // লগইন থাকলে শেয়ার বাটন সচল করা
-                    document.getElementById('btnShareResource').classList.remove('hidden');
-                    document.getElementById('btnShareResource').addEventListener('click', openShareModal);
-
                     document.getElementById('openProfileEditBtn').addEventListener('click', () => {
                         document.getElementById('editProfileName').value = uData.name || ""; document.getElementById('editProfileUID').value = uData.universityUID || "";
-                        document.getElementById('editProfileBatch').value = uData.batchNumber || ""; document.getElementById('editProfileSemester').value = uData.trimester || "";
+                        document.getElementById('editProfileBatch').value = uData.batchNumber || "";
                         document.getElementById('editProfilePhone').value = uData.phone || ""; document.getElementById('editProfileBlood').value = uData.bloodGroup || "";
                         document.getElementById('editProfileEmergencyName').value = uData.emergencyName || ""; document.getElementById('editProfileEmergencyPhone').value = uData.emergencyPhone || "";
-                        document.getElementById('newProfilePassword').value = ""; if(uData.profilePic) { document.getElementById('avatarPreview').src = uData.profilePic; base64PicString = uData.profilePic; }
+                        
+                        document.getElementById('editProfileYear').value = uData.profileYear || "1st Year";
+                        document.getElementById('editProfileTermNum').value = uData.profileTermNum || "1st Trimester";
+                        document.getElementById('editProfileTerm').value = uData.profileTerm || "Spring";
+                        document.getElementById('editProfileSessionYear').value = uData.profileSessionYear || "2026";
+
+                        if(uData.profilePic) { document.getElementById('avatarPreview').src = uData.profilePic; base64PicString = uData.profilePic; }
                         if(isProfileIncomplete) document.getElementById('btnCancelProfile').classList.add('hidden'); else document.getElementById('btnCancelProfile').classList.remove('hidden');
                         document.getElementById('profileModal').className = "fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm";
                     });
+
                     if(isProfileIncomplete) setTimeout(() => { document.getElementById('openProfileEditBtn').click(); }, 1500);
                     document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => window.location.reload()); });
+
+                    // গ্লোবাল ড্রপডাউন জেনারেট করে ডিফল্ট নিজের সেমিস্টারে সেট করা
+                    buildDynamicTrimesterOptionsList();
+                    document.getElementById('semesterFilter').value = studentCurrentTrimesterKey;
+                    listenToGlobalArchiveStream(studentCurrentTrimesterKey);
                 }
             }
-            listenToLiveResources("all");
+        });
+
+        // প্রোফাইল সাবমিট ডাটা রাইট
+        document.getElementById('profileEditForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); if(!loggedInUserUID) return;
+            const newPass = document.getElementById('newProfilePassword').value.trim();
+            try {
+                if(newPass !== "") { if(newPass.length < 6) { alert("Min 6 Chars Required!"); return; } await updatePassword(auth.currentUser, newPass); }
+                await updateDoc(doc(db, "users", loggedInUserUID), {
+                    name: document.getElementById('editProfileName').value.trim(), universityUID: document.getElementById('editProfileUID').value.trim(), batchNumber: document.getElementById('editProfileBatch').value.trim(),
+                    profileYear: document.getElementById('editProfileYear').value, profileTermNum: document.getElementById('editProfileTermNum').value, profileTerm: document.getElementById('editProfileTerm').value, profileSessionYear: document.getElementById('editProfileSessionYear').value,
+                    trimester: `${document.getElementById('editProfileYear').value} - ${document.getElementById('editProfileTermNum').value} (${document.getElementById('editProfileTerm').value})`,
+                    phone: document.getElementById('editProfilePhone').value.trim(), bloodGroup: document.getElementById('editProfileBlood').value, emergencyName: document.getElementById('editProfileEmergencyName').value.trim(), emergencyPhone: document.getElementById('editProfileEmergencyPhone').value.trim(), profilePic: base64PicString
+                });
+                alert("Profile successfully locked & synced!"); window.location.reload();
+            } catch (err) { alert(err.message); }
         });
     </script>
 </body>
