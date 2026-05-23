@@ -94,49 +94,22 @@
     <script>
         const translations = {
             en: {
-                dir: "ltr",
-                portalTitle: "DIS Student Portal",
-                portalSubtitle: "Department of Islamic Studies",
-                loginTab: "Login",
-                registerTab: "Register",
-                lblEmail: "Email Address",
-                lblPassword: "Password",
-                btnLogin: "Sign In",
-                lblRegName: "Full Name",
-                lblRegUID: "University ID (UID)",
-                lblRegBatchNum: "Batch No",
-                lblRegSemester: "Trimester",
-                btnRegister: "Complete Registration"
+                dir: "ltr", portalTitle: "DIS Student Portal", portalSubtitle: "Department of Islamic Studies",
+                loginTab: "Login", registerTab: "Register", lblEmail: "Email Address", lblPassword: "Password",
+                btnLogin: "Sign In", lblRegName: "Full Name", lblRegUID: "University ID (UID)",
+                lblRegBatchNum: "Batch No", lblRegSemester: "Trimester", btnRegister: "Complete Registration"
             },
             ar: {
-                dir: "rtl",
-                portalTitle: "بوابة طلاب قسم الدراسات الإسلامية",
-                portalSubtitle: "قسم الدراسات الإسلامية",
-                loginTab: "تسجيل الدخول",
-                registerTab: "إنشاء حساب",
-                lblEmail: "البريد الإلكتروني",
-                lblPassword: "كلمة المرور",
-                btnLogin: "دخول",
-                lblRegName: "الاسم الكامل",
-                lblRegUID: "الرقم الجامعي (UID)",
-                lblRegBatchNum: "رقم الدفعة",
-                lblRegSemester: "الفصل الدراسي",
-                btnRegister: "إتمام التسجيل"
+                dir: "rtl", portalTitle: "بوابة طلاب قسم الدراسات الإسلامية", portalSubtitle: "قسم الدراسات الإسلامية",
+                loginTab: "تسجيل الدخول", registerTab: "إنشاء حساب", lblEmail: "البريد الإلكتروني", lblPassword: "كلمة المرور",
+                btnLogin: "دخول", lblRegName: "الاسم الكامل", lblRegUID: "الرقم الجامعي (UID)",
+                lblRegBatchNum: "رقم الدفعة", lblRegSemester: "الفصل الدراسي", btnRegister: "إتمام التسجيل"
             },
             bn: {
-                dir: "ltr",
-                portalTitle: "ডিআইএস স্টুডেন্ট পোর্টাল",
-                portalSubtitle: "ইসলামিক স্টাডিজ বিভাগ",
-                loginTab: "লগইন",
-                registerTab: "নিবন্ধন",
-                lblEmail: "ইমেইল ঠিকানা",
-                lblPassword: "পাসওয়ার্ড",
-                btnLogin: "প্রবেশ করুন",
-                lblRegName: "পূর্ণ নাম",
-                lblRegUID: "ইউনিভার্সিটি আইডি (UID)",
-                lblRegBatchNum: "ব্যাচ নং",
-                lblRegSemester: "সেমিস্টার",
-                btnRegister: "নিবন্ধন সম্পন্ন করুন"
+                dir: "ltr", portalTitle: "ডিআইএস স্টুডেন্ট পোর্টাল", portalSubtitle: "ইসলামিক স্টাডিজ বিভাগ",
+                loginTab: "লগইন", registerTab: "নিবন্ধন", lblEmail: "ইমেইল ঠিকানা", lblPassword: "পাসওয়ার্ড",
+                btnLogin: "প্রবেশ করুন", lblRegName: "পূর্ণ নাম", lblRegUID: "ইউনিভার্সিটি আইডি (UID)",
+                lblRegBatchNum: "ব্যাচ নং", lblRegSemester: "সেমিস্টার", btnRegister: "নিবন্ধন সম্পন্ন করুন"
             }
         };
 
@@ -198,6 +171,72 @@
             toggleRegister.classList.add('text-gray-600');
         });
     </script>
-    <script type="module" src="./assets/js/auth.js"></script>
+
+    <script type="module">
+        import { auth, db } from "./assets/js/app.js";
+        import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const lForm = document.getElementById('loginForm');
+        const rForm = document.getElementById('registerForm');
+
+        // ১. অটোমেটিক রেজিস্ট্রেশন এবং ফায়ারস্টোর ডেটাবেজ লজিক
+        if(rForm) {
+            rForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('regName').value.trim();
+                const email = document.getElementById('regEmail').value.trim();
+                const password = document.getElementById('regPassword').value;
+                const uid = document.getElementById('regUID').value.trim();
+                const batch = document.getElementById('regBatchNum').value;
+                const semester = document.getElementById('regSemester').value;
+
+                try {
+                    const cred = await createUserWithEmailAndPassword(auth, email, password);
+                    
+                    // ফায়ারস্টোর 'users' কালেকশনে ডকুমেন্ট রাইট করা
+                    await setDoc(doc(db, "users", cred.user.uid), {
+                        name: name,
+                        email: email,
+                        universityUID: uid,
+                        batchNumber: batch,
+                        trimester: semester,
+                        role: "student" // ডিফল্ট রোল স্টুডেন্ট থাকবে
+                    });
+
+                    alert("Registration Successful! Now please inform admin or login.");
+                    window.location.reload();
+                } catch (err) {
+                    alert("Registration Error: " + err.message);
+                }
+            });
+        }
+
+        // ২. সিকিউর লগইন এবং অ্যাডমিন প্যানেল রিডাইরেকশন কন্ডিশন
+        if(lForm) {
+            lForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value;
+
+                try {
+                    const cred = await signInWithEmailAndPassword(auth, email, password);
+                    
+                    // ডাটাবেজ থেকে রোলের স্ট্যাটাস রিড করা
+                    const userDoc = await getDoc(doc(db, "users", cred.user.uid));
+                    
+                    if(userDoc.exists() && userDoc.data().role === 'admin') {
+                        // যদি রোল ছোট হাতের অক্ষরের 'admin' হয়, তবেই ড্যাশবোর্ড লক খুলবে
+                        window.location.replace("./admin-dashboard.html");
+                    } else {
+                        // অন্যথায় সাধারণ স্টুডেন্ট পোর্টালে রিডাইরেক্ট করবে
+                        window.location.replace("./index.html");
+                    }
+                } catch (err) {
+                    alert("Login Error: " + err.message);
+                }
+            });
+        }
+    </script>
 </body>
 </html>
