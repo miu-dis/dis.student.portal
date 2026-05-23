@@ -198,10 +198,10 @@
     </div>
 
     <script>
-        let currentActiveMethod = "file"; 
+        window.currentActiveMethod = "file";
 
         function switchUploadMethod(method) {
-            currentActiveMethod = method;
+            window.currentActiveMethod = method;
             const fBtn = document.getElementById('methodFileBtn');
             const lBtn = document.getElementById('methodLinkBtn');
             const fSec = document.getElementById('uploadFileSection');
@@ -282,8 +282,18 @@
         langSelector.value = savedLang;
         applyLanguage(savedLang);
 
-        window.openShareModal = () => { document.getElementById('shareModal').className = "fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm"; };
-        window.closeShareModal = () => { document.getElementById('shareModal').className = "fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50"; };
+        function openShareModal() {
+            const modal = document.getElementById('shareModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        function closeShareModal() {
+            const modal = document.getElementById('shareModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+        window.openShareModal = openShareModal;
+        window.closeShareModal = closeShareModal;
         function toggleProfilePassword() { const input = document.getElementById('newProfilePassword'); const icon = document.getElementById('eyeIconProfile'); if (input.type === "password") { input.type = "text"; icon.className = "fa-solid fa-eye"; } else { input.type = "password"; icon.className = "fa-solid fa-eye-slash"; } }
         window.toggleProfilePassword = toggleProfilePassword;
     </script>
@@ -386,6 +396,47 @@
             courseGrid.innerHTML = cards.join("");
         }
 
+        function openShareModalFromModule() {
+            const modal = document.getElementById('shareModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeShareModalFromModule() {
+            const modal = document.getElementById('shareModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function triggerLockedUploadFlow(courseIndex) {
+            const currentLang = localStorage.getItem('preferredLang') || 'en';
+            if (!auth.currentUser) {
+                alert(currentLang === 'bn' ? 'আপলোড করতে প্রথমে লগইন করুন।' : 'Please login first to upload.');
+                window.location.href = './login.html';
+                return;
+            }
+            const combinedTrimesterKey = getCombinedTrimesterKey();
+            if (combinedTrimesterKey !== studentCurrentTrimesterKey) {
+                alert(currentLang === 'bn'
+                    ? '🔴 এক্সেস লক! আপনি শুধু আপনার নিজের রানিং সেমিস্টারের ফাইল আপলোড করতে পারবেন।'
+                    : '🔴 Locked! You can only upload in your own running semester.');
+                return;
+            }
+            const course = latestMappedCourses[courseIndex];
+            if (!course) return;
+
+            document.getElementById('shareAuthor').value = auth.currentUser.displayName || auth.currentUser.email || "";
+            document.getElementById('shareTitle').value = `${course.title} - `;
+            document.getElementById('lockedSemLabel').innerText = studentCurrentTrimesterKey;
+            document.getElementById('resourceShareForm').dataset.lockedCode = course.code;
+            base64UploadedFileString = "";
+            document.getElementById('shareFileField').value = "";
+            document.getElementById('shareUrl').value = "";
+            window.switchUploadMethod('file');
+            openShareModalFromModule();
+        }
+        window.triggerLockedUploadFlow = triggerLockedUploadFlow;
+
         courseGrid.addEventListener('click', (e) => {
             const btn = e.target.closest('[data-upload-course]');
             if (!btn || btn.disabled) return;
@@ -414,34 +465,6 @@
         document.getElementById('filterSession').addEventListener('change', updateFiltersAndListen);
         updateFiltersAndListen();
 
-        window.triggerLockedUploadFlow = (courseIndex) => {
-            const currentLang = localStorage.getItem('preferredLang') || 'en';
-            if (!auth.currentUser) {
-                alert(currentLang === 'bn' ? 'আপলোড করতে প্রথমে লগইন করুন।' : 'Please login first to upload.');
-                window.location.href = './login.html';
-                return;
-            }
-            const combinedTrimesterKey = getCombinedTrimesterKey();
-            if (combinedTrimesterKey !== studentCurrentTrimesterKey) {
-                alert(currentLang === 'bn'
-                    ? '🔴 এক্সেস লক! আপনি শুধু আপনার নিজের রানিং সেমিস্টারের ফাইল আপলোড করতে পারবেন। অন্য সেমিস্টার শুধু দেখা যাবে।'
-                    : '🔴 Locked! You can only upload in your own running semester. Other semesters are view-only.');
-                return;
-            }
-            const course = latestMappedCourses[courseIndex];
-            if (!course) return;
-
-            document.getElementById('shareAuthor').value = auth.currentUser.displayName || auth.currentUser.email || "";
-            document.getElementById('shareTitle').value = `${course.title} - `;
-            document.getElementById('lockedSemLabel').innerText = studentCurrentTrimesterKey;
-            document.getElementById('resourceShareForm').dataset.lockedCode = course.code;
-            base64UploadedFileString = "";
-            document.getElementById('shareFileField').value = "";
-            document.getElementById('shareUrl').value = "";
-            switchUploadMethod('file');
-            openShareModal();
-        };
-
         // ২ এমবি ফিল্টার ইঞ্জিন
         document.getElementById('shareFileField').addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -455,7 +478,7 @@
                         alert("🔴 File size exceeds 2MB limit!\n\nPlease upload the file to Google Drive or YouTube, select 'Share Cloud Link' method, and paste the URL here. Ensure the link visibility is set to Public.");
                     }
                     e.target.value = ""; base64UploadedFileString = "";
-                    switchUploadMethod('link'); return;
+                    window.switchUploadMethod('link'); return;
                 }
                 const reader = new FileReader(); reader.onloadend = () => { base64UploadedFileString = reader.result; }; reader.readAsDataURL(file);
             }
@@ -464,7 +487,7 @@
         // ফর্ম সাবমিশন লজিক
         document.getElementById('resourceShareForm').addEventListener('submit', async (e) => {
             e.preventDefault(); let finalUrlPayload = "";
-            if(currentActiveMethod === 'file') {
+            if (window.currentActiveMethod === 'file') {
                 if(!base64UploadedFileString) { alert("একটি ২ এমবি-র নিচের ফাইল সিলেক্ট করুন।"); return; }
                 finalUrlPayload = base64UploadedFileString;
             } else {
@@ -475,7 +498,7 @@
                 await addDoc(collection(db, "resources"), {
                     author: document.getElementById('shareAuthor').value.trim(), title: document.getElementById('shareTitle').value.trim(), type: document.getElementById('shareType').value, courseCode: document.getElementById('resourceShareForm').dataset.lockedCode, semester: studentCurrentTrimesterKey, url: finalUrlPayload, createdAt: new Date().toISOString()
                 });
-                alert("Study Resource Published Successfully!"); document.getElementById('resourceShareForm').reset(); closeShareModal();
+                alert("Study Resource Published Successfully!"); document.getElementById('resourceShareForm').reset(); closeShareModalFromModule();
                 updateFiltersAndListen();
             } catch (err) { alert(err.message); }
         });
