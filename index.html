@@ -28,37 +28,37 @@
     </nav>
 
     <div id="warningBanner" class="bg-red-600 text-white font-bold p-3 text-center hidden animate-bounce text-xs md:text-sm shadow-md">
-        ⚠️ আপনার প্রোফাইলটি অসম্পূর্ণ! এমার্জেন্সি কন্টাক্ট এবং ব্লাড গ্রুপসহ প্রোফাইল সম্পূর্ণ করা বাধ্যতামূলক। অনুগ্রহ করে 'My Profile' বাটনে ক্লিক করুন।
+        ⚠️ Profile Incomplete!
     </div>
 
     <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white py-8 text-center shadow-inner">
         <div class="container mx-auto px-4">
             <h2 id="heroTitle" class="text-2xl md:text-3xl font-extrabold mb-2">Islamic Studies Study Portal</h2>
-            <p id="heroSubtitle" class="text-emerald-100 text-sm max-w-xl mx-auto">An open platform for classmates to share notes, video lectures, and academic resources.</p>
+            <p id="heroSubtitle" class="text-emerald-100 text-sm max-w-xl mx-auto">Academic Hub</p>
         </div>
     </header>
 
     <main class="container mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="bg-white rounded-xl shadow-md p-5 border-t-4 border-emerald-600">
-            <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center">📢 Notice Board</h3>
+            <h3 id="lblNoticeBoard" class="text-lg font-bold text-gray-900 mb-3 flex items-center">📢 Notice Board</h3>
             <div id="noticeList" class="space-y-3 overflow-y-auto max-h-48 p-1"><p class="text-xs text-gray-400">Loading notices...</p></div>
         </div>
         <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-5 border-t-4 border-amber-500">
-            <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center">⏳ Daily Routine Update (আজকের সাময়িক রুটিন)</h3>
-            <div id="dailyRoutineList" class="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto max-h-48 p-1"><p class="text-xs text-gray-400">Loading today's updates...</p></div>
+            <h3 id="lblDailyRoutine" class="text-lg font-bold text-gray-900 mb-3 flex items-center">⏳ Daily Routine Update</h3>
+            <div id="dailyRoutineList" class="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto max-h-48 p-1"><p class="text-xs text-gray-400">Loading updates...</p></div>
         </div>
     </main>
 
     <section class="container mx-auto px-4 pb-12">
         <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-teal-600">
-            <div class="border-b pb-3 mb-6"><h3 class="text-xl font-bold text-emerald-800">📅 Permanent Weekly Schedule Routine Board</h3></div>
+            <div class="border-b pb-3 mb-6"><h3 id="lblPermanentRoutine" class="text-xl font-bold text-emerald-800">📅 Permanent Weekly Schedule</h3></div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="weeklyRoutineGrid">
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3">Saturday (শনিবার)</h4><div id="day-Saturday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3">Sunday (রবিবার)</h4><div id="day-Sunday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3">Monday (সোমবার)</h4><div id="day-Monday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3">Tuesday (মঙ্গলবার)</h4><div id="day-Tuesday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3">Wednesday (বুধবার)</h4><div id="day-Wednesday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-rose-700 text-white px-3 py-1.5 rounded-lg mb-3">Friday (শুক্রবার)</h4><div id="day-Friday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Saturday">Saturday</h4><div id="day-Saturday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Sunday">Sunday</h4><div id="day-Sunday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Monday">Monday</h4><div id="day-Monday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Tuesday">Tuesday</h4><div id="day-Tuesday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Wednesday">Wednesday</h4><div id="day-Wednesday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-rose-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Friday">Friday</h4><div id="day-Friday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
             </div>
         </div>
     </section>
@@ -67,76 +67,51 @@
         <div class="bg-white rounded-xl shadow-md p-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 border-b border-gray-200 gap-2">
                 <h3 id="lblCourses" class="text-2xl font-bold text-emerald-800 mb-2 md:mb-0">Academic Courses & Handnotes</h3>
-                
                 <select id="semesterFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg p-2.5 outline-none font-semibold text-emerald-800">
-                    <option value="all">All Semesters (সব সেমিস্টার)</option>
-                    <optgroup label="1st Year (প্রথম বর্ষ)">
-                        <option value="1st Year - 1st Sem">1st Year - 1st Sem</option>
-                        <option value="1st Year - 2nd Sem">1st Year - 2nd Sem</option>
-                        <option value="1st Year - 3rd Sem">1st Year - 3rd Sem</option>
-                    </optgroup>
-                    <optgroup label="2nd Year (দ্বিতীয় বর্ষ)">
-                        <option value="2nd Year - 1st Sem">2nd Year - 1st Sem</option>
-                        <option value="2nd Year - 2nd Sem">2nd Year - 2nd Sem</option>
-                        <option value="2nd Year - 3rd Sem">2nd Year - 3rd Sem</option>
-                    </optgroup>
-                    <optgroup label="3rd Year (তৃতীয় বর্ষ)">
-                        <option value="3rd Year - 1st Sem">3rd Year - 1st Sem</option>
-                        <option value="3rd Year - 2nd Sem">3rd Year - 2nd Sem</option>
-                        <option value="3rd Year - 3rd Sem">3rd Year - 3rd Sem</option>
-                    </optgroup>
-                    <optgroup label="4th Year (চতুর্থ বর্ষ)">
-                        <option value="4th Year - 1st Sem">4th Year - 1st Sem</option>
-                        <option value="4th Year - 2nd Sem">4th Year - 2nd Sem</option>
-                        <option value="4th Year - 3rd Sem">4th Year - 3rd Sem</option>
-                    </optgroup>
-                </select>
+                    </select>
             </div>
-            
-            <div id="courseGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p class="text-xs text-gray-400 p-2">Loading academic database...</p>
-            </div>
+            <div id="courseGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"><p class="text-xs text-gray-400 p-2">Loading...</p></div>
         </div>
     </section>
 
     <div id="profileModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative max-h-[90vh] overflow-y-auto">
-            <h3 class="text-lg font-bold text-emerald-800 mb-4 border-b pb-2 flex items-center"><i class="fa-solid fa-id-card mr-2"></i> My Personal Profile Card</h3>
+            <h3 id="m_title" class="text-lg font-bold text-emerald-800 mb-4 border-b pb-2 flex items-center"><i class="fa-solid fa-id-card mr-2"></i> My Personal Profile Card</h3>
             
             <form id="profileEditForm" class="space-y-3 text-xs">
                 <div class="flex items-center space-x-4 bg-slate-50 p-2.5 rounded-xl border border-dashed">
-                    <img id="avatarPreview" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="h-16 w-16 rounded-full object-cover border-2 border-emerald-700 shadow-sm" alt="Avatar">
+                    <img id="avatarPreview" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="h-16 w-16 rounded-full object-cover border-2 border-emerald-700" alt="Avatar">
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-1">Upload Profile Picture (Optional)</label>
+                        <label id="m_pic" class="block font-semibold text-gray-700 mb-1">Upload Profile Picture (Optional)</label>
                         <input type="file" id="profilePicFile" accept="image/*" class="w-full text-xs text-gray-500">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
-                    <div><label class="block font-semibold text-gray-600 mb-0.5">Full Name</label><input type="text" id="editProfileName" required class="w-full p-2 border rounded text-gray-700"></div>
-                    <div><label class="block font-semibold text-gray-600 mb-0.5">University ID (UID)</label><input type="text" id="editProfileUID" required class="w-full p-2 border rounded text-gray-700"></div>
-                    <div><label class="block font-semibold text-gray-600 mb-0.5">Batch Number</label><input type="text" id="editProfileBatch" required class="w-full p-2 border rounded text-gray-700"></div>
-                    <div><label class="block font-semibold text-gray-600 mb-0.5">Trimester</label><input type="text" id="editProfileSemester" required class="w-full p-2 border rounded text-gray-700"></div>
+                    <div><label id="m_name" class="block font-semibold text-gray-600 mb-0.5">Full Name</label><input type="text" id="editProfileName" required class="w-full p-2 border rounded text-gray-700"></div>
+                    <div><label id="m_uid" class="block font-semibold text-gray-600 mb-0.5">University ID (UID)</label><input type="text" id="editProfileUID" required class="w-full p-2 border rounded text-gray-700"></div>
+                    <div><label id="m_batch" class="block font-semibold text-gray-600 mb-0.5">Batch Number</label><input type="text" id="editProfileBatch" required class="w-full p-2 border rounded text-gray-700"></div>
+                    <div><label id="m_trim" class="block font-semibold text-gray-600 mb-0.5">Trimester</label><input type="text" id="editProfileSemester" required class="w-full p-2 border rounded text-gray-700"></div>
                 </div>
 
                 <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-200 space-y-2.5">
-                    <p class="font-bold text-amber-800 text-[11px]">⚠️ Emergency Data (বাধ্যতামূলক)</p>
-                    <div><label class="block font-semibold text-gray-700 mb-0.5">My Mobile Number</label><input type="tel" id="editProfilePhone" required class="w-full p-2 border border-gray-300 rounded"></div>
+                    <p id="m_emg_title" class="font-bold text-amber-800 text-[11px]">⚠️ Emergency Data (বাধ্যতামূলক)</p>
+                    <div><label id="m_phone" class="block font-semibold text-gray-700 mb-0.5">My Mobile Number</label><input type="tel" id="editProfilePhone" required class="w-full p-2 border border-gray-300 rounded"></div>
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-0.5">Blood Group</label>
+                        <label id="m_blood" class="block font-semibold text-gray-700 mb-0.5">Blood Group</label>
                         <select id="editProfileBlood" required class="w-full p-2 border border-gray-300 rounded bg-white">
                             <option value="">Select Blood Group</option>
                             <option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="O+">O+</option><option value="O-">O-</option><option value="AB+">AB+</option><option value="AB-">AB-</option>
                         </select>
                     </div>
-                    <div><label class="block font-semibold text-gray-700 mb-0.5">Emergency Contact Name</label><input type="text" id="editProfileEmergencyName" required class="w-full p-2 border border-gray-300 rounded"></div>
-                    <div><label class="block font-semibold text-gray-700 mb-0.5">Emergency Contact Mobile No</label><input type="tel" id="editProfileEmergencyPhone" required class="w-full p-2 border border-gray-300 rounded"></div>
+                    <div><label id="m_emg_name" class="block font-semibold text-gray-700 mb-0.5">Emergency Contact Name</label><input type="text" id="editProfileEmergencyName" required class="w-full p-2 border border-gray-300 rounded"></div>
+                    <div><label id="m_emg_phone" class="block font-semibold text-gray-700 mb-0.5">Emergency Contact Mobile No</label><input type="tel" id="editProfileEmergencyPhone" required class="w-full p-2 border border-gray-300 rounded"></div>
                 </div>
 
                 <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-200 space-y-2">
-                    <p class="font-bold text-blue-800 text-[11px]">🔒 Change Password (ঐচ্ছিক)</p>
+                    <p id="m_pass_title" class="font-bold text-blue-800 text-[11px]">🔒 Change Password (ঐচ্ছিক)</p>
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-0.5">New Password</label>
+                        <label id="m_pass" class="block font-semibold text-gray-700 mb-0.5">New Password</label>
                         <div class="relative">
                             <input type="password" id="newProfilePassword" class="w-full p-2 border border-gray-300 rounded pr-10" placeholder="Min. 6 characters">
                             <button type="button" onclick="toggleProfilePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -148,7 +123,7 @@
 
                 <div class="flex justify-end space-x-2 pt-2 border-t">
                     <button type="button" id="btnCancelProfile" onclick="closeProfileModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold transition">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-semibold transition">Save Profile Info</button>
+                    <button type="submit" id="btnSaveProfileText" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-semibold transition">Save Profile Info</button>
                 </div>
             </form>
         </div>
@@ -161,6 +136,107 @@
             if (input.type === "password") { input.type = "text"; icon.className = "fa-solid fa-eye"; } 
             else { input.type = "password"; icon.className = "fa-solid fa-eye-slash"; }
         }
+
+        // গ্লোবাল ডাইনামিক কমপ্লিট ভাষা অভিধান ম্যাপ (অন-ক্লিক সিঙ্ক)
+        const translations = {
+            en: {
+                navTitle: "DIS Study Portal", btnNavLogin: "Login / Register",
+                warningBanner: "⚠️ Your profile is incomplete! Mobile number and Blood Group are mandatory. Please click 'My Profile'.",
+                heroTitle: "Islamic Studies Study Portal", heroSubtitle: "An open platform for classmates to share notes, video lectures, and academic resources.",
+                lblNoticeBoard: "📢 Notice Board", lblDailyRoutine: "⏳ Daily Routine Update", lblPermanentRoutine: "📅 Permanent Weekly Schedule Routine Board",
+                lblCourses: "Academic Courses & Handnotes",
+                sat: "Saturday", sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", fri: "Friday",
+                m_title: "My Personal Profile Card", m_pic: "Upload Profile Picture (Optional)", m_name: "Full Name", m_uid: "University ID (UID)",
+                m_batch: "Batch Number", m_trim: "Trimester", m_emg_title: "⚠️ Emergency Data (Mandatory)", m_phone: "My Mobile Number",
+                m_emg_name: "Emergency Contact Name", m_emg_phone: "Emergency Contact Mobile No", m_pass_title: "🔒 Change Password (Optional)",
+                m_pass: "New Password", btnCancelProfile: "Cancel", btnSaveProfileText: "Save Profile Info", filterAll: "All Semesters (সব সেমিস্টার)"
+            },
+            bn: {
+                navTitle: "ডিআইএস স্টাডি পোর্টাল", btnNavLogin: "লগইন / রেজিস্টার",
+                warningBanner: "⚠️ আপনার প্রোফাইলটি অসম্পূর্ণ! এমার্জেন্সি কন্টাক্ট এবং ব্লাড গ্রুপসহ প্রোফাইল সম্পূর্ণ করা বাধ্যতামূলক। অনুগ্রহ করে 'My Profile' বাটনে ক্লিক করুন।",
+                heroTitle: "ইসলামিক স্টাডিজ বিভাগ পোর্টাল", heroSubtitle: "সহপাঠীদের মাঝে ক্লাস নোট, ভিডিও লেকচার এবং একাডেমিক তথ্য শেয়ার করার উন্মুক্ত প্ল্যাটফর্ম।",
+                lblNoticeBoard: "📢 নোটিশ বোর্ড", lblDailyRoutine: "⏳ আজকের সাময়িক রুটিন", lblPermanentRoutine: "📅 স্থায়ী সাপ্তাহিক মাস্টার রুটিন বোর্ড",
+                lblCourses: "একাডেমিক কোর্স ও হ্যান্ডনোটসমূহ",
+                sat: "Saturday (শনিবার)", sun: "Sunday (রবিবার)", mon: "Monday (সোমবার)", tue: "Tuesday (মঙ্গলবার)", wed: "Wednesday (বুধবার)", fri: "Friday (শুক্রবার)",
+                m_title: "আমার প্রোফাইল ইনফো কার্ড", m_pic: "প্রোফাইল পিকচার আপলোড (ঐচ্ছিক)", m_name: "পূর্ণ নাম", m_uid: "ইউনিভার্সিটি আইডি (UID)",
+                m_batch: "ব্যাচ নম্বর", m_trim: "সেমিস্টার / ট্রাইমেস্টার", m_emg_title: "⚠️ জরুরী কন্টাক্ট তথ্য (বাধ্যতামূলক)", m_phone: "আমার মোবাইল নম্বর",
+                m_emg_name: "জরুরী যোগাযোগ ব্যক্তির নাম", m_emg_phone: "জরুরী যোগাযোগ মোবাইল নম্বর", m_pass_title: "🔒 পাসওয়ার্ড পরিবর্তন (ঐচ্ছিক)",
+                m_pass: "নতুন পাসওয়ার্ড", btnCancelProfile: "বাতিল করুন", btnSaveProfileText: "প্রোফাইল সেভ করুন", filterAll: "সব সেমিস্টার"
+            }
+        };
+
+        function applyLanguage(lang) {
+            const t = translations[lang] || translations['en'];
+            document.getElementById('navTitle').innerText = t.navTitle;
+            if(document.getElementById('btnNavLogin')) document.getElementById('btnNavLogin').innerText = t.btnNavLogin;
+            document.getElementById('warningBanner').innerText = t.warningBanner;
+            document.getElementById('heroTitle').innerText = t.heroTitle;
+            document.getElementById('heroSubtitle').innerText = t.heroSubtitle;
+            document.getElementById('lblNoticeBoard').innerText = t.lblNoticeBoard;
+            document.getElementById('lblDailyRoutine').innerText = t.lblDailyRoutine;
+            document.getElementById('lblPermanentRoutine').innerText = t.lblPermanentRoutine;
+            document.getElementById('lblCourses').innerText = t.lblCourses;
+
+            // বারের ভেতরের নাম সিঙ্ক
+            document.getElementById('dayLabel-Saturday').innerText = t.sat;
+            document.getElementById('dayLabel-Sunday').innerText = t.sun;
+            document.getElementById('dayLabel-Monday').innerText = t.mon;
+            document.getElementById('dayLabel-Tuesday').innerText = t.tue;
+            document.getElementById('dayLabel-Wednesday').innerText = t.wed;
+            document.getElementById('dayLabel-Friday').innerText = t.fri;
+
+            // মডাল পপআপ লেবেলগুলোর রিয়েলটাইম রূপান্তর
+            document.getElementById('m_title').innerHTML = `<i class="fa-solid fa-id-card mr-2"></i> ` + t.m_title;
+            document.getElementById('m_pic').innerText = t.m_pic;
+            document.getElementById('m_name').innerText = t.m_name;
+            document.getElementById('m_uid').innerText = t.m_uid;
+            document.getElementById('m_batch').innerText = t.m_batch;
+            document.getElementById('m_trim').innerText = t.m_trim;
+            document.getElementById('m_emg_title').innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> ` + t.m_emg_title;
+            document.getElementById('m_phone').innerText = t.m_phone;
+            document.getElementById('m_emg_name').innerText = t.m_emg_name;
+            document.getElementById('m_emg_phone').innerText = t.m_emg_phone;
+            document.getElementById('m_pass_title').innerHTML = `<i class="fa-solid fa-lock mr-1"></i> ` + t.m_pass_title;
+            document.getElementById('m_pass').innerText = t.m_pass;
+            document.getElementById('btnCancelProfile').innerText = t.btnCancelProfile;
+            document.getElementById('btnSaveProfileText').innerText = t.btnSaveProfileText;
+
+            // ড্রপডাউন ডাইনামিক রেন্ডার (১২ ট্রাইমেস্টার ম্যাপ)
+            const fSelector = document.getElementById('semesterFilter');
+            fSelector.innerHTML = `
+                <option value="all">${t.filterAll}</option>
+                <optgroup label="1st Year">
+                    <option value="1st Year - 1st Sem">1st Year - 1st Sem</option>
+                    <option value="1st Year - 2nd Sem">1st Year - 2nd Sem</option>
+                    <option value="1st Year - 3rd Sem">1st Year - 3rd Sem</option>
+                </optgroup>
+                <optgroup label="2nd Year">
+                    <option value="2nd Year - 1st Sem">2nd Year - 1st Sem</option>
+                    <option value="2nd Year - 2nd Sem">2nd Year - 2nd Sem</option>
+                    <option value="2nd Year - 3rd Sem">2nd Year - 3rd Sem</option>
+                </optgroup>
+                <optgroup label="3rd Year">
+                    <option value="3rd Year - 1st Sem">3rd Year - 1st Sem</option>
+                    <option value="3rd Year - 2nd Sem">3rd Year - 2nd Sem</option>
+                    <option value="3rd Year - 3rd Sem">3rd Year - 3rd Sem</option>
+                </optgroup>
+                <optgroup label="4th Year">
+                    <option value="4th Year - 1st Sem">4th Year - 1st Sem</option>
+                    <option value="4th Year - 2nd Sem">4th Year - 2nd Sem</option>
+                    <option value="4th Year - 3rd Sem">4th Year - 3rd Sem</option>
+                </optgroup>
+            `;
+        }
+
+        const langSelector = document.getElementById('langSelector');
+        langSelector.addEventListener('change', (e) => {
+            localStorage.setItem('preferredLang', e.target.value);
+            applyLanguage(e.target.value);
+            window.location.reload();
+        });
+        const savedLang = localStorage.getItem('preferredLang') || 'en';
+        langSelector.value = savedLang;
+        applyLanguage(savedLang);
     </script>
 
     <script type="module">
@@ -173,7 +249,6 @@
         const courseGrid = document.getElementById('courseGrid');
         const daysWithClasses = { Saturday: false, Sunday: false, Monday: false, Tuesday: false, Wednesday: false, Friday: false };
 
-        // একাডেমিক কোর্সের ফুল সিলেবাস ডাটাবেজ (ডামি ড্রাইভ লিংক সহ সাজানো)
         const academicCoursesDatabase = [
             { code: "IS-1101", title: "Introduction to Islam", semester: "1st Year - 1st Sem", teacher: "Prof. Dr. Mahmudul Hasan Yusuf", link: "#" },
             { code: "IS-1102", title: "Al-Qur'an & Ulumul Qur'an", semester: "1st Year - 1st Sem", teacher: "Dr. Kamruzzaman Khezeree", link: "#" },
@@ -182,13 +257,13 @@
             { code: "IS-1301", title: "Sirat-un-Nabi & Islamic Culture", semester: "1st Year - 3rd Sem", teacher: "Prof. Dr. Mahmudul Hasan Yusuf", link: "#" }
         ];
 
-        // কোর্স হ্যান্ডনোট রেন্ডারিং ও ফিল্টার মেকানিজম
         function renderAcademicCourses(selectedSemester) {
             courseGrid.innerHTML = '';
             const filtered = academicCoursesDatabase.filter(c => selectedSemester === "all" || c.semester === selectedSemester);
+            const currentLang = localStorage.getItem('preferredLang') || 'en';
             
             if(filtered.length === 0) {
-                courseGrid.innerHTML = '<p class="text-xs text-gray-400 col-span-2 p-4 text-center border border-dashed rounded-xl">No active handnotes shared for this semester yet. (এই সেমিস্টারের কোনো নোট এখনো আপলোড করা হয়নি)</p>';
+                courseGrid.innerHTML = `<p class="text-xs text-gray-400 col-span-2 p-4 text-center border border-dashed rounded-xl">${currentLang === 'bn' ? 'এই সেমিস্টারের কোনো নোট এখনো আপলোড করা হয়নি।' : 'No active handnotes shared for this semester yet.'}</p>`;
                 return;
             }
 
@@ -201,22 +276,20 @@
                                 <span class="text-[10px] text-slate-500 font-medium">${course.semester}</span>
                             </div>
                             <h4 class="text-base font-extrabold text-gray-800 mt-2">${course.title}</h4>
-                            <p class="text-xs text-gray-500 mt-1"><i class="fa-solid fa-user-tie mr-1 text-slate-400"></i>Lecturer: ${course.teacher}</p>
+                            <p class="text-xs text-gray-500 mt-1"><i class="fa-solid fa-user-tie mr-1 text-slate-400"></i>${currentLang === 'bn' ? 'লেকচারার' : 'Lecturer'}: ${course.teacher}</p>
                         </div>
                         <div class="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
-                            <span class="text-xs text-gray-400 font-semibold"><i class="fa-regular fa-file-pdf mr-1 text-red-500"></i>Resources Ready</span>
-                            <a href="${course.link}" class="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1">Open Cloud Drive <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>
+                            <span class="text-xs text-gray-400 font-semibold"><i class="fa-regular fa-file-pdf mr-1 text-red-500"></i>${currentLang === 'bn' ? 'রিসোর্স রেডি' : 'Resources Ready'}</span>
+                            <a href="${course.link}" class="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1">${currentLang === 'bn' ? 'ক্লাউড ড্রাইভ ওপেন করুন' : 'Open Cloud Drive'} <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>
                         </div>
                     </div>
                 `;
             });
         }
 
-        document.getElementById('semesterFilter').addEventListener('change', (e) => {
-            renderAcademicCourses(e.target.value);
-        });
+        document.getElementById('semesterFilter').addEventListener('change', (e) => { renderAcademicCourses(e.target.value); });
 
-        // রিয়েলটাইম রুটিন লিসেনার
+        // রিয়েলটাইম রুটিন সিঙ্ক
         onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
             dailyContainer.innerHTML = '';
             Object.keys(daysWithClasses).forEach(day => { const el = document.getElementById(`day-${day}`); if(el) el.innerHTML = ''; daysWithClasses[day] = false; });
@@ -224,13 +297,16 @@
 
             snapshot.forEach((doc) => {
                 const data = doc.data();
+                const currentLang = localStorage.getItem('preferredLang') || 'en';
+                let genderLabel = data.gender === 'Male' ? (currentLang === 'bn' ? 'ভাইদের শাখা' : 'Male') : (currentLang === 'bn' ? 'বোনদের শাখা' : 'Female');
+
                 const cardHTML = `
                     <div class="p-2.5 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-emerald-600 transition">
                         <div class="flex justify-between items-center mb-0.5">
                             <h5 class="font-extrabold text-emerald-800 text-sm">${data.subject}</h5>
-                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${data.gender === 'Male' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${data.gender}</span>
+                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${data.gender === 'Male' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${genderLabel}</span>
                         </div>
-                        <div class="mb-1 text-[11px] text-amber-700 font-bold"><i class="fa-solid fa-users text-amber-500 mr-1"></i>Batch: ${data.batchNumber}</div>
+                        <div class="mb-1 text-[11px] text-amber-700 font-bold"><i class="fa-solid fa-users text-amber-500 mr-1"></i>${currentLang === 'bn' ? 'ব্যাচ' : 'Batch'}: ${data.batchNumber}</div>
                         <div class="grid grid-cols-2 text-[11px] text-gray-600 gap-y-0.5 border-t border-dashed pt-1 mt-1">
                             <p><b>Code:</b> ${data.courseCode}</p><p><b>Room:</b> ${data.room}</p>
                             <p class="text-emerald-700 font-bold col-span-2"><b>Teacher:</b> ${data.teacherCode}</p>
@@ -242,17 +318,17 @@
                     const el = document.getElementById(`day-${data.classDay}`); if (el) { el.innerHTML += cardHTML; daysWithClasses[data.classDay] = true; }
                 }
             });
-            Object.keys(daysWithClasses).forEach(day => { if (!daysWithClasses[day]) document.getElementById(`day-${day}`).innerHTML = '<p class="text-xs text-gray-400 text-center py-2 bg-white/40 border border-dashed rounded-lg">No classes scheduled.</p>'; });
-            if(!hasDaily) dailyContainer.innerHTML = '<p class="text-xs text-gray-400 col-span-2 p-2">No active daily updates.</p>';
+            Object.keys(daysWithClasses).forEach(day => { if (!daysWithClasses[day]) document.getElementById(`day-${day}`).innerHTML = '<p class="text-xs text-gray-400 text-center py-2 bg-white/40 border border-dashed rounded-lg">No classes.</p>'; });
+            if(!hasDaily) dailyContainer.innerHTML = '<p class="text-xs text-gray-400 col-span-2 p-2">No updates.</p>';
         });
 
-        // নোটিশ বোর্ড লিসেনার
+        // নোটিশ লিসেনার
         onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
             const noticeContainer = document.getElementById('noticeList'); noticeContainer.innerHTML = '';
             snapshot.forEach((doc) => { const data = doc.data(); noticeContainer.innerHTML += `<div class="p-2.5 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm text-xs"><p class="font-medium text-gray-800">${data.content}</p></div>`; });
         });
 
-        // সিকিউরিটি এবং রোল বাইপাস কন্ট্রোলার চেক
+        // কড়া সিকিউরিটি এবং রোল বাইপাস কন্ট্রোলার চেক
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 loggedInUserUID = user.uid;
@@ -260,21 +336,18 @@
                 
                 if(userDoc.exists()) {
                     const uData = userDoc.data();
-                    
-                    if (uData.role === 'admin') {
-                        window.location.replace("./admin-dashboard.html");
-                        return;
-                    }
+                    if (uData.role === 'admin') { window.location.replace("./admin-dashboard.html"); return; }
 
                     if(!uData.phone || !uData.bloodGroup || !uData.emergencyPhone) {
                         isProfileIncomplete = true; document.getElementById('warningBanner').classList.remove('hidden');
                     }
 
+                    const currentLang = localStorage.getItem('preferredLang') || 'en';
                     const pulseClass = isProfileIncomplete ? 'bg-red-600 hover:bg-red-700 animate-pulse text-white' : 'bg-emerald-950 hover:bg-emerald-900 text-emerald-200';
                     document.getElementById('navAuthButtons').innerHTML = `
                         <div class="flex items-center space-x-2 gap-1">
-                            <button id="openProfileEditBtn" class="${pulseClass} px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-user mr-1"></i> My Profile</button>
-                            <button id="logoutBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg font-semibold transition text-xs">Logout</button>
+                            <button id="openProfileEditBtn" class="${pulseClass} px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-user mr-1"></i> ${currentLang === 'bn' ? 'আমার প্রোফাইল' : 'My Profile'}</button>
+                            <button id="logoutBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg font-semibold transition text-xs">${currentLang === 'bn' ? 'লগআউট' : 'Logout'}</button>
                         </div>`;
 
                     document.getElementById('openProfileEditBtn').addEventListener('click', () => {
@@ -302,7 +375,7 @@
             renderAcademicCourses("all");
         });
 
-        // ছবি আপলোড কনভার্টার
+        // ছবি আপলোড
         document.getElementById('profilePicFile').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if(file) {
@@ -310,7 +383,7 @@
             }
         });
 
-        // প্রোফাইল ও পাসওয়ার্ড সেভ
+        // প্রোফাইল সেভ
         document.getElementById('profileEditForm').addEventListener('submit', async (e) => {
             e.preventDefault(); if(!loggedInUserUID) return;
             const newPass = document.getElementById('newProfilePassword').value.trim();
