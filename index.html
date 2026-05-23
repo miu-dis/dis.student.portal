@@ -153,22 +153,31 @@
             if(!hasDaily) dailyContainer.innerHTML = '<p class="text-xs text-gray-400 col-span-2 p-2">No active updates.</p>';
         });
 
-        // নোটিশ বোর্ড
+        // নোটিশ লিসেনার
         onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
             const noticeContainer = document.getElementById('noticeList'); noticeContainer.innerHTML = '';
             snapshot.forEach((doc) => { const data = doc.data(); noticeContainer.innerHTML += `<div class="p-2.5 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm text-xs"><p class="font-medium text-gray-800">${data.content}</p></div>`; });
         });
 
-        // প্রোফাইল চেক
+        // ─── ফিক্সড সিকিউরিটি চেক লজিক (অ্যাডমিন বাইপাস) ───
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 loggedInUserUID = user.uid;
                 const userDoc = await getDoc(doc(db, "users", loggedInUserUID));
+                
                 if(userDoc.exists()) {
                     const uData = userDoc.data();
                     
+                    // ১. এখানে যদি ইউজারের রোল 'admin' হয়, তবে তাকে কোনো বাধা ছাড়াই সরাসরি ড্যাশবোর্ডে রিডাইরেক্ট করে দেবে!
+                    if (uData.role === 'admin') {
+                        window.location.replace("./admin-dashboard.html");
+                        return; // কোড এখানেই স্টপ করে দেবে, নিচের স্টুডেন্ট লজিক এক্সিকিউট হবে না
+                    }
+
+                    // ২. সাধারণ স্টুডেন্টদের জন্য প্রোফাইল কমপ্লিট চেক লজিক
                     if(!uData.phone || !uData.bloodGroup || !uData.emergencyPhone) {
-                        isProfileIncomplete = true; document.getElementById('warningBanner').classList.remove('hidden');
+                        isProfileIncomplete = true; 
+                        document.getElementById('warningBanner').classList.remove('hidden');
                     }
 
                     const pulseClass = isProfileIncomplete ? 'bg-red-600 hover:bg-red-700 animate-pulse text-white' : 'bg-emerald-950 hover:bg-emerald-900 text-emerald-200';
@@ -202,7 +211,7 @@
             }
         });
 
-        // প্রোফাইল পিকচার রূপান্তর
+        // প্রোফাইল ছবি রিডার
         document.getElementById('profilePicFile').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if(file) {
