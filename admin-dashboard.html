@@ -131,48 +131,43 @@
             } catch (err) { alert(err.message); }
         });
 
-                               // admin-dashboard.html এর এই অংশটি আপডেট করুন
-                                document.getElementById('courseMapForm').addEventListener('submit', async (e) => {
-                            e.preventDefault();
-                            
-                            // ১. সঠিক Key তৈরি (যেমন: "1st Year - 1st Trimester (Spring 2026)")
-                            const yr = document.getElementById('mapYear').value;
-                            const termNum = document.getElementById('mapTermNum').value;
-                            const term = document.getElementById('mapTerm').value;
-                            const sessYear = document.getElementById('mapSessYear').value;
-                            const key = `${yr} - ${termNum} (${term} ${sessYear})`;
-                        
-                            // ২. ডাটা অবজেক্ট তৈরি
-                            const payload = {
-                                code: document.getElementById('mapCourseCode').value.trim().toUpperCase(),
-                                title: document.getElementById('mapCourseTitle').value.trim(),
-                                teacher: document.getElementById('mapCourseTeacher').value.trim()
-                            };
-                        
-                            try {
-                                const docRef = doc(db, "course_mappings", key);
-                                const docSnap = await getDoc(docRef);
-                        
-                                if (docSnap.exists()) {
-                                    // যদি ডক আগে থেকেই থাকে, তবে অ্যারেতে পুশ করো
-                                    await updateDoc(docRef, {
-                                        courses: arrayUnion(payload)
-                                    });
-                                    alert("কোর্সটি সফলভাবে ম্যাপ করা হয়েছে!");
-                                } else {
-                                    // যদি ডক না থাকে, তবে নতুন ডক ফাইল তৈরি করো
-                                    await setDoc(docRef, {
-                                        courses: [payload]
-                                    });
-                                    alert("নতুন সেশন তৈরি করে কোর্স ম্যাপ করা হয়েছে!");
-                                }
-                                document.getElementById('courseMapForm').reset();
-                            } catch (err) {
-                                console.error("Firebase Error: ", err);
-                                alert("সেভ করতে সমস্যা হচ্ছে: " + err.message);
-                            }
-                        });
+                               document.getElementById('courseMapForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Key ফরম্যাট (স্টুডেন্ট পোর্টালে যা ব্যবহৃত হচ্ছে তার সাথে হুবহু মিল)
+    const key = `${document.getElementById('mapYear').value} - ${document.getElementById('mapTermNum').value} (${document.getElementById('mapTerm').value} ${document.getElementById('mapSessYear').value})`;
+    
+    const payload = {
+        code: document.getElementById('mapCourseCode').value.trim().toUpperCase(),
+        title: document.getElementById('mapCourseTitle').value.trim(),
+        teacher: document.getElementById('mapCourseTeacher').value.trim()
+    };
 
+    console.log("Saving to Key:", key); // ডিবাগিং: কী চেক করার জন্য
+    console.log("Payload:", payload);    // ডিবাগিং: ডাটা চেক করার জন্য
+
+    try {
+        const docRef = doc(db, "course_mappings", key);
+        const snap = await getDoc(docRef);
+        
+        if (snap.exists()) {
+            await updateDoc(docRef, {
+                courses: arrayUnion(payload)
+            });
+            console.log("Update success");
+        } else {
+            await setDoc(docRef, {
+                courses: [payload]
+            });
+            console.log("New doc created success");
+        }
+        alert("সফলভাবে সেভ হয়েছে! Key: " + key);
+        document.getElementById('courseMapForm').reset();
+    } catch (err) {
+        console.error("Firebase Error Details:", err); // এখানে আসল কারণটি আসবে
+        alert("সেভ হচ্ছে না! কারণ: " + err.message);
+    }
+});
         // নোটিশ সাবমিট
         document.getElementById('noticeForm').addEventListener('submit', async (e) => {
             e.preventDefault(); try { await addDoc(collection(db, "notices"), { content: document.getElementById('noticeContent').value.trim(), createdAt: new Date().toISOString() }); alert("Notice Broadcasted!"); document.getElementById('noticeForm').reset(); } catch (err) { alert(err.message); }
