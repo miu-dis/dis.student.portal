@@ -256,7 +256,9 @@
                 btnView: "View", btnEdit: "Edit", btnDelete: "Delete", btnViewFile: "Open file",
                 confirmDeleteResource: "Delete this uploaded resource permanently?", alertResourceDeleted: "Resource deleted.",
                 sm_edit_title: "Edit Study Material", sm_save: "Save changes", alertResourceUpdated: "Resource updated successfully!", alertUploading: "Uploading file, please wait...",
-                alertNotOwner: "You can only edit or delete resources you uploaded."
+                alertNotOwner: "You can only edit or delete resources you uploaded.",
+                fileLinkMissing: "File link missing — please upload again.",
+                alertInvalidFileUrl: "Upload failed: no valid file URL. Check Supabase config (anon key) and public bucket."
             },
             bn: {
                 navTitle: "ডিআইএস স্টাডি পোর্টাল", btnNavLogin: "লগইন / রেজিস্টার", btnMyProfile: "আমার প্রোফাইল", btnLogout: "লগআউট",
@@ -288,7 +290,9 @@
                 btnView: "দেখুন", btnEdit: "এডিট", btnDelete: "মুছুন", btnViewFile: "ফাইল খুলুন",
                 confirmDeleteResource: "এই আপলোড করা রিসোর্স স্থায়ীভাবে মুছবেন?", alertResourceDeleted: "রিসোর্স মুছে ফেলা হয়েছে।",
                 sm_edit_title: "স্টাডি মেটেরিয়াল এডিট", sm_save: "সংরক্ষণ করুন", alertResourceUpdated: "রিসোর্স আপডেট হয়েছে!", alertUploading: "ফাইল আপলোড হচ্ছে, অপেক্ষা করুন...",
-                alertNotOwner: "শুধু নিজের আপলোড করা রিসোর্স এডিট বা ডিলিট করতে পারবেন।"
+                alertNotOwner: "শুধু নিজের আপলোড করা রিসোর্স এডিট বা ডিলিট করতে পারবেন।",
+                fileLinkMissing: "ফাইল লিংক নেই — আবার আপলোড করুন।",
+                alertInvalidFileUrl: "আপলোড সফ্য হয়নি: সঠিক URL তৈরি হয়নি। Supabase-এ anon key ও Public বাকেট চেক করুন।"
             }
         };
         window.portalTranslations = translations;
@@ -382,7 +386,7 @@
 
     <script type="module">
         import { auth, db } from "./assets/js/app.js";
-        import { uploadPortalFile, deletePortalFile } from "./assets/js/fileStorage.js";
+        import { uploadPortalFile, deletePortalFile, getPortalFilePublicUrl } from "./assets/js/fileStorage.js";
         import { onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { collection, onSnapshot, query, orderBy, doc, getDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -403,9 +407,13 @@
         }
 
         function getResourceViewUrl(rData) {
-            if (!rData.url) return "";
-            if (rData.url.startsWith("http") || rData.url.startsWith("data:")) return rData.url;
-            return rData.url;
+            const u = (rData.url || "").trim();
+            if (u.startsWith("http") || u.startsWith("data:")) return u;
+            if (rData.storagePath && rData.urlType !== "external") {
+                const rebuilt = getPortalFilePublicUrl(rData.storagePath);
+                if (rebuilt.startsWith("http")) return rebuilt;
+            }
+            return "";
         }
 
         function canManageResource(rData) {
@@ -434,18 +442,26 @@
                     <button type="button" data-delete-resource="${rData.id}" class="text-[9px] px-1.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 hover:bg-red-600 hover:text-white font-bold">${t('btnDelete')}</button>
                 </div>` : "";
 
+            const titleBlock = viewUrl
+                ? `<a href="${viewUrl}" target="_blank" rel="noopener" class="flex-1 font-medium text-gray-800 hover:text-indigo-700 min-w-0">
+                        <i class="fa-solid ${icon} mr-1"></i>
+                        <span class="break-words">${escapeHtml(rData.title)}</span>
+                        <span class="text-[9px] text-gray-400 block">(${t('byAuthor')} ${escapeHtml(rData.author)})</span>
+                   </a>`
+                : `<div class="flex-1 min-w-0">
+                        <i class="fa-solid ${icon} mr-1"></i>
+                        <span class="break-words font-medium text-gray-800">${escapeHtml(rData.title)}</span>
+                        <span class="text-[9px] text-red-500 block">${t('fileLinkMissing')}</span>
+                   </div>`;
+
             return `
                 <div class="p-2 bg-indigo-50/50 border border-indigo-100 rounded-md text-[11px]">
                     <div class="flex justify-between items-start gap-1">
-                        <a href="${viewUrl || '#'}" target="_blank" rel="noopener" class="flex-1 font-medium text-gray-800 hover:text-indigo-700 min-w-0">
-                            <i class="fa-solid ${icon} mr-1"></i>
-                            <span class="break-words">${escapeHtml(rData.title)}</span>
-                            <span class="text-[9px] text-gray-400 block">(${t('byAuthor')} ${escapeHtml(rData.author)})</span>
-                        </a>
+                        ${titleBlock}
                         ${manageBtns}
                     </div>
                     ${preview}
-                    ${viewUrl ? `<a href="${viewUrl}" target="_blank" class="inline-block mt-1 text-[9px] text-indigo-600 font-bold underline">${t('btnViewFile')}</a>` : ''}
+                    ${viewUrl ? `<a href="${viewUrl}" target="_blank" rel="noopener" class="inline-block mt-1 text-[9px] text-indigo-600 font-bold underline">${t('btnViewFile')}</a>` : ''}
                 </div>`;
         }
 
@@ -723,6 +739,11 @@
                 const semesterKey = editId
                     ? (document.getElementById('lockedSemLabel').innerText.trim() || studentCurrentTrimesterKey)
                     : studentCurrentTrimesterKey;
+
+                if (!urlPayload || (!urlPayload.startsWith("http") && !urlPayload.startsWith("data:"))) {
+                    alert(window.portalT('alertInvalidFileUrl'));
+                    return;
+                }
 
                 const payload = {
                     author: document.getElementById('shareAuthor').value.trim(),
