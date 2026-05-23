@@ -2,82 +2,482 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DIS Study Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Islamic Studies Study Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
-    <nav class="bg-emerald-800 p-4 flex justify-between text-white items-center">
-        <h1 class="font-bold">DIS Portal</h1>
-        <div id="navAuthButtons" class="flex gap-2"></div>
-    </nav>
-    <div class="container mx-auto p-4 space-y-6">
-        <div id="warningBanner" class="bg-red-600 text-white p-3 text-center hidden rounded shadow">⚠️ প্রোফাইল অসম্পূর্ণ!</div>
-        
-        <div class="flex gap-2">
-            <select id="filterYear" class="p-2 border rounded"><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select>
-            <select id="filterTermNum" class="p-2 border rounded"><option>1st Trimester</option><option>2nd Trimester</option><option>3rd Trimester</option></select>
-            <select id="filterSession" class="p-2 border rounded"><option>Spring 2026</option><option>Summer 2026</option></select>
+<body class="bg-gray-50 text-gray-800 font-sans transition-all duration-300">
+
+    <nav class="bg-emerald-800 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3 gap-2">
+                <img src="assets/img/logo.png" alt="University Logo" class="h-10 w-auto ml-2"> 
+                <h1 id="navTitle" class="text-xl font-bold tracking-wide">DIS Study Portal</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <select id="langSelector" class="bg-emerald-900 text-white text-sm font-semibold rounded p-1 border border-emerald-700 outline-none cursor-pointer">
+                    <option value="en">English</option>
+                    <option value="bn">বাংলা</option>
+                </select>
+                <div id="navAuthButtons">
+                    <a href="login.html" id="btnNavLogin" class="bg-white text-emerald-800 px-4 py-1.5 rounded-lg font-semibold hover:bg-emerald-50 transition shadow text-sm">Login / Register</a>
+                </div>
+            </div>
         </div>
-        <div id="courseGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </nav>
+
+    <div id="warningBanner" class="bg-red-600 text-white font-bold p-3 text-center hidden animate-bounce text-xs md:text-sm shadow-md">
+        ⚠️ আপনার প্রোফাইলটি অসম্পূর্ণ! অনুগ্রহ করে 'My Profile' বাটনে ক্লিক করে তথ্য সম্পূর্ণ করুন।
     </div>
 
-    <div id="shareModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4">
-        <div class="bg-white p-6 rounded w-full max-w-md">
-            <h3 class="font-bold mb-4">Share Resource</h3>
-            <form id="resourceShareForm" class="space-y-3">
-                <input type="text" id="shareAuthor" placeholder="Name" required class="w-full p-2 border rounded">
-                <input type="text" id="shareTitle" placeholder="Title" required class="w-full p-2 border rounded">
-                <input type="file" id="shareFileField" class="w-full p-2 border rounded">
-                <button type="submit" class="bg-indigo-600 text-white w-full py-2 rounded">Publish</button>
+    <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white py-8 text-center shadow-inner">
+        <div class="container mx-auto px-4">
+            <h2 id="heroTitle" class="text-2xl md:text-3xl font-extrabold mb-2">Islamic Studies Study Portal</h2>
+            <p id="heroSubtitle" class="text-emerald-100 text-sm max-w-xl mx-auto">Academic Hub</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl shadow-md p-5 border-t-4 border-emerald-600">
+            <h3 id="lblNoticeBoard" class="text-lg font-bold text-gray-900 mb-3 flex items-center">📢 Notice Board</h3>
+            <div id="noticeList" class="space-y-3 overflow-y-auto max-h-48 p-1"><p class="text-xs text-gray-400">Loading notices...</p></div>
+        </div>
+        <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-5 border-t-4 border-amber-500">
+            <h3 id="lblDailyRoutine" class="text-lg font-bold text-gray-900 mb-3 flex items-center">⏳ Daily Routine Update</h3>
+            <div id="dailyRoutineList" class="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto max-h-48 p-1"><p class="text-xs text-gray-400">Loading today's updates...</p></div>
+        </div>
+    </main>
+
+    <section class="container mx-auto px-4 pb-12">
+        <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-teal-600">
+            <div class="border-b pb-3 mb-6"><h3 id="lblPermanentRoutine" class="text-xl font-bold text-emerald-800">📅 Permanent Weekly Schedule Board</h3></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="weeklyRoutineGrid">
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Saturday">Saturday</h4><div id="day-Saturday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Sunday">Sunday</h4><div id="day-Sunday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Monday">Monday</h4><div id="day-Monday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Tuesday">Tuesday</h4><div id="day-Tuesday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Wednesday">Wednesday</h4><div id="day-Wednesday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-rose-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Friday">Friday</h4><div id="day-Friday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-4 pb-12">
+        <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-indigo-600">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 pb-4 border-b border-gray-200 gap-4">
+                <div>
+                    <h3 id="lblCourses" class="text-2xl font-bold text-emerald-800 mb-0.5">Academic Resources Directory</h3>
+                    <p class="text-xs text-gray-500 font-medium" id="lblSubTitleCourses">সব সেমিস্টারের ফাইল দেখার উম্মুক্ত আর্কাইভ (আপলোড শুধুমাত্র নিজের সেমিস্টারে লকিং)।</p>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto text-xs font-semibold">
+                    <select id="filterYear" class="bg-gray-50 border border-gray-300 text-emerald-800 p-2 rounded-lg outline-none">
+                        <option value="1st Year">1st Year</option><option value="2nd Year">2nd Year</option><option value="3rd Year">3rd Year</option><option value="4th Year">4th Year</option>
+                    </select>
+                    <select id="filterTermNum" class="bg-gray-50 border border-gray-300 text-emerald-800 p-2 rounded-lg outline-none">
+                        <option value="1st Trimester">1st Trimester</option><option value="2nd Trimester">2nd Trimester</option><option value="3rd Trimester">3rd Trimester</option>
+                    </select>
+                    <select id="filterSession" class="bg-gray-50 border border-gray-300 text-emerald-800 p-2 rounded-lg outline-none">
+                        <option value="Spring 2026">Spring 2026</option><option value="Summer 2026">Summer 2026</option><option value="Fall 2026">Fall 2026</option>
+                        <option value="Spring 2027">Spring 2027</option><option value="Summer 2027">Summer 2027</option><option value="Fall 2027">Fall 2027</option>
+                    </select>
+                    <span id="displayStudentCurrentSem" class="bg-indigo-50 text-indigo-800 font-bold px-3 py-2 rounded-lg border border-indigo-200 shrink-0">Syncing...</span>
+                </div>
+            </div>
+            
+            <div id="courseGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <p class="text-xs text-gray-400 p-2">Loading academic course archive...</p>
+            </div>
+        </div>
+    </section>
+
+    <div id="shareModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
+            <h3 id="sm_title" class="text-lg font-bold text-indigo-900 mb-4 border-b pb-2 flex items-center"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> Share / Upload Study Material</h3>
+            
+            <form id="resourceShareForm" class="space-y-3 text-xs">
+                <div>
+                    <label id="sm_name" class="block font-semibold text-gray-600 mb-1">Contributor Name</label>
+                    <input type="text" id="shareAuthor" required class="w-full p-2 border rounded">
+                </div>
+                <div>
+                    <label id="sm_topic" class="block font-semibold text-gray-600 mb-1">Topic / Subject Title</label>
+                    <input type="text" id="shareTitle" required class="w-full p-2 border rounded" placeholder="e.g. উসুল আল-শাশী ১ম পরিচ্ছেদ নোট">
+                </div>
+                <div>
+                    <label id="sm_type" class="block font-semibold text-gray-600 mb-1">Resource Type</label>
+                    <select id="shareType" required class="w-full p-2 border rounded bg-white">
+                        <option value="PDF/Handnote">PDF / Handnote</option>
+                        <option value="Video Lecture">Video / YouTube Link</option>
+                        <option value="Audio/Voice">Audio / Voice Clip</option>
+                        <option value="Image/Document">Image / Document</option>
+                    </select>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-xl border border-dashed space-y-2">
+                    <label id="lblUploadMethod" class="block font-bold text-gray-700 mb-1">Choose Method (শেয়ার করার মাধ্যম সিলেক্ট করুন):</label>
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <button type="button" onclick="switchUploadMethod('file')" id="methodFileBtn" class="py-1.5 text-center font-bold rounded-lg bg-indigo-100 text-indigo-800 border border-indigo-300">📁 Direct File Upload</button>
+                        <button type="button" onclick="switchUploadMethod('link')" id="methodLinkBtn" class="py-1.5 text-center font-bold rounded-lg bg-gray-100 text-gray-600 border">🔗 Share Cloud Link</button>
+                    </div>
+
+                    <div id="uploadFileSection">
+                        <label id="lblSelectFileText" class="block text-[10px] text-gray-500 font-semibold mb-1">Select File (Max Size: 2MB)</label>
+                        <input type="file" id="shareFileField" accept="image/*,application/pdf,audio/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-100 file:text-indigo-800 hover:file:bg-indigo-200 cursor-pointer">
+                    </div>
+
+                    <div id="uploadLinkSection" class="hidden">
+                        <label id="lblLinkUrlText" class="block text-[10px] text-gray-500 font-semibold mb-1">Paste Public Link Address</label>
+                        <input type="url" id="shareUrl" class="w-full p-2 border border-indigo-300 rounded text-blue-600 font-mono" placeholder="https://drive.google.com/... (Must be Public)">
+                    </div>
+                </div>
+
+                <div class="bg-indigo-50 p-2.5 rounded-lg text-indigo-900 font-medium text-[11px] border border-indigo-200">
+                    🔒 এই ফাইলটি অটোমেটিক আপনার নিজের রানিং সেমিস্টার <b id="lockedSemLabel">...</b> এ লক হয়ে পাবলিশ হবে।
+                </div>
+
+                <div class="flex justify-end space-x-2 pt-2 border-t">
+                    <button type="button" onclick="closeShareModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold transition" id="sm_cancel">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition" id="sm_submit">Publish Live</button>
+                </div>
             </form>
         </div>
     </div>
 
-    <script type="module">
-        import { auth, db } from "./assets/js/app.js";
-        import { doc, getDoc, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    <div id="profileModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative max-h-[90vh] overflow-y-auto">
+            <h3 id="m_title" class="text-lg font-bold text-emerald-800 mb-4 border-b pb-2 flex items-center"><i class="fa-solid fa-id-card mr-2"></i> My Personal Profile Card</h3>
+            <form id="profileEditForm" class="space-y-3 text-xs">
+                <div class="flex items-center space-x-4 bg-slate-50 p-2.5 rounded-xl border border-dashed">
+                    <img id="avatarPreview" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="h-16 w-16 rounded-full object-cover border-2 border-emerald-700 shadow-sm" alt="Avatar">
+                    <div><label id="m_pic" class="block font-semibold text-gray-700 mb-1">Upload Profile Picture</label><input type="file" id="profilePicFile" accept="image/*" class="w-full text-xs text-gray-500"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="col-span-2"><label id="m_name" class="block font-semibold text-gray-600 mb-0.5">Full Name</label><input type="text" id="editProfileName" required class="w-full p-2 border rounded text-gray-700"></div>
+                    <div><label id="m_uid" class="block font-semibold text-gray-600 mb-0.5">University ID (UID)</label><input type="text" id="editProfileUID" required class="w-full p-2 border rounded text-gray-700"></div>
+                    <div><label id="m_batch" class="block font-semibold text-gray-600 mb-0.5">Batch Number</label><input type="text" id="editProfileBatch" required class="w-full p-2 border rounded text-gray-700"></div>
+                </div>
+                <div class="bg-slate-100 p-3 rounded-xl border space-y-2">
+                    <p id="m_academic_title" class="font-bold text-slate-700 text-[11px]"><i class="fa-solid fa-graduation-cap mr-1"></i> Academic Session Status</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <select id="editProfileYear" required class="w-full p-1.5 border rounded bg-white text-gray-700"><option value="1st Year">1st Year</option><option value="2nd Year">2nd Year</option><option value="3rd Year">3rd Year</option><option value="4th Year">4th Year</option></select>
+                        </div>
+                        <div>
+                            <select id="editProfileTermNum" required class="w-full p-1.5 border rounded bg-white text-gray-700"><option value="1st Trimester">1st Trimester</option><option value="2nd Trimester">2nd Trimester</option><option value="3rd Trimester">3rd Trimester</option></select>
+                        </div>
+                        <div>
+                            <select id="editProfileTerm" required class="w-full p-1.5 border rounded bg-white text-gray-700"><option value="Spring">Spring</option><option value="Summer">Summer</option><option value="Fall">Fall</option></select>
+                        </div>
+                        <div>
+                            <select id="editProfileSessionYear" required class="w-full p-1.5 border rounded bg-white text-gray-700"><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-200 space-y-2.5">
+                    <p id="m_emg_title" class="font-bold text-amber-800 text-[11px]">⚠️ Emergency Data</p>
+                    <div><label id="m_phone" class="block font-semibold text-gray-700 mb-0.5">My Mobile Number</label><input type="tel" id="editProfilePhone" required class="w-full p-2 border border-gray-300 rounded"></div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-0.5">Blood Group</label>
+                        <select id="editProfileBlood" required class="w-full p-2 border border-gray-300 rounded bg-white"><option value="">Select Blood Group</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="O+">O+</option><option value="O-">O-</option><option value="AB+">AB+</option><option value="AB-">AB-</option></select>
+                    </div>
+                    <div><label class="block font-semibold text-gray-700 mb-0.5">Emergency Contact Name</label><input type="text" id="editProfileEmergencyName" required class="w-full p-2 border border-gray-300 rounded"></div>
+                    <div><label class="block font-semibold text-gray-700 mb-0.5">Emergency Contact Mobile No</label><input type="tel" id="editProfileEmergencyPhone" required class="w-full p-2 border border-gray-300 rounded"></div>
+                </div>
+                <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-200 space-y-2">
+                    <p id="m_pass_title" class="font-bold text-blue-800 text-[11px]">🔒 Change Password</p>
+                    <div class="relative"><input type="password" id="newProfilePassword" class="w-full p-2 border border-gray-300 rounded pr-10" placeholder="Min. 6 characters"><button type="button" onclick="toggleProfilePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"><i id="eyeIconProfile" class="fa-solid fa-eye-slash"></i></button></div>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2 border-t">
+                    <button type="button" id="btnCancelProfile" onclick="closeProfileModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold transition">Cancel</button>
+                    <button type="submit" id="btnSaveProfileText" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-semibold transition">Save Profile Info</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        let currentTrimesterKey = "";
-        let selectedCode = "";
+    <script>
+        let currentActiveMethod = "file"; 
 
-        async function refreshResources() {
-            const key = `${document.getElementById('filterYear').value} - ${document.getElementById('filterTermNum').value} (${document.getElementById('filterSession').value})`;
-            const mapDoc = await getDoc(doc(db, "course_mappings", key));
-            const grid = document.getElementById('courseGrid');
-            grid.innerHTML = '';
-            if (mapDoc.exists()) {
-                mapDoc.data().courses.forEach(c => {
-                    grid.innerHTML += `<div class="p-4 border rounded bg-white">
-                        <h3 class="font-bold">${c.title}</h3>
-                        <p class="text-xs text-gray-500">${c.teacher}</p>
-                        <button onclick="window.triggerShare('${c.code}')" class="bg-indigo-600 text-white p-2 mt-2 rounded text-xs">Share Note</button>
-                    </div>`;
-                });
+        function switchUploadMethod(method) {
+            currentActiveMethod = method;
+            const fBtn = document.getElementById('methodFileBtn');
+            const lBtn = document.getElementById('methodLinkBtn');
+            const fSec = document.getElementById('uploadFileSection');
+            const lSec = document.getElementById('uploadLinkSection');
+
+            if(method === 'file') {
+                fBtn.className = "py-1.5 text-center font-bold rounded-lg bg-indigo-100 text-indigo-800 border border-indigo-300 w-full";
+                lBtn.className = "py-1.5 text-center font-bold rounded-lg bg-gray-100 text-gray-600 border w-full";
+                fSec.classList.remove('hidden'); lSec.classList.add('hidden');
+            } else {
+                lBtn.className = "py-1.5 text-center font-bold rounded-lg bg-indigo-100 text-indigo-800 border border-indigo-300 w-full";
+                fBtn.className = "py-1.5 text-center font-bold rounded-lg bg-gray-100 text-gray-600 border w-full";
+                lSec.classList.remove('hidden'); fSec.classList.add('hidden');
             }
         }
+        window.switchUploadMethod = switchUploadMethod;
 
-        document.querySelectorAll('select').forEach(s => s.addEventListener('change', refreshResources));
-        window.triggerShare = (code) => { selectedCode = code; document.getElementById('shareModal').classList.remove('hidden'); };
-        
-        document.getElementById('resourceShareForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const file = document.getElementById('shareFileField').files[0];
-            if (file && file.size > 2 * 1024 * 1024) { alert("2MB limit exceeded!"); return; }
-            const reader = new FileReader();
-            reader.onload = async () => {
-                await addDoc(collection(db, "resources"), {
-                    title: document.getElementById('shareTitle').value,
-                    semester: currentTrimesterKey,
-                    courseCode: selectedCode,
-                    url: reader.result
+        const translations = {
+            en: {
+                navTitle: "DIS Study Portal", btnNavLogin: "Login / Register", warningBanner: "⚠️ Profile Incomplete! Mandatory fields are empty.",
+                heroTitle: "Islamic Studies Study Portal", heroSubtitle: "Academic matrix open directory server.", lblNoticeBoard: "📢 Notice Board",
+                lblDailyRoutine: "⏳ Daily Routine Update", lblPermanentRoutine: "📅 Permanent Weekly Schedule Board", lblCourses: "Class Shared Resources Archive",
+                lblSubTitleCourses: "Filter and read study resources from any trimester session using the checkboxes above.",
+                sat: "Saturday", sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", fri: "Friday",
+                m_title: "My Personal Profile Card", m_pic: "Upload Profile Picture", m_name: "Full Name", m_uid: "University ID (UID)",
+                m_batch: "Batch Number", m_academic_title: "Academic Trimester Status", m_emg_title: "⚠️ Emergency Data", m_phone: "My Mobile Number",
+                m_emg_name: "Emergency Contact Name", m_emg_phone: "Emergency Contact Mobile No", m_pass_title: "🔒 Change Password",
+                btnCancelProfile: "Cancel", btnSaveProfileText: "Save Profile Info", sm_title: "Share Study Material / Upload File", sm_name: "Contributor Name", sm_topic: "Topic / Subject Title", sm_type: "Resource Type", sm_cancel: "Cancel", sm_submit: "Publish Live"
+            },
+            bn: {
+                navTitle: "ডিআইএস স্টাডি পোর্টাল", btnNavLogin: "লগইন / রেজিস্টার", warningBanner: "⚠️ আপনার প্রোফাইলটি অসম্পূর্ণ! অনুগ্রহ করে 'My Profile' বাটনে ক্লিক করে তথ্য সম্পূর্ণ করুন।",
+                heroTitle: "ইসলামিক স্টাডিজ বিভাগ পোর্টাল", heroSubtitle: "সহপাঠীদের মাঝে ক্লাস নোট এবং লেকচার শেয়ার করার উন্মুক্ত প্ল্যাটফর্ম।", lblNoticeBoard: "📢 নোটিশ বোর্ড",
+                lblDailyRoutine: "⏳ আজকের সাময়িক রুটিন", lblPermanentRoutine: "📅 স্থায়ী সাপ্তাহিক মাস্টার রুটিন বোর্ড", lblCourses: "একাডেমিক курс ও শেয়ারড রিসোর্স আর্কাইভ",
+                lblSubTitleCourses: "ওপরের তিনটি সেশন বক্স সিলেক্ট করে খুব সহজে যেকোনো সেমিস্টারের ফাইল এক ক্লিকে খুঁজে বের করুন।",
+                sat: "Saturday (শনিবার)", sun: "Sunday (রবিবার)", mon: "Monday (সোমবার)", tue: "Tuesday (মঙ্গলবার)", wed: "Wednesday (বুধবার)", fri: "Friday (শুক্রবার)",
+                m_title: "আমার প্রোফাইল ইনফো কার্ড", m_pic: "প্রোফাইল পিকচার আপলোড (ঐচ্ছিক)", m_name: "পূর্ণ নাম", m_uid: "ইউনিভার্সিটি আইডি (UID)",
+                m_batch: "ব্যাচ নম্বর", m_academic_title: "একাডেমিক সেশন (বর্ষ / সেমিস্টার নং / সেশন / সাল)", m_emg_title: "⚠️ জরুরী কন্টাক্ট তথ্য (বাধ্যতামূলক)", m_phone: "আমার মোবাইল নম্বর",
+                m_emg_name: "জরুরী যোগাযোগ ব্যক্তির নাম", m_emg_phone: "জরুরী যোগাযোগ মোবাইল নম্বর", m_pass_title: "🔒 পাসওয়ার্ড পরিবর্তন (ঐচ্ছিক)",
+                btnCancelProfile: "বাতিল করুন", btnSaveProfileText: "প্রোফাইল সেভ করুন", sm_title: "স্টাডি মেটেরিয়াল / ফাইল আপলোড করুন", sm_name: "আপনার নাম", sm_topic: "নোট বা লেকচারের নাম", sm_type: "রিসোর্সের ধরণ", sm_cancel: "বাতিল", sm_submit: "লাইভ পাবলিশ করুন"
+            }
+        };
+
+        function applyLanguage(lang) {
+            const t = translations[lang] || translations['en'];
+            document.getElementById('navTitle').innerText = t.navTitle;
+            if(document.getElementById('btnNavLogin')) document.getElementById('btnNavLogin').innerText = t.btnNavLogin;
+            document.getElementById('warningBanner').innerText = t.warningBanner;
+            document.getElementById('heroTitle').innerText = t.heroTitle;
+            document.getElementById('heroSubtitle').innerText = t.heroSubtitle;
+            document.getElementById('lblNoticeBoard').innerText = t.lblNoticeBoard;
+            document.getElementById('lblDailyRoutine').innerText = t.lblDailyRoutine;
+            document.getElementById('lblPermanentRoutine').innerText = t.lblPermanentRoutine;
+            document.getElementById('lblCourses').innerText = t.lblCourses;
+            document.getElementById('lblSubTitleCourses').innerText = t.lblSubTitleCourses;
+
+            document.getElementById('dayLabel-Saturday').innerText = t.sat; document.getElementById('dayLabel-Sunday').innerText = t.sun;
+            document.getElementById('dayLabel-Monday').innerText = t.mon; document.getElementById('dayLabel-Tuesday').innerText = t.tue;
+            document.getElementById('dayLabel-Wednesday').innerText = t.wed; document.getElementById('dayLabel-Friday').innerText = t.fri;
+
+            document.getElementById('m_title').innerHTML = `<i class="fa-solid fa-id-card mr-2"></i> ` + t.m_title;
+            document.getElementById('m_pic').innerText = t.m_pic; document.getElementById('m_name').innerText = t.m_name;
+            document.getElementById('m_uid').innerText = t.m_uid; document.getElementById('m_batch').innerText = t.m_batch;
+            document.getElementById('m_academic_title').innerHTML = `<i class="fa-solid fa-graduation-cap mr-1"></i> ` + t.m_academic_title;
+            document.getElementById('m_emg_title').innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> ` + t.m_emg_title;
+            document.getElementById('m_phone').innerText = t.m_phone; document.getElementById('m_emg_name').innerText = t.m_emg_name;
+            document.getElementById('m_emg_phone').innerText = t.m_emg_phone; document.getElementById('m_pass_title').innerHTML = `<i class="fa-solid fa-lock mr-1"></i> ` + t.m_pass_title;
+            document.getElementById('btnCancelProfile').innerText = t.btnCancelProfile; document.getElementById('btnSaveProfileText').innerText = t.btnSaveProfileText;
+
+            document.getElementById('sm_title').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> ` + t.sm_title;
+            document.getElementById('sm_name').innerText = t.sm_name; document.getElementById('sm_topic').innerText = t.sm_topic;
+            document.getElementById('sm_type').innerText = t.sm_type; document.getElementById('sm_cancel').innerText = t.sm_cancel;
+            document.getElementById('sm_submit').innerText = t.sm_submit;
+        }
+
+        const langSelector = document.getElementById('langSelector');
+        langSelector.addEventListener('change', (e) => { localStorage.setItem('preferredLang', e.target.value); applyLanguage(e.target.value); window.location.reload(); });
+        const savedLang = localStorage.getItem('preferredLang') || 'en';
+        langSelector.value = savedLang;
+        applyLanguage(savedLang);
+
+        window.openShareModal = () => { document.getElementById('shareModal').className = "fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm"; };
+        window.closeShareModal = () => { document.getElementById('shareModal').className = "fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50"; };
+        function toggleProfilePassword() { const input = document.getElementById('newProfilePassword'); const icon = document.getElementById('eyeIconProfile'); if (input.type === "password") { input.type = "text"; icon.className = "fa-solid fa-eye"; } else { input.type = "password"; icon.className = "fa-solid fa-eye-slash"; } }
+        window.toggleProfilePassword = toggleProfilePassword;
+    </script>
+
+    <script type="module">
+        import { auth, db } from "./assets/js/app.js";
+        import { onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { collection, onSnapshot, query, orderBy, doc, getDoc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        let loggedInUserUID = null; let isProfileIncomplete = false; let base64PicString = "";
+        let studentCurrentTrimesterKey = ""; 
+        let base64UploadedFileString = ""; 
+        const dailyContainer = document.getElementById('dailyRoutineList');
+        const courseGrid = document.getElementById('courseGrid');
+        const daysWithClasses = { Saturday: false, Sunday: false, Monday: false, Tuesday: false, Wednesday: false, Friday: false };
+
+        // ৩-ফিল্টার বক্স ডাটা লিসেনার লুপ
+        async function updateFiltersAndListen() {
+            const yr = document.getElementById('filterYear').value; const term = document.getElementById('filterTermNum').value; const sess = document.getElementById('filterSession').value;
+            const combinedTrimesterKey = `${yr} - ${term} (${sess})`;
+
+            const mapDoc = await getDoc(doc(db, "course_mappings", combinedTrimesterKey));
+            let mappedCourses = []; if(mapDoc.exists()) mappedCourses = mapDoc.data().courses || [];
+
+            onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snapshot) => {
+                courseGrid.innerHTML = ''; const currentLang = localStorage.getItem('preferredLang') || 'en';
+                if(mappedCourses.length === 0) { courseGrid.innerHTML = `<p class="text-xs text-gray-400 col-span-3 p-6 text-center border border-dashed rounded-xl w-full">${currentLang === 'bn' ? 'এই সিলেক্টেড সেমিস্টারে কোনো লাইভ কোর্স এখনো অ্যাডমিন প্যানেল থেকে তৈরি করা হয়নি।' : 'No courses mapped for this combined filter session by admin yet.'}</p>`; return; }
+
+                mappedCourses.forEach(course => {
+                    let sharedItemsHTML = "";
+                    snapshot.forEach(resDoc => {
+                        const rData = resDoc.data();
+                        if(rData.courseCode === course.code && rData.semester === combinedTrimesterKey) {
+                            let icon = "fa-file-pdf text-red-500";
+                            if(rData.type.includes("Video")) icon = "fa-video text-blue-500";
+                            if(rData.type.includes("Audio")) icon = "fa-microphone text-purple-500";
+                            if(rData.type.includes("Image")) icon = "fa-image text-amber-500";
+
+                            sharedItemsHTML += `
+                                <a href="${rData.url}" target="_blank" class="flex justify-between items-center p-2 bg-indigo-50/50 border border-indigo-100 rounded-md hover:bg-indigo-100 transition text-[11px] font-medium text-gray-700">
+                                    <span class="truncate"><i class="fa-solid ${icon} mr-1"></i> ${rData.title} <span class="text-[9px] text-gray-400 font-normal">(By: ${rData.author})</span></span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-indigo-500 shrink-0"></i>
+                                </a>`;
+                        }
+                    });
+
+                    if(sharedItemsHTML === "") sharedItemsHTML = `<p class="text-[10px] text-gray-400 italic p-1">No shared files.</p>`;
+                    const isMyOwnSemester = (combinedTrimesterKey === studentCurrentTrimesterKey);
+                    const btnColorClass = isMyOwnSemester ? "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-600 hover:text-white shadow-sm font-bold" : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed text-center";
+
+                    courseGrid.innerHTML += `
+                        <div class="border border-gray-200 rounded-xl p-4 bg-gray-50 flex flex-col justify-between hover:shadow-md hover:border-indigo-600 transition duration-200">
+                            <div>
+                                <div class="flex justify-between items-start">
+                                    <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded">${course.code}</span>
+                                    <span class="text-[9px] bg-slate-200 font-bold px-1.5 py-0.5 rounded text-slate-700">Active Course</span>
+                                </div>
+                                <h4 class="text-base font-extrabold text-gray-800 mt-2">${course.title}</h4>
+                                <p class="text-xs text-gray-500 mt-1 mb-3"><i class="fa-solid fa-user-tie mr-1 text-slate-400"></i>${currentLang === 'bn' ? 'ফ্যাকাল্টি' : 'Faculty'}: ${course.teacher}</p>
+                                <div class="space-y-1.5 border-t border-dashed pt-2.5">${sharedItemsHTML}</div>
+                            </div>
+                            <div class="mt-4 pt-2.5 flex">
+                                <button onclick="triggerLockedUploadFlow('${course.code}', '${course.title}', ${isMyOwnSemester})" class="w-full ${btnColorClass} border text-center text-xs py-2 rounded-lg transition flex items-center justify-center gap-1"><i class="fa-solid fa-plus-circle"></i> ${currentLang === 'bn' ? 'নোট / লিংক যোগ করুন' : 'Add Resource Link'}</button>
+                            </div>
+                        </div>`;
                 });
-                alert("Published!");
-                document.getElementById('shareModal').classList.add('hidden');
-            };
-            if(file) reader.readAsDataURL(file);
+            });
+        }
+
+        document.getElementById('filterYear').addEventListener('change', updateFiltersAndListen);
+        document.getElementById('filterTermNum').addEventListener('change', updateFiltersAndListen);
+        document.getElementById('filterSession').addEventListener('change', updateFiltersAndListen);
+
+        window.triggerLockedUploadFlow = (courseCode, courseTitle, isAllowed) => {
+            if(!isAllowed) { alert("🔴 এক্সেস লক! আপনি শুধু আপনার নিজের রানিং সেমিস্টারের ফাইল আপলোড করতে পারবেন। অন্য সেমিস্টারের ফাইল শুধুমাত্র দেখার অনুমতি রয়েছে।"); return; }
+            document.getElementById('shareAuthor').value = auth.currentUser.displayName || "";
+            document.getElementById('shareTitle').value = `${courseTitle} - `;
+            document.getElementById('lockedSemLabel').innerText = studentCurrentTrimesterKey;
+            document.getElementById('resourceShareForm').dataset.lockedCode = courseCode;
+            
+            // স্টেট ও ভেরিয়েবল ক্লিয়ার
+            base64UploadedFileString = ""; 
+            document.getElementById('shareFileField').value = ""; 
+            document.getElementById('shareUrl').value = "";
+            switchUploadMethod('file'); 
+            openShareModal();
+        };
+
+        // ২ এমবি ফিল্টার ইঞ্জিন
+        document.getElementById('shareFileField').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const currentLang = localStorage.getItem('preferredLang') || 'en';
+            if(file) {
+                const fileSizeInMB = file.size / (1024 * 1024);
+                if(fileSizeInMB > 2) {
+                    if(currentLang === 'bn') {
+                        alert("🔴 ফাইলের সাইজ ২ এমবি-এর বেশি!\n\nঅনুগ্রহ করে ফাইলটি গুগল ড্রাইভে বা ইউটিউবে আপলোড করে সেটির পাবলিক লিংক এখানে শেয়ার করুন এবং লিংকটি যেন সবার জন্য Public করা থাকে।");
+                    } else {
+                        alert("🔴 File size exceeds 2MB limit!\n\nPlease upload the file to Google Drive or YouTube, select 'Share Cloud Link' method, and paste the URL here. Ensure the link visibility is set to Public.");
+                    }
+                    e.target.value = ""; base64UploadedFileString = "";
+                    switchUploadMethod('link'); return;
+                }
+                const reader = new FileReader(); reader.onloadend = () => { base64UploadedFileString = reader.result; }; reader.readAsDataURL(file);
+            }
         });
+
+        // ফর্ম সাবমিশন লজিক
+        document.getElementById('resourceShareForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); let finalUrlPayload = "";
+            if(currentActiveMethod === 'file') {
+                if(!base64UploadedFileString) { alert("একটি ২ এমবি-র নিচের ফাইল সিলেক্ট করুন।"); return; }
+                finalUrlPayload = base64UploadedFileString;
+            } else {
+                finalUrlPayload = document.getElementById('shareUrl').value.trim();
+                if(!finalUrlPayload) { alert("লিংক পেস্ট করুন।"); return; }
+            }
+            try {
+                await addDoc(collection(db, "resources"), {
+                    author: document.getElementById('shareAuthor').value.trim(), title: document.getElementById('shareTitle').value.trim(), type: document.getElementById('shareType').value, courseCode: document.getElementById('resourceShareForm').dataset.lockedCode, semester: studentCurrentTrimesterKey, url: finalUrlPayload, createdAt: new Date().toISOString()
+                });
+                alert("Study Resource Published Successfully!"); document.getElementById('resourceShareForm').reset(); closeShareModal();
+            } catch (err) { alert(err.message); }
+        });
+
+        // রুটিন ও নোটিশ লিসেনার
+        onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
+            dailyContainer.innerHTML = ''; Object.keys(daysWithClasses).forEach(day => { const el = document.getElementById(`day-${day}`); if(el) el.innerHTML = ''; daysWithClasses[day] = false; });
+            snapshot.forEach((doc) => {
+                const data = doc.data(); const currentLang = localStorage.getItem('preferredLang') || 'en';
+                let genderLabel = data.gender === 'Male' ? (currentLang === 'bn' ? 'ভাইদের শাখা' : 'Male') : (currentLang === 'bn' ? 'বোনদের শাখা' : 'Female');
+                const cardHTML = `<div class="p-2.5 bg-white border border-slate-200 rounded-lg shadow-sm text-xs"><div class="flex justify-between items-center mb-0.5"><h5 class="font-extrabold text-emerald-800 text-sm">${data.subject}</h5><span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${data.gender === 'Male' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${genderLabel}</span></div><div class="mb-1 text-[11px] text-amber-700 font-bold">Batch: ${data.batchNumber}</div><div class="grid grid-cols-2 text-[11px] text-gray-600 gap-y-0.5 border-t border-dashed pt-1 mt-1"><p><b>Code:</b> ${data.courseCode}</p><p><b>Room:</b> ${data.room}</p><p class="text-emerald-700 font-bold col-span-2"><b>Teacher:</b> ${data.teacherCode}</p><p class="font-bold text-slate-700 col-span-2 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${data.timeSlot}</p></div></div>`;
+                if (data.boardType === 'daily') { dailyContainer.innerHTML += cardHTML; hasDaily = true; } else if (data.boardType === 'permanent' && data.classDay && data.classDay !== "N/A") { const el = document.getElementById(`day-${data.classDay}`); if (el) { el.innerHTML += cardHTML; daysWithClasses[data.classDay] = true; } }
+            });
+            Object.keys(daysWithClasses).forEach(day => { if (!daysWithClasses[day]) document.getElementById(`day-${day}`).innerHTML = '<p class="text-xs text-gray-400 text-center py-2 bg-white/40 border border-dashed rounded-lg">No classes.</p>'; });
+        });
+        onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
+            const noticeContainer = document.getElementById('noticeList'); noticeContainer.innerHTML = '';
+            snapshot.forEach((doc) => { const data = doc.data(); noticeContainer.innerHTML += `<div class="p-2.5 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm text-xs"><p class="font-medium text-gray-800">${data.content}</p></div>`; });
+        });
+
+        // প্রোফাইল ভ্যালিডেশন
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                loggedInUserUID = user.uid; const userDoc = await getDoc(doc(db, "users", loggedInUserUID));
+                if(userDoc.exists()) {
+                    const uData = userDoc.data(); if (uData.role === 'admin') { window.location.replace("./admin-dashboard.html"); return; }
+                    const uYear = uData.profileYear || "1st Year"; const uTermNum = uData.profileTermNum || "1st Trimester"; const uSess = uData.profileTerm || "Spring"; const uSessYear = uData.profileSessionYear || "2026";
+                    studentCurrentTrimesterKey = `${uYear} - ${uTermNum} (${uSess} ${uSessYear})`;
+                    document.getElementById('displayStudentCurrentSem').innerText = uData.profileYear ? `${uYear} - ${uTermNum}` : "Profile Incomplete!";
+
+                    if(!uData.phone || !uData.bloodGroup || !uData.emergencyPhone || !uData.profileYear || !uData.profileTermNum) {
+                        isProfileIncomplete = true; document.getElementById('warningBanner').classList.remove('hidden');
+                    }
+                    const currentLang = localStorage.getItem('preferredLang') || 'en';
+                    const pulseClass = isProfileIncomplete ? 'bg-red-600 hover:bg-red-700 animate-pulse text-white' : 'bg-emerald-950 hover:bg-emerald-900 text-emerald-200';
+                    document.getElementById('navAuthButtons').innerHTML = `<div class="flex items-center space-x-2 gap-1"><button id="openProfileEditBtn" class="${pulseClass} px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-user mr-1"></i> ${currentLang === 'bn' ? 'আমার প্রোফাইল' : 'My Profile'}</button><button id="logoutBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg font-semibold transition text-xs">Logout</button></div>`;
+
+                    document.getElementById('openProfileEditBtn').addEventListener('click', () => {
+                        document.getElementById('editProfileName').value = uData.name || ""; document.getElementById('editProfileUID').value = uData.universityUID || ""; document.getElementById('editProfileBatch').value = uData.batchNumber || "";
+                        document.getElementById('editProfilePhone').value = uData.phone || ""; document.getElementById('editProfileBlood').value = uData.bloodGroup || ""; document.getElementById('editProfileEmergencyName').value = uData.emergencyName || ""; document.getElementById('editProfileEmergencyPhone').value = uData.emergencyPhone || "";
+                        document.getElementById('editProfileYear').value = uData.profileYear || "1st Year"; document.getElementById('editProfileTermNum').value = uData.profileTermNum || "1st Trimester"; document.getElementById('editProfileTerm').value = uData.profileTerm || "Spring"; document.getElementById('editProfileSessionYear').value = uData.profileSessionYear || "2026";
+                        if(uData.profilePic) { document.getElementById('avatarPreview').src = uData.profilePic; base64PicString = uData.profilePic; }
+                        if(isProfileIncomplete) document.getElementById('btnCancelProfile').classList.add('hidden'); else document.getElementById('btnCancelProfile').classList.remove('hidden');
+                        document.getElementById('profileModal').className = "fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm";
+                    });
+                    if(isProfileIncomplete) setTimeout(() => { document.getElementById('openProfileEditBtn').click(); }, 1500);
+                    document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => window.location.reload()); });
+
+                    document.getElementById('filterYear').value = uYear;
+                    document.getElementById('filterTermNum').value = uTermNum;
+                    document.getElementById('filterSession').value = `${uSess} ${uSessYear}`;
+                    updateFiltersAndListen();
+                }
+            }
+        });
+
+        // প্রোফাইল সেভ
+        document.getElementById('profilePicFile').addEventListener('change', (e) => { const file = e.target.files[0]; if(file) { const reader = new FileReader(); reader.onloadend = () => { base64PicString = reader.result; document.getElementById('avatarPreview').src = reader.result; }; reader.readAsDataURL(file); } });
+        document.getElementById('profileEditForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); if(!loggedInUserUID) return;
+            const newPass = document.getElementById('newProfilePassword').value.trim();
+            try {
+                if(newPass !== "") { if(newPass.length < 6) { alert("Min 6 chars!"); return; } await updatePassword(auth.currentUser, newPass); }
+                await updateDoc(doc(db, "users", loggedInUserUID), {
+                    name: document.getElementById('editProfileName').value.trim(), universityUID: document.getElementById('editProfileUID').value.trim(), batchNumber: document.getElementById('editProfileBatch').value.trim(),
+                    profileYear: document.getElementById('editProfileYear').value, profileTermNum: document.getElementById('editProfileTermNum').value, profileTerm: document.getElementById('editProfileTerm').value, profileSessionYear: document.getElementById('editProfileSessionYear').value,
+                    trimester: `${document.getElementById('editProfileYear').value} - ${document.getElementById('editProfileTermNum').value} (${document.getElementById('editProfileTerm').value} ${document.getElementById('editProfileSessionYear').value})`,
+                    phone: document.getElementById('editProfilePhone').value.trim(), bloodGroup: document.getElementById('editProfileBlood').value, emergencyName: document.getElementById('editProfileEmergencyName').value.trim(), emergencyPhone: document.getElementById('editProfileEmergencyPhone').value.trim(), profilePic: base64PicString
+                });
+                alert("Profile saved successfully!"); window.location.reload();
+            } catch (err) { alert(err.message); }
+        });
+        window.closeProfileModal = () => { if(isProfileIncomplete) { alert("আপনার ইমার্জেন্সি তথ্য এবং ব্লাড গ্রুপ পূরণ করা বাধ্যতামূলক!"); return; } document.getElementById('profileModal').className = "fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50"; };
     </script>
 </body>
 </html>
