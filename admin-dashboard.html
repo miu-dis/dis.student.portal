@@ -169,16 +169,15 @@
 
         // রুটিন লিসেনার (ট্যাগিং এবং এডিট বাটনসহ আপগ্রেড)
         onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
-            const adminRoutineList = document.getElementById('adminRoutineList'); document.getElementById('routineCount').innerText = snapshot.size; adminRoutineList.innerHTML = '';
-            snapshot.forEach(res => {
+            const adminRoutineList = document.getElementById('adminRoutineList');
+            document.getElementById('routineCount').innerText = snapshot.size;
+            adminRoutineList.innerHTML = snapshot.docs.map(res => {
                 const data = res.data(); const id = res.id;
-                
-                // সাময়িক নাকি স্থায়ী তা বোঝার ট্যাগ লজিক
                 const isDaily = data.boardType === 'daily';
                 const tagColor = isDaily ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-emerald-100 text-emerald-800 border-emerald-300";
                 const tagLabel = isDaily ? "Daily" : "Permanent";
-
-                adminRoutineList.innerHTML += `
+                const dataJson = JSON.stringify(data).replace(/"/g, '&quot;');
+                return `
                     <div class="p-2.5 bg-slate-50 border rounded-lg flex flex-col gap-1.5 shadow-sm">
                         <div class="flex justify-between items-start">
                             <div>
@@ -188,46 +187,63 @@
                             <span class="text-[9px] font-bold px-1.5 py-0.5 border rounded ${tagColor}">${tagLabel}</span>
                         </div>
                         <div class="flex justify-end space-x-1 gap-1">
-                            <button onclick="openRoutineEditModal('${id}', ${JSON.stringify(data).replace(/"/g, '&quot;')})" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2 py-0.5 rounded transition text-[10px] font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>
+                            <button onclick="openRoutineEditModal('${id}', ${dataJson})" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2 py-0.5 rounded transition text-[10px] font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>
                             <button onclick="deleteDataDocument('routines', '${id}')" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-2 py-0.5 rounded transition text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Delete</button>
                         </div>
                     </div>`;
-            });
+            }).join("");
         });
 
         // কোর্স ম্যাপিং লিসেনার (এডিট ম্যানেজার প্যানেল)
         onSnapshot(collection(db, "course_mappings"), (snapshot) => {
-            const adminMappingList = document.getElementById('adminMappingList'); document.getElementById('mappingCount').innerText = snapshot.size; adminMappingList.innerHTML = '';
-            if(snapshot.empty) { adminMappingList.innerHTML = '<p class="text-gray-400 text-center py-2">No mappings created.</p>'; return; }
-            
+            const adminMappingList = document.getElementById('adminMappingList');
+            document.getElementById('mappingCount').innerText = snapshot.size;
+            if (snapshot.empty) {
+                adminMappingList.innerHTML = '<p class="text-gray-400 text-center py-2">No mappings created.</p>';
+                return;
+            }
+            const rows = [];
             snapshot.forEach((docSnap) => {
-                const docKey = docSnap.id; const courses = docSnap.data().courses || [];
+                const docKey = docSnap.id;
+                const courses = docSnap.data().courses || [];
                 courses.forEach((course, index) => {
-                    adminMappingList.innerHTML += `
+                    const courseJson = JSON.stringify(course).replace(/"/g, '&quot;');
+                    rows.push(`
                         <div class="p-2 bg-indigo-50/50 border border-indigo-100 rounded-lg flex justify-between items-center">
                             <div class="max-w-[70%]">
                                 <p class="font-bold text-indigo-950">${course.code}: ${course.title}</p>
                                 <p class="text-[9px] text-gray-400 truncate">Sem: ${docKey} | Tch: ${course.teacher}</p>
                             </div>
                             <div class="flex space-x-1 shrink-0 gap-1">
-                                <button onclick="openCourseEditModal('${docKey}', ${index}, ${JSON.stringify(course).replace(/"/g, '&quot;')})" class="text-blue-600 bg-white border border-blue-200 hover:bg-blue-600 hover:text-white px-1.5 py-0.5 rounded text-[10px] font-semibold"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="openCourseEditModal('${docKey}', ${index}, ${courseJson})" class="text-blue-600 bg-white border border-blue-200 hover:bg-blue-600 hover:text-white px-1.5 py-0.5 rounded text-[10px] font-semibold"><i class="fa-solid fa-pen"></i></button>
                                 <button onclick="deleteCourseMappingEntry('${docKey}', ${index})" class="text-red-600 bg-white border border-red-200 hover:bg-red-600 hover:text-white px-1.5 py-0.5 rounded text-[10px] font-semibold"><i class="fa-solid fa-trash"></i></button>
                             </div>
-                        </div>`;
+                        </div>`);
                 });
             });
+            adminMappingList.innerHTML = rows.join("");
         });
 
         // নোটিশ লিসেনার
         onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
-            const adminNoticeList = document.getElementById('adminNoticeList'); document.getElementById('noticeCount').innerText = snapshot.size; adminNoticeList.innerHTML = '';
-            snapshot.forEach(res => { adminNoticeList.innerHTML += `<div class="flex justify-between items-center p-2 bg-amber-50 border border-amber-200 rounded-lg"><p class="truncate max-w-[80%]">${res.data().content}</p><button onclick="deleteDataDocument('notices', '${res.id}')" class="text-red-600 h-6 w-6 hover:bg-red-600 hover:text-white rounded transition flex items-center justify-center shrink-0"><i class="fa-solid fa-trash-can"></i></button></div>`; });
+            const adminNoticeList = document.getElementById('adminNoticeList');
+            document.getElementById('noticeCount').innerText = snapshot.size;
+            adminNoticeList.innerHTML = snapshot.docs.map(res => `
+                <div class="flex justify-between items-center p-2 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p class="truncate max-w-[80%]">${res.data().content}</p>
+                    <button onclick="deleteDataDocument('notices', '${res.id}')" class="text-red-600 h-6 w-6 hover:bg-red-600 hover:text-white rounded transition flex items-center justify-center shrink-0"><i class="fa-solid fa-trash-can"></i></button>
+                </div>`).join("");
         });
 
         // স্টুডেন্ট টেবিল
         const studentTableBody = document.getElementById('studentTableBody');
         onSnapshot(collection(db, "users"), (snapshot) => {
-            studentTableBody.innerHTML = ''; snapshot.forEach((res) => { const data = res.data(); const id = res.id; const isBtnVisible = data.role === 'admin' ? 'hidden' : 'inline-block'; studentTableBody.innerHTML += `<tr><td class="px-4 py-3 font-bold">${data.name || 'N/A'}<br><span class="text-[10px] text-gray-400">UID: ${data.universityUID}</span></td><td class="px-4 py-3">Batch: ${data.batchNumber}<br><span class="text-[10px] text-indigo-700 font-bold">${data.trimester || 'N/A'}</span></td><td class="px-4 py-3 font-extrabold text-red-600">${data.bloodGroup || 'PENDING'}</td><td class="px-4 py-3">${data.phone || 'PENDING'}</td><td class="px-4 py-3"><b>${data.emergencyPhone || 'PENDING'}</b><br><span class="text-[10px]">(${data.emergencyName})</span></td><td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${data.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">${(data.role || 'student').toUpperCase()}</span></td><td class="px-4 py-3 text-center"><button onclick="resetStudentPasswordToDefault('${id}', '${data.name}')" class="${isBtnVisible} bg-amber-100 text-amber-800 hover:bg-amber-600 hover:text-white px-2 py-1 rounded font-bold text-[10px]"><i class="fa-solid fa-key-skeleton"></i> Reset</button></td></tr>`; });
+            studentTableBody.innerHTML = snapshot.docs.map((res) => {
+                const data = res.data(); const id = res.id;
+                const isBtnVisible = data.role === 'admin' ? 'hidden' : 'inline-block';
+                const safeName = (data.name || 'User').replace(/'/g, "\\'");
+                return `<tr><td class="px-4 py-3 font-bold">${data.name || 'N/A'}<br><span class="text-[10px] text-gray-400">UID: ${data.universityUID}</span></td><td class="px-4 py-3">Batch: ${data.batchNumber}<br><span class="text-[10px] text-indigo-700 font-bold">${data.trimester || 'N/A'}</span></td><td class="px-4 py-3 font-extrabold text-red-600">${data.bloodGroup || 'PENDING'}</td><td class="px-4 py-3">${data.phone || 'PENDING'}</td><td class="px-4 py-3"><b>${data.emergencyPhone || 'PENDING'}</b><br><span class="text-[10px]">(${data.emergencyName})</span></td><td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${data.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">${(data.role || 'student').toUpperCase()}</span></td><td class="px-4 py-3 text-center"><button onclick="resetStudentPasswordToDefault('${id}', '${safeName}')" class="${isBtnVisible} bg-amber-100 text-amber-800 hover:bg-amber-600 hover:text-white px-2 py-1 rounded font-bold text-[10px]"><i class="fa-solid fa-key-skeleton"></i> Reset</button></td></tr>`;
+            }).join("");
         });
 
         // ─── মডাল উইন্ডো ওপেন এডিট লজিকস ───
