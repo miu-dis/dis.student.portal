@@ -96,7 +96,7 @@
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
             <h3 id="sm_title" class="text-lg font-bold text-indigo-900 mb-4 border-b pb-2 flex items-center"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> Share / Upload Study Material</h3>
             
-            <form id="resourceShareForm" class="space-y-3 text-xs">
+            <form id="resourceShareForm" class="space-y-3 text-xs" data-edit-id="">
                 <div>
                     <label id="sm_name" class="block font-semibold text-gray-600 mb-1">Contributor Name</label>
                     <input type="text" id="shareAuthor" required readonly class="w-full p-2 border rounded bg-gray-100 text-gray-700 cursor-not-allowed">
@@ -252,7 +252,11 @@
                 alertFileSize: "🔴 File exceeds 2MB! Upload to Drive/YouTube and paste a public link.", alertPickFile: "Select a file under 2MB.", alertPasteLink: "Paste a link.", alertPublished: "Resource published successfully!",
                 alertProfileSaved: "Profile saved!", alertProfileRequired: "Emergency info and blood group are required!", alertPassMin: "Password must be at least 6 characters.",
                 genderMale: "Male Section", genderFemale: "Female Section", noClasses: "No classes.", loadFail: "Failed to load courses. Refresh the page.",
-                displaySemSync: "Syncing...", byAuthor: "By:", profileIncomplete: "Profile incomplete!", loadingCourses: "Loading courses..."
+                displaySemSync: "Syncing...", byAuthor: "By:", profileIncomplete: "Profile incomplete!", loadingCourses: "Loading courses...",
+                btnView: "View", btnEdit: "Edit", btnDelete: "Delete", btnViewFile: "Open file",
+                confirmDeleteResource: "Delete this uploaded resource permanently?", alertResourceDeleted: "Resource deleted.",
+                sm_edit_title: "Edit Study Material", sm_save: "Save changes", alertResourceUpdated: "Resource updated successfully!", alertUploading: "Uploading file, please wait...",
+                alertNotOwner: "You can only edit or delete resources you uploaded."
             },
             bn: {
                 navTitle: "ডিআইএস স্টাডি পোর্টাল", btnNavLogin: "লগইন / রেজিস্টার", btnMyProfile: "আমার প্রোফাইল", btnLogout: "লগআউট",
@@ -280,7 +284,11 @@
                 alertFileSize: "🔴 ফাইল ২ এমবি-র বেশি! ড্রাইভ/ইউটিউবে আপলোড করে পাবলিক লিংক দিন।", alertPickFile: "২ এমবি-র নিচে একটি ফাইল সিলেক্ট করুন।", alertPasteLink: "লিংক পেস্ট করুন।", alertPublished: "রিসোর্স সফলভাবে প্রকাশিত!",
                 alertProfileSaved: "প্রোফাইল সেভ হয়েছে!", alertProfileRequired: "জরুরি তথ্য ও রক্তের গ্রুপ পূরণ বাধ্যতামূলক!", alertPassMin: "পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে।",
                 genderMale: "ভাইদের শাখা", genderFemale: "বোনদের শাখা", noClasses: "ক্লাস নেই।", loadFail: "কোর্স লোড ব্যর্থ। পেজ রিফ্রেশ করুন।",
-                displaySemSync: "সিঙ্ক হচ্ছে...", byAuthor: "প্রকাশক:", profileIncomplete: "প্রোফাইল অসম্পূর্ণ!", loadingCourses: "কোর্স লোড হচ্ছে..."
+                displaySemSync: "সিঙ্ক হচ্ছে...", byAuthor: "প্রকাশক:", profileIncomplete: "প্রোফাইল অসম্পূর্ণ!", loadingCourses: "কোর্স লোড হচ্ছে...",
+                btnView: "দেখুন", btnEdit: "এডিট", btnDelete: "মুছুন", btnViewFile: "ফাইল খুলুন",
+                confirmDeleteResource: "এই আপলোড করা রিসোর্স স্থায়ীভাবে মুছবেন?", alertResourceDeleted: "রিসোর্স মুছে ফেলা হয়েছে।",
+                sm_edit_title: "স্টাডি মেটেরিয়াল এডিট", sm_save: "সংরক্ষণ করুন", alertResourceUpdated: "রিসোর্স আপডেট হয়েছে!", alertUploading: "ফাইল আপলোড হচ্ছে, অপেক্ষা করুন...",
+                alertNotOwner: "শুধু নিজের আপলোড করা রিসোর্স এডিট বা ডিলিট করতে পারবেন।"
             }
         };
         window.portalTranslations = translations;
@@ -373,9 +381,10 @@
     </script>
 
     <script type="module">
-        import { auth, db } from "./assets/js/app.js";
+        import { auth, db, storage } from "./assets/js/app.js";
         import { onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { collection, onSnapshot, query, orderBy, doc, getDoc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { collection, onSnapshot, query, orderBy, doc, getDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         let loggedInUserUID = null; let loggedInUserName = ""; let isProfileIncomplete = false; let base64PicString = "";
         let studentCurrentTrimesterKey = ""; 
@@ -387,6 +396,63 @@
         let latestMappedCourses = [];
         let resourcesSnapshot = null;
         let renderCourseGridTimer = null;
+        let pendingUploadFile = null;
+
+        function escapeHtml(text) {
+            return String(text || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+        }
+
+        function getResourceViewUrl(rData) {
+            if (!rData.url) return "";
+            if (rData.url.startsWith("http") || rData.url.startsWith("data:")) return rData.url;
+            return rData.url;
+        }
+
+        function canManageResource(rData) {
+            return Boolean(loggedInUserUID) && rData.uploadedBy && rData.uploadedBy === loggedInUserUID;
+        }
+
+        async function uploadFileToStorage(file) {
+            const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+            const path = `resources/${loggedInUserUID}/${Date.now()}_${safeName}`;
+            const storageRef = ref(storage, path);
+            await uploadBytes(storageRef, file);
+            const downloadUrl = await getDownloadURL(storageRef);
+            return { downloadUrl, storagePath: path };
+        }
+
+        function renderResourceItemHTML(rData, t) {
+            const viewUrl = getResourceViewUrl(rData);
+            const isImage = (rData.type && rData.type.includes("Image")) || (viewUrl && (viewUrl.startsWith("data:image") || /\.(png|jpe?g|gif|webp)(\?|$)/i.test(viewUrl)));
+            let icon = "fa-file-pdf text-red-500";
+            if (rData.type && rData.type.includes("Video")) icon = "fa-video text-blue-500";
+            if (rData.type && rData.type.includes("Audio")) icon = "fa-microphone text-purple-500";
+            if (rData.type && rData.type.includes("Image")) icon = "fa-image text-amber-500";
+
+            const preview = (isImage && viewUrl)
+                ? `<a href="${viewUrl}" target="_blank" class="block mt-1"><img src="${viewUrl}" alt="preview" class="max-h-24 rounded border object-contain bg-white w-full"></a>`
+                : "";
+
+            const manageBtns = canManageResource(rData) ? `
+                <div class="flex gap-1 shrink-0 ml-1">
+                    <button type="button" data-edit-resource="${rData.id}" class="text-[9px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-600 hover:text-white font-bold">${t('btnEdit')}</button>
+                    <button type="button" data-delete-resource="${rData.id}" class="text-[9px] px-1.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 hover:bg-red-600 hover:text-white font-bold">${t('btnDelete')}</button>
+                </div>` : "";
+
+            return `
+                <div class="p-2 bg-indigo-50/50 border border-indigo-100 rounded-md text-[11px]">
+                    <div class="flex justify-between items-start gap-1">
+                        <a href="${viewUrl || '#'}" target="_blank" rel="noopener" class="flex-1 font-medium text-gray-800 hover:text-indigo-700 min-w-0">
+                            <i class="fa-solid ${icon} mr-1"></i>
+                            <span class="break-words">${escapeHtml(rData.title)}</span>
+                            <span class="text-[9px] text-gray-400 block">(${t('byAuthor')} ${escapeHtml(rData.author)})</span>
+                        </a>
+                        ${manageBtns}
+                    </div>
+                    ${preview}
+                    ${viewUrl ? `<a href="${viewUrl}" target="_blank" class="inline-block mt-1 text-[9px] text-indigo-600 font-bold underline">${t('btnViewFile')}</a>` : ''}
+                </div>`;
+        }
 
         function getCombinedTrimesterKey() {
             const yr = document.getElementById('filterYear').value;
@@ -399,7 +465,7 @@
             const byCourse = {};
             if (!resourcesSnapshot) return byCourse;
             resourcesSnapshot.forEach(resDoc => {
-                const rData = resDoc.data();
+                const rData = { id: resDoc.id, ...resDoc.data() };
                 if (rData.semester !== combinedTrimesterKey) return;
                 const code = rData.courseCode;
                 if (!byCourse[code]) byCourse[code] = [];
@@ -428,17 +494,7 @@
 
             latestMappedCourses.forEach((course, courseIndex) => {
                 const files = resourcesByCourse[course.code] || [];
-                let sharedItemsHTML = files.map(rData => {
-                    let icon = "fa-file-pdf text-red-500";
-                    if (rData.type && rData.type.includes("Video")) icon = "fa-video text-blue-500";
-                    if (rData.type && rData.type.includes("Audio")) icon = "fa-microphone text-purple-500";
-                    if (rData.type && rData.type.includes("Image")) icon = "fa-image text-amber-500";
-                    return `
-                        <a href="${rData.url}" target="_blank" class="flex justify-between items-center p-2 bg-indigo-50/50 border border-indigo-100 rounded-md hover:bg-indigo-100 transition text-[11px] font-medium text-gray-700">
-                            <span class="truncate"><i class="fa-solid ${icon} mr-1"></i> ${rData.title} <span class="text-[9px] text-gray-400 font-normal">(${t('byAuthor')} ${rData.author})</span></span>
-                            <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-indigo-500 shrink-0"></i>
-                        </a>`;
-                }).join("");
+                let sharedItemsHTML = files.map(rData => renderResourceItemHTML(rData, t)).join("");
                 if (!sharedItemsHTML) sharedItemsHTML = `<p class="text-[10px] text-gray-400 italic p-1">${t('noSharedFiles')}</p>`;
 
                 const btnColorClass = canUpload
@@ -501,12 +557,63 @@
             document.getElementById('lockedSemLabel').innerText = studentCurrentTrimesterKey;
             document.getElementById('resourceShareForm').dataset.lockedCode = course.code;
             document.getElementById('resourceShareForm').dataset.lockedCourseTitle = course.title;
+            document.getElementById('resourceShareForm').dataset.editId = "";
+            pendingUploadFile = null;
             base64UploadedFileString = "";
             document.getElementById('shareFileField').value = "";
             document.getElementById('shareUrl').value = "";
+            document.getElementById('sm_submit').innerText = window.portalT('sm_submit');
+            document.getElementById('sm_title').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> ${window.portalT('sm_title')}`;
             window.switchUploadMethod('file');
             refreshShareModalLabels();
             openShareModalFromModule();
+        }
+
+        async function openEditResourceModal(resourceId) {
+            const snap = await getDoc(doc(db, "resources", resourceId));
+            if (!snap.exists()) return;
+            const rData = snap.data();
+            if (!canManageResource({ ...rData, id: resourceId })) {
+                alert(window.portalT('alertNotOwner'));
+                return;
+            }
+            const course = latestMappedCourses.find(c => c.code === rData.courseCode);
+            document.getElementById('shareAuthor').value = rData.author || loggedInUserName;
+            document.getElementById('lockedCourseDisplay').value = course ? `${course.code}: ${course.title}` : rData.courseCode;
+            const titleParts = (rData.title || "").split(" — ");
+            document.getElementById('shareTitle').value = titleParts.length > 1 ? titleParts.slice(1).join(" — ") : rData.title;
+            document.getElementById('shareType').value = rData.type || "PDF/Handnote";
+            document.getElementById('shareUrl').value = (rData.urlType === "external") ? (rData.url || "") : "";
+            document.getElementById('resourceShareForm').dataset.lockedCode = rData.courseCode;
+            document.getElementById('resourceShareForm').dataset.lockedCourseTitle = course?.title || rData.courseCode;
+            document.getElementById('resourceShareForm').dataset.editId = resourceId;
+            document.getElementById('lockedSemLabel').innerText = rData.semester || studentCurrentTrimesterKey;
+            pendingUploadFile = null;
+            base64UploadedFileString = "";
+            document.getElementById('shareFileField').value = "";
+            window.switchUploadMethod((rData.urlType === "external" || (rData.url && rData.url.startsWith("http"))) ? 'link' : 'file');
+            document.getElementById('sm_submit').innerText = window.portalT('sm_save');
+            document.getElementById('sm_title').innerHTML = `<i class="fa-solid fa-pen-to-square mr-2"></i> ${window.portalT('sm_edit_title')}`;
+            refreshShareModalLabels();
+            openShareModalFromModule();
+        }
+
+        async function deleteResourceById(resourceId) {
+            const snap = await getDoc(doc(db, "resources", resourceId));
+            if (!snap.exists()) return;
+            const rData = snap.data();
+            if (!canManageResource({ ...rData, id: resourceId })) {
+                alert(window.portalT('alertNotOwner'));
+                return;
+            }
+            if (!confirm(window.portalT('confirmDeleteResource'))) return;
+            try {
+                if (rData.storagePath) {
+                    try { await deleteObject(ref(storage, rData.storagePath)); } catch (e) { console.warn(e); }
+                }
+                await deleteDoc(doc(db, "resources", resourceId));
+                alert(window.portalT('alertResourceDeleted'));
+            } catch (err) { alert(err.message); }
         }
 
         function refreshShareModalLabels() {
@@ -518,9 +625,15 @@
         window.triggerLockedUploadFlow = triggerLockedUploadFlow;
 
         courseGrid.addEventListener('click', (e) => {
-            const btn = e.target.closest('[data-upload-course]');
-            if (!btn || btn.disabled) return;
-            triggerLockedUploadFlow(parseInt(btn.dataset.uploadCourse, 10));
+            const uploadBtn = e.target.closest('[data-upload-course]');
+            if (uploadBtn && !uploadBtn.disabled) {
+                triggerLockedUploadFlow(parseInt(uploadBtn.dataset.uploadCourse, 10));
+                return;
+            }
+            const editBtn = e.target.closest('[data-edit-resource]');
+            if (editBtn) { openEditResourceModal(editBtn.dataset.editResource); return; }
+            const delBtn = e.target.closest('[data-delete-resource]');
+            if (delBtn) { deleteResourceById(delBtn.dataset.deleteResource); }
         });
 
         async function updateFiltersAndListen() {
@@ -548,45 +661,105 @@
         // ২ এমবি ফিল্টার ইঞ্জিন
         document.getElementById('shareFileField').addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if(file) {
-                const fileSizeInMB = file.size / (1024 * 1024);
-                if(fileSizeInMB > 2) {
-                    alert(window.portalT('alertFileSizeAuto'));
-                    e.target.value = ""; base64UploadedFileString = "";
-                    window.switchUploadMethod('link');
-                    document.getElementById('shareUrl').focus();
-                    return;
-                }
-                const reader = new FileReader(); reader.onloadend = () => { base64UploadedFileString = reader.result; }; reader.readAsDataURL(file);
+            if (!file) return;
+            const fileSizeInMB = file.size / (1024 * 1024);
+            if (fileSizeInMB > 2) {
+                alert(window.portalT('alertFileSizeAuto'));
+                e.target.value = "";
+                pendingUploadFile = null;
+                base64UploadedFileString = "";
+                window.switchUploadMethod('link');
+                document.getElementById('shareUrl').focus();
+                return;
             }
+            pendingUploadFile = file;
+            base64UploadedFileString = "";
         });
 
         // ফর্ম সাবমিশন লজিক
         document.getElementById('resourceShareForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); let finalUrlPayload = "";
-            if (window.currentActiveMethod === 'file') {
-                if(!base64UploadedFileString) { alert(window.portalT('alertPickFile')); return; }
-                finalUrlPayload = base64UploadedFileString;
-            } else {
-                finalUrlPayload = document.getElementById('shareUrl').value.trim();
-                if(!finalUrlPayload) { alert(window.portalT('alertPasteLink')); return; }
-            }
+            e.preventDefault();
+            const formEl = document.getElementById('resourceShareForm');
+            const editId = formEl.dataset.editId || "";
+            const noteTitle = document.getElementById('shareTitle').value.trim();
+            const courseLabel = formEl.dataset.lockedCourseTitle || formEl.dataset.lockedCode;
+            const fullTitle = noteTitle ? `${courseLabel} — ${noteTitle}` : courseLabel;
+            let urlPayload = "";
+            let urlType = "external";
+            let storagePath = "";
+
             try {
-                const formEl = document.getElementById('resourceShareForm');
-                const noteTitle = document.getElementById('shareTitle').value.trim();
-                const courseLabel = formEl.dataset.lockedCourseTitle || formEl.dataset.lockedCode;
-                await addDoc(collection(db, "resources"), {
+                if (window.currentActiveMethod === 'file') {
+                    if (pendingUploadFile) {
+                        const submitBtn = document.getElementById('sm_submit');
+                        submitBtn.disabled = true;
+                        submitBtn.innerText = window.portalT('alertUploading');
+                        const uploaded = await uploadFileToStorage(pendingUploadFile);
+                        if (editId) {
+                            const prevSnap = await getDoc(doc(db, "resources", editId));
+                            const oldPath = prevSnap.exists() ? prevSnap.data().storagePath : null;
+                            if (oldPath && oldPath !== uploaded.storagePath) {
+                                try { await deleteObject(ref(storage, oldPath)); } catch (e) { console.warn(e); }
+                            }
+                        }
+                        urlPayload = uploaded.downloadUrl;
+                        storagePath = uploaded.storagePath;
+                        urlType = "storage";
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = editId ? window.portalT('sm_save') : window.portalT('sm_submit');
+                    } else if (editId) {
+                        const existing = await getDoc(doc(db, "resources", editId));
+                        if (existing.exists()) {
+                            urlPayload = existing.data().url;
+                            urlType = existing.data().urlType || "storage";
+                            storagePath = existing.data().storagePath || "";
+                        }
+                    } else {
+                        alert(window.portalT('alertPickFile'));
+                        return;
+                    }
+                } else {
+                    urlPayload = document.getElementById('shareUrl').value.trim();
+                    if (!urlPayload) { alert(window.portalT('alertPasteLink')); return; }
+                    urlType = "external";
+                    storagePath = "";
+                }
+
+                const semesterKey = editId
+                    ? (document.getElementById('lockedSemLabel').innerText.trim() || studentCurrentTrimesterKey)
+                    : studentCurrentTrimesterKey;
+
+                const payload = {
                     author: document.getElementById('shareAuthor').value.trim(),
-                    title: noteTitle ? `${courseLabel} — ${noteTitle}` : courseLabel,
+                    title: fullTitle,
                     type: document.getElementById('shareType').value,
                     courseCode: formEl.dataset.lockedCode,
-                    semester: studentCurrentTrimesterKey,
-                    url: finalUrlPayload,
-                    createdAt: new Date().toISOString()
-                });
-                alert(window.portalT('alertPublished')); document.getElementById('resourceShareForm').reset(); closeShareModalFromModule();
+                    semester: semesterKey,
+                    url: urlPayload,
+                    urlType,
+                    storagePath,
+                    uploadedBy: loggedInUserUID,
+                    updatedAt: new Date().toISOString()
+                };
+
+                if (editId) {
+                    await updateDoc(doc(db, "resources", editId), payload);
+                    alert(window.portalT('alertResourceUpdated'));
+                } else {
+                    await addDoc(collection(db, "resources"), { ...payload, createdAt: new Date().toISOString() });
+                    alert(window.portalT('alertPublished'));
+                }
+                formEl.reset();
+                formEl.dataset.editId = "";
+                pendingUploadFile = null;
+                closeShareModalFromModule();
                 updateFiltersAndListen();
-            } catch (err) { alert(err.message); }
+            } catch (err) {
+                const submitBtn = document.getElementById('sm_submit');
+                submitBtn.disabled = false;
+                submitBtn.innerText = formEl.dataset.editId ? window.portalT('sm_save') : window.portalT('sm_submit');
+                alert(err.message);
+            }
         });
 
         // রুটিন ও নোটিশ লিসেনার
