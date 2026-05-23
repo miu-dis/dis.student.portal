@@ -99,11 +99,15 @@
             <form id="resourceShareForm" class="space-y-3 text-xs">
                 <div>
                     <label id="sm_name" class="block font-semibold text-gray-600 mb-1">Contributor Name</label>
-                    <input type="text" id="shareAuthor" required class="w-full p-2 border rounded">
+                    <input type="text" id="shareAuthor" required readonly class="w-full p-2 border rounded bg-gray-100 text-gray-700 cursor-not-allowed">
                 </div>
                 <div>
-                    <label id="sm_topic" class="block font-semibold text-gray-600 mb-1">Topic / Subject Title</label>
-                    <input type="text" id="shareTitle" required class="w-full p-2 border rounded">
+                    <label id="sm_locked_course" class="block font-semibold text-gray-600 mb-1">Locked Course</label>
+                    <input type="text" id="lockedCourseDisplay" readonly class="w-full p-2 border rounded bg-indigo-50 text-indigo-900 font-bold cursor-not-allowed">
+                </div>
+                <div>
+                    <label id="sm_topic" class="block font-semibold text-gray-600 mb-1">Note / Lecture Title</label>
+                    <input type="text" id="shareTitle" required class="w-full p-2 border rounded" placeholder="e.g. Chapter 1 notes">
                 </div>
                 <div>
                     <label id="sm_type" class="block font-semibold text-gray-600 mb-1">Resource Type</label>
@@ -115,21 +119,23 @@
                     </select>
                 </div>
 
-                <div class="bg-slate-50 p-3 rounded-xl border border-dashed space-y-2">
-                    <label id="lblUploadMethod" class="block font-bold text-gray-700 mb-1"></label>
+                <div id="uploadSizeNotice" class="bg-amber-50 border border-amber-300 text-amber-900 text-[10px] p-2.5 rounded-lg leading-relaxed font-medium"></div>
+
+                <div class="bg-slate-50 p-3 rounded-xl border border-dashed border-slate-300 space-y-2">
+                    <label id="lblUploadMethod" class="block font-bold text-gray-700 mb-1">Choose upload method:</label>
                     <div class="grid grid-cols-2 gap-2 mb-2">
-                        <button type="button" onclick="switchUploadMethod('file')" id="methodFileBtn" class="py-1.5 text-center font-bold rounded-lg bg-indigo-100 text-indigo-800 border border-indigo-300 w-full"></button>
-                        <button type="button" onclick="switchUploadMethod('link')" id="methodLinkBtn" class="py-1.5 text-center font-bold rounded-lg bg-gray-100 text-gray-600 border w-full"></button>
+                        <button type="button" onclick="switchUploadMethod('file')" id="methodFileBtn" class="py-2 text-center text-[11px] font-bold rounded-lg bg-indigo-100 text-indigo-800 border border-indigo-300 w-full">📁 Direct File</button>
+                        <button type="button" onclick="switchUploadMethod('link')" id="methodLinkBtn" class="py-2 text-center text-[11px] font-bold rounded-lg bg-gray-100 text-gray-600 border border-gray-300 w-full">🔗 Cloud Link</button>
                     </div>
 
                     <div id="uploadFileSection">
-                        <label id="lblSelectFileText" class="block text-[10px] text-gray-500 font-semibold mb-1"></label>
+                        <label id="lblSelectFileText" class="block text-[10px] text-gray-500 font-semibold mb-1">Select file (max 2MB)</label>
                         <input type="file" id="shareFileField" accept="image/*,application/pdf,audio/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-100 file:text-indigo-800 hover:file:bg-indigo-200 cursor-pointer">
                     </div>
 
                     <div id="uploadLinkSection" class="hidden">
-                        <label id="lblLinkUrlText" class="block text-[10px] text-gray-500 font-semibold mb-1"></label>
-                        <input type="url" id="shareUrl" class="w-full p-2 border border-indigo-300 rounded text-blue-600 font-mono">
+                        <label id="lblLinkUrlText" class="block text-[10px] text-gray-500 font-semibold mb-1">Paste public link</label>
+                        <input type="url" id="shareUrl" class="w-full p-2 border border-indigo-300 rounded text-blue-600 font-mono" placeholder="https://drive.google.com/...">
                     </div>
                 </div>
 
@@ -234,10 +240,12 @@
                 m_emg_phone: "Emergency Contact Mobile", m_pass_title: "🔒 Change Password (optional)", m_pass_ph: "Min. 6 characters",
                 m_blood: "Blood Group", m_blood_select: "Select Blood Group",
                 btnCancelProfile: "Cancel", btnSaveProfileText: "Save Profile",
-                sm_title: "Share Study Material", sm_name: "Contributor Name", sm_topic: "Topic / Subject Title", sm_type: "Resource Type",
-                sm_topic_ph: "e.g. Usul al-Shashi — Chapter 1 notes", sm_cancel: "Cancel", sm_submit: "Publish Live",
-                lblUploadMethod: "Choose upload method:", methodFile: "📁 Direct File Upload", methodLink: "🔗 Share Cloud Link",
-                lblSelectFile: "Select file (max 2MB)", lblLinkUrl: "Paste public link", shareUrl_ph: "https://drive.google.com/... (public)",
+                sm_title: "Share Study Material", sm_name: "Contributor Name", sm_locked_course: "Locked Course", sm_topic: "Note / Lecture Title", sm_type: "Resource Type",
+                sm_topic_ph: "e.g. Chapter 1 — Introduction notes", sm_cancel: "Cancel", sm_submit: "Publish Live",
+                lblUploadMethod: "Choose upload method:", methodFile: "📁 Direct File", methodLink: "🔗 Cloud Link",
+                lblSelectFile: "Select file (max 2MB)", lblLinkUrl: "Paste public link (must be Public)", shareUrl_ph: "https://drive.google.com/... (Public)",
+                uploadSizeWarn: "⚠️ Direct upload limit: 2MB. If your file is larger, upload it to Google Drive or YouTube first, set sharing to Public, then paste the link here.",
+                alertFileSizeAuto: "🔴 This file is over 2MB! Switched to Cloud Link mode. Upload to Drive/YouTube, set the link to Public, then paste it below.",
                 lockSemBefore: "🔒 This file will be saved under your running semester", lockSemAfter: ". Classmates can view it in this course. You cannot upload to other semesters.",
                 typePdf: "PDF / Handnote", typeVideo: "Video / YouTube Link", typeAudio: "Audio / Voice", typeImage: "Image / Document",
                 alertLoginUpload: "Please login first to upload.", alertSemLock: "🔒 Locked! You can only upload in your own running semester.",
@@ -260,10 +268,12 @@
                 m_emg_name: "জরুরি যোগাযোগের নাম", m_emg_phone: "জরুরি মোবাইল নম্বর", m_pass_title: "🔒 পাসওয়ার্ড (ঐচ্ছিক)", m_pass_ph: "কমপক্ষে ৬ অক্ষর",
                 m_blood: "রক্তের গ্রুপ", m_blood_select: "রক্তের গ্রুপ সিলেক্ট করুন",
                 btnCancelProfile: "বাতিল", btnSaveProfileText: "প্রোফাইল সেভ",
-                sm_title: "স্টাডি মেটেরিয়াল আপলোড", sm_name: "আপনার নাম", sm_topic: "বিষয় / শিরোনাম", sm_type: "রিসোর্সের ধরণ",
-                sm_topic_ph: "যেমন: উসূল আশ-শাশী — ১ম পরিচ্ছেদ", sm_cancel: "বাতিল", sm_submit: "প্রকাশ করুন",
+                sm_title: "স্টাডি মেটেরিয়াল আপলোড", sm_name: "আপনার নাম", sm_locked_course: "লক করা কোর্স", sm_topic: "নোট / লেকচারের শিরোনাম", sm_type: "রিসোর্সের ধরণ",
+                sm_topic_ph: "যেমন: ১ম পরিচ্ছেদ — ভূমিকা", sm_cancel: "বাতিল", sm_submit: "প্রকাশ করুন",
                 lblUploadMethod: "আপলোড পদ্ধতি সিলেক্ট করুন:", methodFile: "📁 সরাসরি ফাইল", methodLink: "🔗 ক্লাউড লিংক",
-                lblSelectFile: "ফাইল সিলেক্ট (সর্বোচ্চ ২ এমবি)", lblLinkUrl: "পাবলিক লিংক পেস্ট করুন", shareUrl_ph: "https://drive.google.com/... (পাবলিক)",
+                lblSelectFile: "ফাইল সিলেক্ট (সর্বোচ্চ ২ এমবি)", lblLinkUrl: "পাবলিক লিংক পেস্ট করুন (অবশ্যই Public)", shareUrl_ph: "https://drive.google.com/... (Public)",
+                uploadSizeWarn: "⚠️ সরাসরি আপলোড সীমা: ২ এমবি। ফাইল বড় হলে আগে Google Drive বা YouTube-এ আপলোড করুন, শেয়ারিং Public করুন, তারপর লিংক এখানে দিন।",
+                alertFileSizeAuto: "🔴 ফাইল ২ এমবি-র বেশি! স্বয়ংক্রিয়ভাবে লিংক মোডে নেওয়া হয়েছে। Drive/YouTube-এ আপলোড করে Public লিংক পেস্ট করুন।",
                 lockSemBefore: "🔒 এই ফাইলটি আপনার রানিং সেমিস্টার", lockSemAfter: " এ সংরক্ষিত হবে। সহপাঠীরা এই কোর্সে দেখতে পারবে। অন্য সেমিস্টারে আপলোড করা যাবে না।",
                 typePdf: "পিডিএফ / হ্যান্ডনোট", typeVideo: "ভিডিও / ইউটিউব", typeAudio: "অডিও / ভয়েস", typeImage: "ছবি / ডকুমেন্ট",
                 alertLoginUpload: "আপলোড করতে প্রথমে লগইন করুন।", alertSemLock: "🔴 লক! শুধু আপনার নিজের রানিং সেমিস্টারে আপলোড করা যাবে।",
@@ -304,8 +314,11 @@
             document.getElementById('btnCancelProfile').innerText = t.btnCancelProfile; document.getElementById('btnSaveProfileText').innerText = t.btnSaveProfileText;
 
             document.getElementById('sm_title').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> ` + t.sm_title;
-            document.getElementById('sm_name').innerText = t.sm_name; document.getElementById('sm_topic').innerText = t.sm_topic;
-            document.getElementById('sm_type').innerText = t.sm_type; document.getElementById('sm_cancel').innerText = t.sm_cancel;
+            document.getElementById('sm_name').innerText = t.sm_name;
+            document.getElementById('sm_locked_course').innerText = t.sm_locked_course;
+            document.getElementById('sm_topic').innerText = t.sm_topic;
+            document.getElementById('sm_type').innerText = t.sm_type;
+            document.getElementById('sm_cancel').innerText = t.sm_cancel;
             document.getElementById('sm_submit').innerText = t.sm_submit;
             document.getElementById('shareTitle').placeholder = t.sm_topic_ph;
             document.getElementById('shareUrl').placeholder = t.shareUrl_ph;
@@ -314,6 +327,8 @@
             document.getElementById('methodLinkBtn').innerText = t.methodLink;
             document.getElementById('lblSelectFileText').innerText = t.lblSelectFile;
             document.getElementById('lblLinkUrlText').innerText = t.lblLinkUrl;
+            document.getElementById('uploadSizeNotice').innerText = t.uploadSizeWarn;
+            if (typeof switchUploadMethod === 'function') switchUploadMethod(window.currentActiveMethod || 'file');
             document.getElementById('lockSemNoticeBefore').innerText = t.lockSemBefore;
             document.getElementById('lockSemNoticeAfter').innerText = t.lockSemAfter;
             document.getElementById('newProfilePassword').placeholder = t.m_pass_ph;
@@ -362,7 +377,7 @@
         import { onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { collection, onSnapshot, query, orderBy, doc, getDoc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        let loggedInUserUID = null; let isProfileIncomplete = false; let base64PicString = "";
+        let loggedInUserUID = null; let loggedInUserName = ""; let isProfileIncomplete = false; let base64PicString = "";
         let studentCurrentTrimesterKey = ""; 
         let base64UploadedFileString = ""; 
         const dailyContainer = document.getElementById('dailyRoutineList');
@@ -480,10 +495,12 @@
             const course = latestMappedCourses[courseIndex];
             if (!course) return;
 
-            document.getElementById('shareAuthor').value = auth.currentUser.displayName || auth.currentUser.email || "";
-            document.getElementById('shareTitle').value = `${course.title} - `;
+            document.getElementById('shareAuthor').value = loggedInUserName || auth.currentUser.displayName || "";
+            document.getElementById('lockedCourseDisplay').value = `${course.code}: ${course.title}`;
+            document.getElementById('shareTitle').value = "";
             document.getElementById('lockedSemLabel').innerText = studentCurrentTrimesterKey;
             document.getElementById('resourceShareForm').dataset.lockedCode = course.code;
+            document.getElementById('resourceShareForm').dataset.lockedCourseTitle = course.title;
             base64UploadedFileString = "";
             document.getElementById('shareFileField').value = "";
             document.getElementById('shareUrl').value = "";
@@ -526,9 +543,11 @@
             if(file) {
                 const fileSizeInMB = file.size / (1024 * 1024);
                 if(fileSizeInMB > 2) {
-                    alert(window.portalT('alertFileSize'));
+                    alert(window.portalT('alertFileSizeAuto'));
                     e.target.value = ""; base64UploadedFileString = "";
-                    window.switchUploadMethod('link'); return;
+                    window.switchUploadMethod('link');
+                    document.getElementById('shareUrl').focus();
+                    return;
                 }
                 const reader = new FileReader(); reader.onloadend = () => { base64UploadedFileString = reader.result; }; reader.readAsDataURL(file);
             }
@@ -545,8 +564,17 @@
                 if(!finalUrlPayload) { alert(window.portalT('alertPasteLink')); return; }
             }
             try {
+                const formEl = document.getElementById('resourceShareForm');
+                const noteTitle = document.getElementById('shareTitle').value.trim();
+                const courseLabel = formEl.dataset.lockedCourseTitle || formEl.dataset.lockedCode;
                 await addDoc(collection(db, "resources"), {
-                    author: document.getElementById('shareAuthor').value.trim(), title: document.getElementById('shareTitle').value.trim(), type: document.getElementById('shareType').value, courseCode: document.getElementById('resourceShareForm').dataset.lockedCode, semester: studentCurrentTrimesterKey, url: finalUrlPayload, createdAt: new Date().toISOString()
+                    author: document.getElementById('shareAuthor').value.trim(),
+                    title: noteTitle ? `${courseLabel} — ${noteTitle}` : courseLabel,
+                    type: document.getElementById('shareType').value,
+                    courseCode: formEl.dataset.lockedCode,
+                    semester: studentCurrentTrimesterKey,
+                    url: finalUrlPayload,
+                    createdAt: new Date().toISOString()
                 });
                 alert(window.portalT('alertPublished')); document.getElementById('resourceShareForm').reset(); closeShareModalFromModule();
                 updateFiltersAndListen();
@@ -577,6 +605,7 @@
             const userDoc = await getDoc(doc(db, "users", loggedInUserUID));
             if (userDoc.exists()) {
                     const uData = userDoc.data(); if (uData.role === 'admin') { window.location.replace("./admin-dashboard.html"); return; }
+                    loggedInUserName = (uData.name || "").trim();
                     const uYear = uData.profileYear || "1st Year"; const uTermNum = uData.profileTermNum || "1st Trimester"; const uSess = uData.profileTerm || "Spring"; const uSessYear = uData.profileSessionYear || "2026";
                     studentCurrentTrimesterKey = uData.trimester && uData.trimester.includes("(")
                         ? uData.trimester
