@@ -131,19 +131,24 @@
             } catch (err) { alert(err.message); }
         });
 
-        // কোর্স ম্যাপিং উইজার্ড সাবমিট
-        document.getElementById('courseMapForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); const key = `${document.getElementById('mapYear').value} - ${document.getElementById('mapTerm').value} (${document.getElementById('mapSessYear').value})`;
-            const payload = { code: document.getElementById('mapCourseCode').value.trim().toUpperCase(), title: document.getElementById('mapCourseTitle').value.trim(), teacher: document.getElementById('mapCourseTeacher').value.trim() };
-            try {
-                const mapDoc = await getDoc(doc(db, "course_mappings", key));
-                let currentCourses = mapDoc.exists() ? (mapDoc.data().courses || []) : [];
-                currentCourses.push(payload);
-                const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
-                await setDoc(doc(db, "course_mappings", key), { courses: currentCourses });
-                alert("Course mapped successfully!"); document.getElementById('courseMapForm').reset();
-            } catch (err) { alert(err.message); }
-        });
+       // admin-dashboard.html এর এই অংশটি আপডেট করুন
+document.getElementById('courseMapForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // স্টুডেন্ট প্যানেলের ফরম্যাটের সাথে মিল রেখে Key তৈরি (Year - TermNum (Term Year))
+    const yr = document.getElementById('mapYear').value;
+    const termNum = document.getElementById('mapTermNum').value; // নতুন যোগ করুন যদি না থাকে
+    const term = document.getElementById('mapTerm').value;
+    const sessYear = document.getElementById('mapSessYear').value;
+    
+    const key = `${yr} - ${termNum} (${term} ${sessYear})`;
+
+    const payload = { 
+        code: document.getElementById('mapCourseCode').value.trim().toUpperCase(), 
+        title: document.getElementById('mapCourseTitle').value.trim(), 
+        teacher: document.getElementById('mapCourseTeacher').value.trim() 
+    };
+    // ... বাকি কোড (সেটডক/আপডেটডক) একইভাবে থাকবে
+});
 
         // নোটিশ সাবমিট
         document.getElementById('noticeForm').addEventListener('submit', async (e) => {
