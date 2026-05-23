@@ -2,67 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 p-8">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="bg-white p-6 rounded shadow">
-            <h2 class="font-bold mb-4">Course Mapping Wizard</h2>
-            <form id="courseMapForm" class="space-y-3">
-                <select id="mapYear" class="w-full border p-2"><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select>
-                <select id="mapTermNum" class="w-full border p-2"><option>1st Trimester</option><option>2nd Trimester</option><option>3rd Trimester</option></select>
-                <select id="mapTerm" class="w-full border p-2"><option>Spring</option><option>Summer</option><option>Fall</option></select>
-                <select id="mapSessYear" class="w-full border p-2"><option>2026</option><option>2027</option></select>
-                <input type="text" id="mapCourseCode" placeholder="Code" class="w-full border p-2" required>
-                <input type="text" id="mapCourseTitle" placeholder="Title" class="w-full border p-2" required>
-                <button type="submit" class="bg-indigo-600 text-white w-full py-2 rounded">Sync Course</button>
-            </form>
-        </div>
-
-        <div class="bg-white p-6 rounded shadow overflow-x-auto">
-            <table class="w-full text-xs">
-                <thead><tr><th>Name</th><th>Role</th><th>Action</th></tr></thead>
-                <tbody id="studentTableBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <script type="module">
-        import { db } from "./assets/js/app.js";
-        import { doc, getDoc, setDoc, updateDoc, arrayUnion, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        // ১. কোর্স ম্যাপিং
-        document.getElementById('courseMapForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const key = `${document.getElementById('mapYear').value} - ${document.getElementById('mapTermNum').value} (${document.getElementById('mapTerm').value} ${document.getElementById('mapSessYear').value})`;
-            const payload = { code: document.getElementById('mapCourseCode').value, title: document.getElementById('mapCourseTitle').value };
-            const docRef = doc(db, "course_mappings", key);
-            const snap = await getDoc(docRef);
-            if(snap.exists()) await updateDoc(docRef, { courses: arrayUnion(payload) });
-            else await setDoc(docRef, { courses: [payload] });
-            alert("Mapped!");
-        });
-
-        // ২. স্টুডেন্ট লিস্ট ও রোল স্ট্যাটাস
-        onSnapshot(collection(db, "users"), (snap) => {
-            const body = document.getElementById('studentTableBody');
-            body.innerHTML = '';
-            snap.forEach(d => {
-                const data = d.data();
-                body.innerHTML += `<tr>
-                    <td>${data.name}</td>
-                    <td><span class="px-2 bg-blue-100">${data.role?.toUpperCase()}</span></td>
-                    <td><button onclick="alert('Resetting...')" class="bg-amber-500 text-white px-2 rounded">Reset Pass</button></td>
-                </tr>`;
-            });
-        });
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Islamic Studies Study Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
