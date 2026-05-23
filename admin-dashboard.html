@@ -112,7 +112,7 @@
 
     <script type="module">
         import { auth, db } from "./assets/js/app.js";
-        import { deletePortalFile, getPortalFilePublicUrl } from "./assets/js/fileStorage.js";
+        import { deletePortalFile, openResourceFile } from "./assets/js/fileStorage.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { doc, getDoc, setDoc, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -244,19 +244,16 @@
                 return;
             }
             const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-            const resolveViewUrl = (d) => {
-                const u = (d.url || "").trim();
-                if (u.startsWith("http") || u.startsWith("data:")) return u;
-                if (d.storagePath && d.urlType !== "external") {
-                    const rebuilt = getPortalFilePublicUrl(d.storagePath);
-                    if (rebuilt.startsWith("http")) return rebuilt;
+            const canView = (d) => {
+                if (d.urlType === "external") {
+                    const u = (d.url || "").trim();
+                    return u.startsWith("http") || u.startsWith("data:");
                 }
-                return "";
+                return Boolean(d.storagePath) || (d.url || "").trim().startsWith("http");
             };
             adminResourceList.innerHTML = snapshot.docs.map(res => {
                 const d = res.data();
-                const viewUrl = resolveViewUrl(d);
-                const payload = encodeURIComponent(JSON.stringify(d));
+                const payload = encodeURIComponent(JSON.stringify({ ...d, id: res.id }));
                 return `
                     <div class="p-2.5 bg-purple-50/40 border border-purple-100 rounded-lg">
                         <div class="flex justify-between gap-2 items-start">
@@ -266,9 +263,9 @@
                                 <p class="text-[9px] text-gray-400">By: ${esc(d.author || 'Unknown')} | ${esc(d.type || 'File')}</p>
                             </div>
                             <div class="flex flex-col gap-1 shrink-0">
-                                ${viewUrl
-                                    ? `<a href="${esc(viewUrl)}" target="_blank" rel="noopener" class="text-[9px] px-2 py-0.5 rounded bg-white border text-indigo-700 text-center font-bold">View</a>`
-                                    : `<span class="text-[9px] px-2 py-0.5 rounded bg-gray-100 border text-red-600 text-center">No link</span>`}
+                                ${canView(d)
+                                    ? `<button type="button" data-admin-view-resource="${res.id}" data-resource-payload="${payload}" class="text-[9px] px-2 py-0.5 rounded bg-white border text-indigo-700 text-center font-bold">View</button>`
+                                    : `<span class="text-[9px] px-2 py-0.5 rounded bg-gray-100 border text-red-600 text-center">No file</span>`}
                                 <button type="button" data-admin-edit-resource="${res.id}" data-resource-payload="${payload}" class="text-[9px] px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-bold">Edit</button>
                                 <button type="button" data-admin-delete-resource="${res.id}" class="text-[9px] px-2 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 font-bold">Delete</button>
                             </div>
@@ -277,7 +274,17 @@
             }).join("");
         });
 
-        document.getElementById('adminResourceList').addEventListener('click', (e) => {
+        document.getElementById('adminResourceList').addEventListener('click', async (e) => {
+            const viewBtn = e.target.closest('[data-admin-view-resource]');
+            if (viewBtn) {
+                e.preventDefault();
+                try {
+                    const data = JSON.parse(decodeURIComponent(viewBtn.dataset.resourcePayload));
+                    const ok = await openResourceFile(data);
+                    if (!ok) alert("ফাইল খোলা যায়নি। Supabase Storage বা পুরনো ভাঙা আপলোড — মুছে আবার আপলোড করুন।");
+                } catch (err) { alert(err.message); }
+                return;
+            }
             const editBtn = e.target.closest('[data-admin-edit-resource]');
             if (editBtn) {
                 try {
@@ -357,11 +364,18 @@
                     </div>
                     <div><label class="font-bold text-gray-600">File / Link URL</label><input type="text" id="m_res_url" value="${safeUrl}" class="w-full p-2 border rounded text-[10px]"></div>
                     ${(data.url && data.url.startsWith("http")) || data.storagePath
-                        ? `<a href="${(data.url && data.url.startsWith("http")) ? data.url : getPortalFilePublicUrl(data.storagePath)}" target="_blank" rel="noopener" class="text-indigo-600 underline text-[10px]">Preview open in new tab</a>`
-                        : `<span class="text-red-500 text-[10px]">No valid file URL — re-upload needed</span>`}
+                        ? `<button type="button" id="m_res_preview_btn" class="text-indigo-600 underline text-[10px] font-bold">Preview file in new tab</button>`
+                        : `<span class="text-red-500 text-[10px]">No valid file — re-upload needed</span>`}
                 </div>`;
             document.getElementById('editModal').classList.remove('hidden');
             document.getElementById('editModal').classList.add('flex');
+            const previewBtn = document.getElementById('m_res_preview_btn');
+            if (previewBtn) {
+                previewBtn.onclick = async () => {
+                    const ok = await openResourceFile({ ...data, id });
+                    if (!ok) alert("ফাইল খোলা যায়নি।");
+                };
+            }
         };
 
         window.deleteResourceAdmin = async (id) => {
