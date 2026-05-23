@@ -34,7 +34,7 @@
     <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white py-8 text-center shadow-inner">
         <div class="container mx-auto px-4">
             <h2 id="heroTitle" class="text-2xl md:text-3xl font-extrabold mb-2">Islamic Studies Study Portal</h2>
-            <p id="heroSubtitle" class="text-emerald-100 text-sm max-w-xl mx-auto">An open platform for classmates to share notes and schedules.</p>
+            <p id="heroSubtitle" class="text-emerald-100 text-sm max-w-xl mx-auto">An open platform for classmates to share notes, video lectures, and academic resources.</p>
         </div>
     </header>
 
@@ -44,14 +44,14 @@
             <div id="noticeList" class="space-y-3 overflow-y-auto max-h-48 p-1"><p class="text-xs text-gray-400">Loading notices...</p></div>
         </div>
         <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-5 border-t-4 border-amber-500">
-            <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center">⏳ Daily Routine Update</h3>
-            <div id="dailyRoutineList" class="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto max-h-48 p-1"><p class="text-xs text-gray-400">Loading updates...</p></div>
+            <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center">⏳ Daily Routine Update (আজকের সাময়িক রুটিন)</h3>
+            <div id="dailyRoutineList" class="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto max-h-48 p-1"><p class="text-xs text-gray-400">Loading today's updates...</p></div>
         </div>
     </main>
 
     <section class="container mx-auto px-4 pb-12">
         <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-teal-600">
-            <div class="border-b pb-3 mb-6"><h3 class="text-xl font-bold text-emerald-800">📅 Permanent Weekly Schedule</h3></div>
+            <div class="border-b pb-3 mb-6"><h3 class="text-xl font-bold text-emerald-800">📅 Permanent Weekly Schedule Routine Board</h3></div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="weeklyRoutineGrid">
                 <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3">Saturday (শনিবার)</h4><div id="day-Saturday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
                 <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3">Sunday (রবিবার)</h4><div id="day-Sunday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
@@ -63,13 +63,49 @@
         </div>
     </section>
 
+    <section class="container mx-auto px-4 pb-12">
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 border-b border-gray-200 gap-2">
+                <h3 id="lblCourses" class="text-2xl font-bold text-emerald-800 mb-2 md:mb-0">Academic Courses & Handnotes</h3>
+                
+                <select id="semesterFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg p-2.5 outline-none font-semibold text-emerald-800">
+                    <option value="all">All Semesters (সব সেমিস্টার)</option>
+                    <optgroup label="1st Year (প্রথম বর্ষ)">
+                        <option value="1st Year - 1st Sem">1st Year - 1st Sem</option>
+                        <option value="1st Year - 2nd Sem">1st Year - 2nd Sem</option>
+                        <option value="1st Year - 3rd Sem">1st Year - 3rd Sem</option>
+                    </optgroup>
+                    <optgroup label="2nd Year (দ্বিতীয় বর্ষ)">
+                        <option value="2nd Year - 1st Sem">2nd Year - 1st Sem</option>
+                        <option value="2nd Year - 2nd Sem">2nd Year - 2nd Sem</option>
+                        <option value="2nd Year - 3rd Sem">2nd Year - 3rd Sem</option>
+                    </optgroup>
+                    <optgroup label="3rd Year (তৃতীয় বর্ষ)">
+                        <option value="3rd Year - 1st Sem">3rd Year - 1st Sem</option>
+                        <option value="3rd Year - 2nd Sem">3rd Year - 2nd Sem</option>
+                        <option value="3rd Year - 3rd Sem">3rd Year - 3rd Sem</option>
+                    </optgroup>
+                    <optgroup label="4th Year (চতুর্থ বর্ষ)">
+                        <option value="4th Year - 1st Sem">4th Year - 1st Sem</option>
+                        <option value="4th Year - 2nd Sem">4th Year - 2nd Sem</option>
+                        <option value="4th Year - 3rd Sem">4th Year - 3rd Sem</option>
+                    </optgroup>
+                </select>
+            </div>
+            
+            <div id="courseGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p class="text-xs text-gray-400 p-2">Loading academic database...</p>
+            </div>
+        </div>
+    </section>
+
     <div id="profileModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative max-h-[90vh] overflow-y-auto">
             <h3 class="text-lg font-bold text-emerald-800 mb-4 border-b pb-2 flex items-center"><i class="fa-solid fa-id-card mr-2"></i> My Personal Profile Card</h3>
             
             <form id="profileEditForm" class="space-y-3 text-xs">
                 <div class="flex items-center space-x-4 bg-slate-50 p-2.5 rounded-xl border border-dashed">
-                    <img id="avatarPreview" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="h-16 w-16 rounded-full object-cover border-2 border-emerald-700" alt="Avatar">
+                    <img id="avatarPreview" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="h-16 w-16 rounded-full object-cover border-2 border-emerald-700 shadow-sm" alt="Avatar">
                     <div>
                         <label class="block font-semibold text-gray-700 mb-1">Upload Profile Picture (Optional)</label>
                         <input type="file" id="profilePicFile" accept="image/*" class="w-full text-xs text-gray-500">
@@ -103,7 +139,7 @@
                         <label class="block font-semibold text-gray-700 mb-0.5">New Password</label>
                         <div class="relative">
                             <input type="password" id="newProfilePassword" class="w-full p-2 border border-gray-300 rounded pr-10" placeholder="Min. 6 characters">
-                            <button type="button" onclick="toggleProfilePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-700">
+                            <button type="button" onclick="toggleProfilePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                                 <i id="eyeIconProfile" class="fa-solid fa-eye-slash"></i>
                             </button>
                         </div>
@@ -134,32 +170,89 @@
 
         let loggedInUserUID = null; let isProfileIncomplete = false; let base64PicString = "";
         const dailyContainer = document.getElementById('dailyRoutineList');
+        const courseGrid = document.getElementById('courseGrid');
         const daysWithClasses = { Saturday: false, Sunday: false, Monday: false, Tuesday: false, Wednesday: false, Friday: false };
 
-        // রুটিন লিসেনার
+        // একাডেমিক কোর্সের ফুল সিলেবাস ডাটাবেজ (ডামি ড্রাইভ লিংক সহ সাজানো)
+        const academicCoursesDatabase = [
+            { code: "IS-1101", title: "Introduction to Islam", semester: "1st Year - 1st Sem", teacher: "Prof. Dr. Mahmudul Hasan Yusuf", link: "#" },
+            { code: "IS-1102", title: "Al-Qur'an & Ulumul Qur'an", semester: "1st Year - 1st Sem", teacher: "Dr. Kamruzzaman Khezeree", link: "#" },
+            { code: "IS-1201", title: "Usul al-Shashi (Jurisprudence)", semester: "1st Year - 2nd Sem", teacher: "Dr. Mostafa Hossain Shahin", link: "#" },
+            { code: "IS-1202", title: "Hadith Studies & Literature", semester: "1st Year - 2nd Sem", teacher: "Dr. Kamruzzaman Khezeree", link: "#" },
+            { code: "IS-1301", title: "Sirat-un-Nabi & Islamic Culture", semester: "1st Year - 3rd Sem", teacher: "Prof. Dr. Mahmudul Hasan Yusuf", link: "#" }
+        ];
+
+        // কোর্স হ্যান্ডনোট রেন্ডারিং ও ফিল্টার মেকানিজম
+        function renderAcademicCourses(selectedSemester) {
+            courseGrid.innerHTML = '';
+            const filtered = academicCoursesDatabase.filter(c => selectedSemester === "all" || c.semester === selectedSemester);
+            
+            if(filtered.length === 0) {
+                courseGrid.innerHTML = '<p class="text-xs text-gray-400 col-span-2 p-4 text-center border border-dashed rounded-xl">No active handnotes shared for this semester yet. (এই সেমিস্টারের কোনো নোট এখনো আপলোড করা হয়নি)</p>';
+                return;
+            }
+
+            filtered.forEach(course => {
+                courseGrid.innerHTML += `
+                    <div class="border border-gray-200 rounded-xl p-4 bg-gray-50 flex flex-col justify-between hover:shadow-md hover:border-emerald-600 transition">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded">${course.code}</span>
+                                <span class="text-[10px] text-slate-500 font-medium">${course.semester}</span>
+                            </div>
+                            <h4 class="text-base font-extrabold text-gray-800 mt-2">${course.title}</h4>
+                            <p class="text-xs text-gray-500 mt-1"><i class="fa-solid fa-user-tie mr-1 text-slate-400"></i>Lecturer: ${course.teacher}</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
+                            <span class="text-xs text-gray-400 font-semibold"><i class="fa-regular fa-file-pdf mr-1 text-red-500"></i>Resources Ready</span>
+                            <a href="${course.link}" class="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1">Open Cloud Drive <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        document.getElementById('semesterFilter').addEventListener('change', (e) => {
+            renderAcademicCourses(e.target.value);
+        });
+
+        // রিয়েলটাইম রুটিন লিসেনার
         onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
             dailyContainer.innerHTML = '';
             Object.keys(daysWithClasses).forEach(day => { const el = document.getElementById(`day-${day}`); if(el) el.innerHTML = ''; daysWithClasses[day] = false; });
             let hasDaily = false;
+
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                const cardHTML = `<div class="p-2.5 bg-white border border-slate-200 rounded-lg shadow-sm text-xs"><div class="flex justify-between items-center mb-0.5"><h5 class="font-extrabold text-emerald-800 text-sm">${data.subject}</h5><span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${data.gender === 'Male' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${data.gender}</span></div><div class="mb-1 text-[11px] text-amber-700 font-bold">Batch: ${data.batchNumber}</div><div class="grid grid-cols-2 text-[11px] text-gray-600 gap-y-0.5 border-t border-dashed pt-1 mt-1"><p><b>Code:</b> ${data.courseCode}</p><p><b>Room:</b> ${data.room}</p><p class="text-emerald-700 font-bold col-span-2"><b>Teacher:</b> ${data.teacherCode}</p><p class="font-bold text-slate-700 col-span-2 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${data.timeSlot}</p></div></div>`;
+                const cardHTML = `
+                    <div class="p-2.5 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-emerald-600 transition">
+                        <div class="flex justify-between items-center mb-0.5">
+                            <h5 class="font-extrabold text-emerald-800 text-sm">${data.subject}</h5>
+                            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${data.gender === 'Male' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${data.gender}</span>
+                        </div>
+                        <div class="mb-1 text-[11px] text-amber-700 font-bold"><i class="fa-solid fa-users text-amber-500 mr-1"></i>Batch: ${data.batchNumber}</div>
+                        <div class="grid grid-cols-2 text-[11px] text-gray-600 gap-y-0.5 border-t border-dashed pt-1 mt-1">
+                            <p><b>Code:</b> ${data.courseCode}</p><p><b>Room:</b> ${data.room}</p>
+                            <p class="text-emerald-700 font-bold col-span-2"><b>Teacher:</b> ${data.teacherCode}</p>
+                            <p class="font-bold text-slate-700 col-span-2 mt-0.5"><i class="fa-regular fa-clock text-emerald-600 mr-1"></i>${data.timeSlot}</p>
+                        </div>
+                    </div>`;
                 if (data.boardType === 'daily') { dailyContainer.innerHTML += cardHTML; hasDaily = true; } 
                 else if (data.boardType === 'permanent' && data.classDay && data.classDay !== "N/A") {
                     const el = document.getElementById(`day-${data.classDay}`); if (el) { el.innerHTML += cardHTML; daysWithClasses[data.classDay] = true; }
                 }
             });
-            Object.keys(daysWithClasses).forEach(day => { if (!daysWithClasses[day]) document.getElementById(`day-${day}`).innerHTML = '<p class="text-xs text-gray-400 text-center py-2 bg-white/40 border border-dashed rounded-lg">No classes.</p>'; });
-            if(!hasDaily) dailyContainer.innerHTML = '<p class="text-xs text-gray-400 col-span-2 p-2">No active updates.</p>';
+            Object.keys(daysWithClasses).forEach(day => { if (!daysWithClasses[day]) document.getElementById(`day-${day}`).innerHTML = '<p class="text-xs text-gray-400 text-center py-2 bg-white/40 border border-dashed rounded-lg">No classes scheduled.</p>'; });
+            if(!hasDaily) dailyContainer.innerHTML = '<p class="text-xs text-gray-400 col-span-2 p-2">No active daily updates.</p>';
         });
 
-        // নোটিশ লিসেনার
+        // নোটিশ বোর্ড লিসেনার
         onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
             const noticeContainer = document.getElementById('noticeList'); noticeContainer.innerHTML = '';
             snapshot.forEach((doc) => { const data = doc.data(); noticeContainer.innerHTML += `<div class="p-2.5 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm text-xs"><p class="font-medium text-gray-800">${data.content}</p></div>`; });
         });
 
-        // ─── ফিক্সড সিকিউরিটি চেক লজিক (অ্যাডমিন বাইপাস) ───
+        // সিকিউরিটি এবং রোল বাইপাস কন্ট্রোলার চেক
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 loggedInUserUID = user.uid;
@@ -168,16 +261,13 @@
                 if(userDoc.exists()) {
                     const uData = userDoc.data();
                     
-                    // ১. এখানে যদি ইউজারের রোল 'admin' হয়, তবে তাকে কোনো বাধা ছাড়াই সরাসরি ড্যাশবোর্ডে রিডাইরেক্ট করে দেবে!
                     if (uData.role === 'admin') {
                         window.location.replace("./admin-dashboard.html");
-                        return; // কোড এখানেই স্টপ করে দেবে, নিচের স্টুডেন্ট লজিক এক্সিকিউট হবে না
+                        return;
                     }
 
-                    // ২. সাধারণ স্টুডেন্টদের জন্য প্রোফাইল কমপ্লিট চেক লজিক
                     if(!uData.phone || !uData.bloodGroup || !uData.emergencyPhone) {
-                        isProfileIncomplete = true; 
-                        document.getElementById('warningBanner').classList.remove('hidden');
+                        isProfileIncomplete = true; document.getElementById('warningBanner').classList.remove('hidden');
                     }
 
                     const pulseClass = isProfileIncomplete ? 'bg-red-600 hover:bg-red-700 animate-pulse text-white' : 'bg-emerald-950 hover:bg-emerald-900 text-emerald-200';
@@ -209,9 +299,10 @@
                     document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => window.location.reload()); });
                 }
             }
+            renderAcademicCourses("all");
         });
 
-        // প্রোফাইল ছবি রিডার
+        // ছবি আপলোড কনভার্টার
         document.getElementById('profilePicFile').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if(file) {
@@ -219,7 +310,7 @@
             }
         });
 
-        // প্রোফাইল সেভ
+        // প্রোফাইল ও পাসওয়ার্ড সেভ
         document.getElementById('profileEditForm').addEventListener('submit', async (e) => {
             e.preventDefault(); if(!loggedInUserUID) return;
             const newPass = document.getElementById('newProfilePassword').value.trim();
@@ -231,7 +322,7 @@
                 await updateDoc(doc(db, "users", loggedInUserUID), {
                     name: document.getElementById('editProfileName').value.trim(), universityUID: document.getElementById('editProfileUID').value.trim(), batchNumber: document.getElementById('editProfileBatch').value.trim(), trimester: document.getElementById('editProfileSemester').value.trim(), phone: document.getElementById('editProfilePhone').value.trim(), bloodGroup: document.getElementById('editProfileBlood').value, emergencyName: document.getElementById('editProfileEmergencyName').value.trim(), emergencyPhone: document.getElementById('editProfileEmergencyPhone').value.trim(), profilePic: base64PicString
                 });
-                alert("Profile saved successfully!"); window.location.reload();
+                alert("Profile completed and saved successfully!"); window.location.reload();
             } catch (err) { alert("Update error: " + err.message); }
         });
 
