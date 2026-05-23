@@ -381,10 +381,10 @@
     </script>
 
     <script type="module">
-        import { auth, db, storage } from "./assets/js/app.js";
+        import { auth, db } from "./assets/js/app.js";
+        import { uploadPortalFile, deletePortalFile } from "./assets/js/fileStorage.js";
         import { onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { collection, onSnapshot, query, orderBy, doc, getDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         let loggedInUserUID = null; let loggedInUserName = ""; let isProfileIncomplete = false; let base64PicString = "";
         let studentCurrentTrimesterKey = ""; 
@@ -413,12 +413,7 @@
         }
 
         async function uploadFileToStorage(file) {
-            const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-            const path = `resources/${loggedInUserUID}/${Date.now()}_${safeName}`;
-            const storageRef = ref(storage, path);
-            await uploadBytes(storageRef, file);
-            const downloadUrl = await getDownloadURL(storageRef);
-            return { downloadUrl, storagePath: path };
+            return uploadPortalFile(file, loggedInUserUID);
         }
 
         function renderResourceItemHTML(rData, t) {
@@ -591,7 +586,7 @@
             pendingUploadFile = null;
             base64UploadedFileString = "";
             document.getElementById('shareFileField').value = "";
-            window.switchUploadMethod((rData.urlType === "external" || (rData.url && rData.url.startsWith("http"))) ? 'link' : 'file');
+            window.switchUploadMethod(rData.urlType === "external" ? "link" : "file");
             document.getElementById('sm_submit').innerText = window.portalT('sm_save');
             document.getElementById('sm_title').innerHTML = `<i class="fa-solid fa-pen-to-square mr-2"></i> ${window.portalT('sm_edit_title')}`;
             refreshShareModalLabels();
@@ -608,8 +603,8 @@
             }
             if (!confirm(window.portalT('confirmDeleteResource'))) return;
             try {
-                if (rData.storagePath) {
-                    try { await deleteObject(ref(storage, rData.storagePath)); } catch (e) { console.warn(e); }
+                if (rData.storagePath && rData.urlType !== "external") {
+                    await deletePortalFile(rData.storagePath);
                 }
                 await deleteDoc(doc(db, "resources", resourceId));
                 alert(window.portalT('alertResourceDeleted'));
@@ -699,19 +694,19 @@
                             const prevSnap = await getDoc(doc(db, "resources", editId));
                             const oldPath = prevSnap.exists() ? prevSnap.data().storagePath : null;
                             if (oldPath && oldPath !== uploaded.storagePath) {
-                                try { await deleteObject(ref(storage, oldPath)); } catch (e) { console.warn(e); }
+                                await deletePortalFile(oldPath);
                             }
                         }
                         urlPayload = uploaded.downloadUrl;
                         storagePath = uploaded.storagePath;
-                        urlType = "storage";
+                        urlType = uploaded.urlType;
                         submitBtn.disabled = false;
                         submitBtn.innerText = editId ? window.portalT('sm_save') : window.portalT('sm_submit');
                     } else if (editId) {
                         const existing = await getDoc(doc(db, "resources", editId));
                         if (existing.exists()) {
                             urlPayload = existing.data().url;
-                            urlType = existing.data().urlType || "storage";
+                            urlType = existing.data().urlType || "supabase";
                             storagePath = existing.data().storagePath || "";
                         }
                     } else {
