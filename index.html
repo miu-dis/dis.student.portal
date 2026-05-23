@@ -56,9 +56,9 @@
         <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-teal-600">
             <div class="border-b pb-3 mb-6">
                 <h3 id="lblPermanentRoutine" class="text-xl font-bold text-emerald-800 flex items-center">
-                    <i class="fa-solid fa-calendar-days mr-2 text-teal-600"></i> Permanent Weekly Schedule Routine Board (স্থায়ী সাপ্তাহিক মাস্টার রুটিন)
+                    <i class="fa-solid fa-calendar-days mr-2 text-teal-600"></i> Permanent Weekly Schedule Routine Board (স্থায়ী साप्ताहिक মাস্টার রুটিন)
                 </h3>
-                <p class="text-xs text-gray-500 mt-1">সব বারের ক্লাস শিডিউল একনজরে নিচে সাজানো রয়েছে।</p>
+                <p class="text-xs text-gray-500 mt-1">সব বারের ক্লাস শিডিউল একনজরে নিচে সাজানো রয়েছে। (বৃহস্পতিবার অফ-ডে)</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="weeklyRoutineGrid">
@@ -98,10 +98,10 @@
                 </div>
 
                 <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
-                    <h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 flex justify-between items-center">
-                        <span>Thursday (বৃহস্পতিবার)</span> <i class="fa-solid fa-clock-seven text-xs"></i>
+                    <h4 class="font-bold text-sm bg-rose-700 text-white px-3 py-1.5 rounded-lg mb-3 flex justify-between items-center">
+                        <span>Friday (শুক্রবার)</span> <i class="fa-solid fa-clock-seven text-xs"></i>
                     </h4>
-                    <div id="day-Thursday" class="space-y-2 text-xs text-gray-500">No classes scheduled.</div>
+                    <div id="day-Friday" class="space-y-2 text-xs text-gray-500">No classes scheduled.</div>
                 </div>
             </div>
         </div>
@@ -149,9 +149,6 @@
         };
 
         const langSelector = document.getElementById('langSelector');
-        const navContainer = document.getElementById('navContainer');
-        const navLogoTitle = document.getElementById('navLogoTitle');
-
         function applyLanguage(lang) {
             const t = translations[lang] || translations['en'];
             document.body.dir = t.dir;
@@ -182,15 +179,16 @@
         import { collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const dailyContainer = document.getElementById('dailyRoutineList');
-        const daysWithClasses = { Saturday: false, Sunday: false, Monday: false, Tuesday: false, Wednesday: false, Thursday: false };
+        // বৃহস্পতিবারের বদলে ফ্রাইডে ট্র্যাক করার অবজেক্ট
+        const daysWithClasses = { Saturday: false, Sunday: false, Monday: false, Tuesday: false, Wednesday: false, Friday: false };
 
-        // রিয়েলটাইম রুটিন ডেটাবেজ লিসেনার
         onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
             dailyContainer.innerHTML = '';
             
-            // সপ্তাহের প্রতিটা বারের কন্টেইনার আগে ফাঁকা বা রিসেট করে নেওয়া
+            // কন্টেইনার রিসেট
             Object.keys(daysWithClasses).forEach(day => {
-                document.getElementById(`day-${day}`).innerHTML = '';
+                const el = document.getElementById(`day-${day}`);
+                if(el) el.innerHTML = '';
                 daysWithClasses[day] = false;
             });
 
@@ -202,7 +200,7 @@
                 
                 let genderLabel = data.gender === 'Male' ? (currentLang === 'bn' ? 'ভাইদের শাখা' : 'Male') : (currentLang === 'bn' ? 'বোনদের শাখা' : 'Female');
 
-                // কম্প্যাক্ট টেবিল/ক্যালেন্ডার কার্ড ডিজাইন (একনজরে দেখার জন্য)
+                // কার্ড লেআউটে সরাসরি টিচারের নাম বা কোড বড় এবং বোল্ড আকারে দেখার ব্যবস্থা
                 const cardHTML = `
                     <div class="p-2.5 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-emerald-600 transition">
                         <div class="flex justify-between items-center mb-1">
@@ -212,18 +210,18 @@
                         <div class="grid grid-cols-2 text-[11px] text-gray-600 gap-y-0.5 border-t border-dashed pt-1 mt-1">
                             <p><i class="fa-solid fa-barcode text-gray-400 mr-1"></i><b>Code:</b> ${data.courseCode}</p>
                             <p><i class="fa-solid fa-door-open text-gray-400 mr-1"></i><b>Room:</b> ${data.room}</p>
-                            <p><i class="fa-solid fa-user-tie text-gray-400 mr-1"></i><b>Tch:</b> ${data.teacherCode}</p>
+                            <p class="text-emerald-700 font-bold"><i class="fa-solid fa-user-tie text-emerald-600 mr-1"></i><b>Teacher:</b> ${data.teacherCode}</p>
                             <p class="font-bold text-slate-700"><i class="fa-regular fa-clock text-emerald-600 mr-1"></i>${data.timeSlot}</p>
                         </div>
                     </div>
                 `;
 
-                // ১. যদি বোর্ড টাইপ 'daily' (সাময়িক) হয়
+                // সাময়িক রুটিন আপলোড
                 if (data.boardType === 'daily') {
                     dailyContainer.innerHTML += cardHTML;
                     hasDaily = true;
                 } 
-                // ২. যদি বোর্ড টাইপ 'permanent' (স্থায়ী) হয় এবং একটি নির্দিষ্ট বার সিলেক্ট থাকে
+                // স্থায়ী রুটিন আপলোড
                 else if (data.boardType === 'permanent' && data.classDay && data.classDay !== "N/A") {
                     const targetDayBox = document.getElementById(`day-${data.classDay}`);
                     if (targetDayBox) {
@@ -233,10 +231,11 @@
                 }
             });
 
-            // খালি বারের নোটিশ হ্যান্ডলিং
+            // ক্লাস না থাকা দিনগুলোর হ্যান্ডলিং
             Object.keys(daysWithClasses).forEach(day => {
-                if (!daysWithClasses[day]) {
-                    document.getElementById(`day-${day}`).innerHTML = '<p class="text-xs text-gray-400 text-center py-2 bg-white/40 border border-dashed rounded-lg">No classes on this day.</p>';
+                const el = document.getElementById(`day-${day}`);
+                if (el && !daysWithClasses[day]) {
+                    el.innerHTML = '<p class="text-xs text-gray-400 text-center py-2 bg-white/40 border border-dashed rounded-lg">No classes on this day.</p>';
                 }
             });
 
@@ -261,7 +260,7 @@
             });
         });
 
-        // অথেনটিকেশন স্টেট হ্যান্ডেলার (লগআউট/প্যানেল বাটন)
+        // অথেনটিকেশন স্টেট হ্যান্ডেলার
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const currentLang = localStorage.getItem('preferredLang') || 'en';
