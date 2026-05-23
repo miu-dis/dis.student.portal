@@ -65,15 +65,27 @@
 
     <section class="container mx-auto px-4 pb-12">
         <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-indigo-600">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 border-b border-gray-200 gap-3">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 pb-4 border-b border-gray-200 gap-4">
                 <div>
                     <h3 id="lblCourses" class="text-2xl font-bold text-emerald-800 mb-0.5">Academic Resources Directory</h3>
                     <p class="text-xs text-gray-500 font-medium" id="lblSubTitleCourses">সব সেমিস্টারের ফাইল দেখার উম্মুক্ত আর্কাইভ (আপলোড শুধুমাত্র নিজের সেমিস্টারে লকিং)।</p>
                 </div>
                 
-                <div class="flex items-center space-x-2 w-full md:w-auto gap-2 justify-end">
-                    <select id="semesterFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-xs md:text-sm rounded-lg p-2.5 font-semibold text-emerald-800 outline-none"></select>
-                    <span id="displayStudentCurrentSem" class="bg-indigo-50 text-indigo-800 font-bold text-xs px-3 py-2 rounded-lg border border-indigo-200">Syncing Profile...</span>
+                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto text-xs font-semibold">
+                    <select id="filterYear" class="bg-gray-50 border border-gray-300 text-emerald-800 p-2 rounded-lg outline-none cursor-pointer">
+                        <option value="1st Year">1st Year</option><option value="2nd Year">2nd Year</option><option value="3rd Year">3rd Year</option><option value="4th Year">4th Year</option>
+                    </select>
+                    <select id="filterTermNum" class="bg-gray-50 border border-gray-300 text-emerald-800 p-2 rounded-lg outline-none cursor-pointer">
+                        <option value="1st Trimester">1st Trimester</option><option value="2nd Trimester">2nd Trimester</option><option value="3rd Trimester">3rd Trimester</option>
+                    </select>
+                    <select id="filterSession" class="bg-gray-50 border border-gray-300 text-emerald-800 p-2 rounded-lg outline-none cursor-pointer">
+                        <option value="Spring 2026">Spring 2026</option><option value="Summer 2026">Summer 2026</option><option value="Fall 2026">Fall 2026</option>
+                        <option value="Spring 2027">Spring 2027</option><option value="Summer 2027">Summer 2027</option><option value="Fall 2027">Fall 2027</option>
+                        <option value="Spring 2028">Spring 2028</option><option value="Summer 2028">Summer 2028</option><option value="Fall 2028">Fall 2028</option>
+                        <option value="Spring 2029">Spring 2029</option><option value="Summer 2029">Summer 2029</option><option value="Fall 2029">Fall 2029</option>
+                        <option value="Spring 2030">Spring 2030</option><option value="Summer 2030">Summer 2030</option><option value="Fall 2030">Fall 2030</option>
+                    </select>
+                    <span id="displayStudentCurrentSem" class="bg-indigo-50 text-indigo-800 font-bold px-3 py-2 rounded-lg border border-indigo-200 shrink-0">Syncing...</span>
                 </div>
             </div>
             
@@ -139,25 +151,25 @@
                     <p id="m_academic_title" class="font-bold text-slate-700 text-[11px]"><i class="fa-solid fa-graduation-cap mr-1"></i> Academic Session Status</p>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
-                            <label class="block text-[10px] text-gray-500 font-semibold">Year (বর্ষ)</label>
+                            <label class="block text-[10px] text-gray-500 font-semibold">Year</label>
                             <select id="editProfileYear" required class="w-full p-1.5 border rounded bg-white text-gray-700">
                                 <option value="1st Year">1st Year</option><option value="2nd Year">2nd Year</option><option value="3rd Year">3rd Year</option><option value="4th Year">4th Year</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] text-gray-500 font-semibold">Trimester Term (সেমিস্টার নং)</label>
+                            <label class="block text-[10px] text-gray-500 font-semibold">Trimester Term</label>
                             <select id="editProfileTermNum" required class="w-full p-1.5 border rounded bg-white text-gray-700">
                                 <option value="1st Trimester">1st Trimester</option><option value="2nd Trimester">2nd Trimester</option><option value="3rd Trimester">3rd Trimester</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] text-gray-500 font-semibold">Admission Session (সেশন)</label>
+                            <label class="block text-[10px] text-gray-500 font-semibold">Admission Session</label>
                             <select id="editProfileTerm" required class="w-full p-1.5 border rounded bg-white text-gray-700">
                                 <option value="Spring">Spring</option><option value="Summer">Summer</option><option value="Fall">Fall</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] text-gray-500 font-semibold">Session Year (সাল)</label>
+                            <label class="block text-[10px] text-gray-500 font-semibold">Session Year</label>
                             <select id="editProfileSessionYear" required class="w-full p-1.5 border rounded bg-white text-gray-700">
                                 <option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option>
                             </select>
@@ -169,7 +181,7 @@
                     <p id="m_emg_title" class="font-bold text-amber-800 text-[11px]">⚠️ Emergency Data</p>
                     <div><label id="m_phone" class="block font-semibold text-gray-700 mb-0.5">My Mobile Number</label><input type="tel" id="editProfilePhone" required class="w-full p-2 border border-gray-300 rounded"></div>
                     <div>
-                        <label id="m_blood" class="block font-semibold text-gray-700 mb-0.5">Blood Group</label>
+                        <label class="block font-semibold text-gray-700 mb-0.5">Blood Group</label>
                         <select id="editProfileBlood" required class="w-full p-2 border border-gray-300 rounded bg-white">
                             <option value="">Select Blood Group</option>
                             <option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="O+">O+</option><option value="O-">O-</option><option value="AB+">AB+</option><option value="AB-">AB-</option>
@@ -201,16 +213,18 @@
                 navTitle: "DIS Study Portal", btnNavLogin: "Login / Register", warningBanner: "⚠️ Profile Incomplete! Mandatory fields are empty.",
                 heroTitle: "Islamic Studies Study Portal", heroSubtitle: "Academic matrix open directory server.", lblNoticeBoard: "📢 Notice Board",
                 lblDailyRoutine: "⏳ Daily Routine Update", lblPermanentRoutine: "📅 Permanent Weekly Schedule Board", lblCourses: "Class Shared Resources Archive",
+                lblSubTitleCourses: "Filter and read study resources from any trimester session using the checkboxes above.",
                 sat: "Saturday", sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", fri: "Friday",
                 m_title: "My Personal Profile Card", m_pic: "Upload Profile Picture", m_name: "Full Name", m_uid: "University ID (UID)",
-                m_batch: "Batch Number", m_academic_title: "Academic Trimester Status (Year/Term/Session/Year)", m_emg_title: "⚠️ Emergency Data (Compulsory)", m_phone: "My Mobile Number",
-                m_emg_name: "Emergency Contact Name", m_emg_phone: "Emergency Contact Mobile No", m_pass_title: "🔒 Change Password (Optional)",
+                m_batch: "Batch Number", m_academic_title: "Academic Trimester Status", m_emg_title: "⚠️ Emergency Data", m_phone: "My Mobile Number",
+                m_emg_name: "Emergency Contact Name", m_emg_phone: "Emergency Contact Mobile No", m_pass_title: "🔒 Change Password",
                 btnCancelProfile: "Cancel", btnSaveProfileText: "Save Profile Info", sm_title: "Share Study Material / Link", sm_name: "Contributor Name", sm_topic: "Topic / Subject Title", sm_type: "Resource Type", sm_cancel: "Cancel", sm_submit: "Publish Live"
             },
             bn: {
                 navTitle: "ডিআইএস স্টাডি পোর্টাল", btnNavLogin: "লগইন / রেজিস্টার", warningBanner: "⚠️ আপনার প্রোফাইলটি অসম্পূর্ণ! অনুগ্রহ করে 'My Profile' বাটনে ক্লিক করে তথ্য সম্পূর্ণ করুন।",
                 heroTitle: "ইসলামিক স্টাডিজ বিভাগ পোর্টাল", heroSubtitle: "সহপাঠীদের মাঝে ক্লাস নোট এবং লেকচার শেয়ার করার উন্মুক্ত আর্কাইভ।", lblNoticeBoard: "📢 নোটিশ বোর্ড",
                 lblDailyRoutine: "⏳ আজকের সাময়িক রুটিন", lblPermanentRoutine: "📅 স্থায়ী সাপ্তাহিক মাস্টার রুটিন বোর্ড", lblCourses: "একাডেমিক কোর্স ও শেয়ারড রিসোর্স আর্কাইভ",
+                lblSubTitleCourses: "ওপরের তিনটি সেশন বক্স সিলেক্ট করে খুব সহজে যেকোনো সেমিস্টারের ফাইল এক ক্লিকে খুঁজে বের করুন।",
                 sat: "Saturday (শনিবার)", sun: "Sunday (রবিবার)", mon: "Monday (সোমবার)", tue: "Tuesday (মঙ্গলবার)", wed: "Wednesday (বুধবার)", fri: "Friday (শুক্রবার)",
                 m_title: "আমার প্রোফাইল ইনফো কার্ড", m_pic: "প্রোফাইল পিকচার আপলোড (ঐচ্ছিক)", m_name: "পূর্ণ নাম", m_uid: "ইউনিভার্সিটি আইডি (UID)",
                 m_batch: "ব্যাচ নম্বর", m_academic_title: "একাডেমিক সেশন (বর্ষ / সেমিস্টার নং / সেশন / সাল)", m_emg_title: "⚠️ জরুরী কন্টাক্ট তথ্য (বাধ্যতামূলক)", m_phone: "আমার মোবাইল নম্বর",
@@ -230,6 +244,7 @@
             document.getElementById('lblDailyRoutine').innerText = t.lblDailyRoutine;
             document.getElementById('lblPermanentRoutine').innerText = t.lblPermanentRoutine;
             document.getElementById('lblCourses').innerText = t.lblCourses;
+            document.getElementById('lblSubTitleCourses').innerText = t.lblSubTitleCourses;
 
             document.getElementById('dayLabel-Saturday').innerText = t.sat; document.getElementById('dayLabel-Sunday').innerText = t.sun;
             document.getElementById('dayLabel-Monday').innerText = t.mon; document.getElementById('dayLabel-Tuesday').innerText = t.tue;
@@ -268,15 +283,22 @@
         import { collection, onSnapshot, query, orderBy, doc, getDoc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         let loggedInUserUID = null; let isProfileIncomplete = false; let base64PicString = "";
-        let studentCurrentTrimesterKey = ""; // স্টুডেন্টের রানিং লক কী (যেমন: "1st Year - 2nd Trimester (Spring 2026)")
+        let studentCurrentTrimesterKey = ""; 
         const dailyContainer = document.getElementById('dailyRoutineList');
         const courseGrid = document.getElementById('courseGrid');
         const daysWithClasses = { Saturday: false, Sunday: false, Monday: false, Tuesday: false, Wednesday: false, Friday: false };
 
-        // ১. গ্লোবাল আর্কাইভ ফিল্টার লুপ (সবাই সবার ফাইল দেখতে পারবে)
-        async function listenToGlobalArchiveStream(selectedTrimesterKey) {
-            // সিলেক্টেড সেমিস্টারে কোন কোন কোর্স আছে তা অ্যাডমিন ডক থেকে নেওয়া
-            const mapDoc = await getDoc(doc(db, "course_mappings", selectedTrimesterKey));
+        // ১. ৩-ফিল্টার বক্স ডাটা কম্পোজিশন ও লাইভ লিসেনার লুপ (স্মার্ট ইঞ্জিন)
+        async function updateFiltersAndListen() {
+            const yr = document.getElementById('filterYear').value;
+            const term = document.getElementById('filterTermNum').value;
+            const sess = document.getElementById('filterSession').value; // যেমন: "Spring 2026"
+            
+            // মাস্টার সার্চ কী তৈরি (যেমন: "1st Year - 1st Trimester (Spring 2026)")
+            const combinedTrimesterKey = `${yr} - ${term} (${sess})`;
+
+            // এডমিন ম্যাপিং ডাটা চেক
+            const mapDoc = await getDoc(doc(db, "course_mappings", combinedTrimesterKey));
             let mappedCourses = [];
             if(mapDoc.exists()) mappedCourses = mapDoc.data().courses || [];
 
@@ -285,7 +307,7 @@
                 const currentLang = localStorage.getItem('preferredLang') || 'en';
 
                 if(mappedCourses.length === 0) {
-                    courseGrid.innerHTML = `<p class="text-xs text-gray-400 col-span-3 p-6 text-center border border-dashed rounded-xl w-full">${currentLang === 'bn' ? 'এই সেমিস্টারের কোনো সিল্যাবস বা কোর্স অ্যাডমিন প্যানেল থেকে ম্যাপ করা হয়নি।' : 'No active courses mapped for this semester session by admin yet.'}</p>`;
+                    courseGrid.innerHTML = `<p class="text-xs text-gray-400 col-span-3 p-6 text-center border border-dashed rounded-xl w-full">${currentLang === 'bn' ? 'এই সিলেক্টেড সেমিস্টারে কোনো লাইভ কোর্স বা সিলেবাস এখনো অ্যাডমিন প্যানেল থেকে তৈরি করা হয়নি।' : 'No courses mapped for this combined filter session by admin yet.'}</p>`;
                     return;
                 }
 
@@ -293,11 +315,11 @@
                     let sharedItemsHTML = "";
                     snapshot.forEach(resDoc => {
                         const rData = resDoc.data();
-                        if(rData.courseCode === course.code && rData.semester === selectedTrimesterKey) {
+                        if(rData.courseCode === course.code && rData.semester === combinedTrimesterKey) {
                             let icon = "fa-file-pdf text-red-500";
-                            if(rData.type.includes("Video")) icon = "fa-video text-blue-500";
-                            if(rData.type.includes("Audio")) icon = "fa-microphone text-purple-500";
-                            if(rData.type.includes("Image")) icon = "fa-image text-amber-500";
+                            if(data.type.includes("Video")) icon = "fa-video text-blue-500";
+                            if(data.type.includes("Audio")) icon = "fa-microphone text-purple-500";
+                            if(data.type.includes("Image")) icon = "fa-image text-amber-500";
 
                             sharedItemsHTML += `
                                 <a href="${rData.url}" target="_blank" class="flex justify-between items-center p-2 bg-indigo-50/50 border border-indigo-100 rounded-md hover:bg-indigo-100 transition text-[11px] font-medium text-gray-700">
@@ -307,10 +329,10 @@
                         }
                     });
 
-                    if(sharedItemsHTML === "") sharedItemsHTML = `<p class="text-[10px] text-gray-400 italic p-1">No shared files ready.</p>`;
+                    if(sharedItemsHTML === "") sharedItemsHTML = `<p class="text-[10px] text-gray-400 italic p-1">No shared files.</p>`;
 
-                    // আপলোড লক মেকানিজম ভ্যালিডেশন চেক
-                    const isMyOwnSemester = (selectedTrimesterKey === studentCurrentTrimesterKey);
+                    // আপলোড লক মেকানিজম ভ্যালিডেশন চেক (কারেন্ট ফিল্টার বনাম স্টুডেন্টের নিজের সেশন)
+                    const isMyOwnSemester = (combinedTrimesterKey === studentCurrentTrimesterKey);
                     const btnColorClass = isMyOwnSemester ? "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-600 hover:text-white" : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed";
 
                     courseGrid.innerHTML += `
@@ -318,7 +340,7 @@
                             <div>
                                 <div class="flex justify-between items-start">
                                     <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded">${course.code}</span>
-                                    <span class="text-[9px] bg-slate-200 font-bold px-1.5 py-0.5 rounded text-slate-700">${course.termGroup || 'Active'}</span>
+                                    <span class="text-[9px] bg-slate-200 font-bold px-1.5 py-0.5 rounded text-slate-700">${course.title ? combinedTrimesterKey.split('(')[0] : ''}</span>
                                 </div>
                                 <h4 class="text-base font-extrabold text-gray-800 mt-2">${course.title}</h4>
                                 <p class="text-xs text-gray-500 mt-1 mb-3"><i class="fa-solid fa-user-tie mr-1 text-slate-400"></i>${currentLang === 'bn' ? 'ফ্যাকাল্টি' : 'Faculty'}: ${course.teacher}</p>
@@ -336,7 +358,12 @@
             });
         }
 
-        // ২. আপলোড লক বাটন প্রোটেকশন গেটওয়ে ট্র্যাকার
+        // ফিল্টার বাটন লিসেনার ইভেন্ট ইনজেকশন
+        document.getElementById('filterYear').addEventListener('change', updateFiltersAndListen);
+        document.getElementById('filterTermNum').addEventListener('change', updateFiltersAndListen);
+        document.getElementById('filterSession').addEventListener('change', updateFiltersAndListen);
+
+        // ২. আপলোড লক বাটন প্রোটেকশন গেটওয়ে
         window.triggerLockedUploadFlow = (courseCode, courseTitle, isAllowed) => {
             if(!isAllowed) {
                 alert("🔴 এক্সেস লক! আপনি শুধু আপনার নিজের রানিং সেমিস্টারের ফাইল আপলোড করতে পারবেন। অন্য সেমিস্টারের ফাইল শুধুমাত্র দেখার অনুমতি রয়েছে।");
@@ -348,10 +375,7 @@
             openShareModal();
         };
 
-        // ড্রপডাউন আর্কাইভ লিসেনার ফিল্টার চেঞ্জার
-        document.getElementById('semesterFilter').addEventListener('change', (e) => { listenToGlobalArchiveStream(e.target.value); });
-
-        // ৩. স্টুডেন্ট ফাইল ক্লাউড কন্ট্রিবিউশন আপলোডার
+        // স্টুডেন্ট ফাইল ক্লাউড কন্ট্রিביউশন আপলোডার
         document.getElementById('resourceShareForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             try {
@@ -360,17 +384,17 @@
                     title: document.getElementById('shareTitle').value.trim(),
                     type: document.getElementById('shareType').value,
                     courseCode: document.getElementById('resourceShareForm').dataset.lockedCode,
-                    semester: studentCurrentTrimesterKey, // অটো লকড ব্যাকএন্ড কী
+                    semester: studentCurrentTrimesterKey, 
                     url: document.getElementById('shareUrl').value.trim(),
                     createdAt: new Date().toISOString()
                 });
-                alert("Published Live successfully onto your running trimester board!");
+                alert("Published Live successfully!");
                 document.getElementById('resourceShareForm').reset();
                 closeShareModal();
             } catch (err) { alert(err.message); }
         });
 
-        // ৪. রুটিন ও নোটিশ লিসেনার (১০০% সচল)
+        // ৩. রুটিন ও নোটিশ লিসেনার 
         onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
             dailyContainer.innerHTML = ''; Object.keys(daysWithClasses).forEach(day => { const el = document.getElementById(`day-${day}`); if(el) el.innerHTML = ''; daysWithClasses[day] = false; });
             snapshot.forEach((doc) => {
@@ -387,30 +411,7 @@
             snapshot.forEach((doc) => { const data = doc.data(); noticeContainer.innerHTML += `<div class="p-2.5 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm text-xs"><p class="font-medium text-gray-800">${data.content}</p></div>`; });
         });
 
-        // ৫. অল-ইন-ওয়ান ৪-বক্স ড্রপডাউন সেমিস্টার কী সিঙ্ক জেনারেটর
-        function buildDynamicTrimesterOptionsList() {
-            const filter = document.getElementById('semesterFilter');
-            filter.innerHTML = '';
-            const years = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
-            const terms = ["1st Trimester", "2nd Trimester", "3rd Trimester"];
-            const sessions = ["Spring", "Summer", "Fall"];
-            
-            // ২০২৬ থেকে ২০৩০ সালের জন্য গ্লোবাল আর্কাইভ ম্যাপ ড্রপডাউন জেনারেট করা
-            for(let year of [2026, 2027, 2028]) {
-                sessions.forEach(sess => {
-                    years.forEach(yr => {
-                        terms.forEach(termNum => {
-                            const key = `${yr} - ${termNum} (${sess} ${year})`;
-                            const opt = document.createElement('option');
-                            opt.value = key; opt.innerText = key;
-                            filter.appendChild(opt);
-                        });
-                    });
-                });
-            }
-        }
-
-        // ৬. প্রোফাইল ভ্যালিডেশন এবং সেশন এসাইনমেন্ট
+        // ৪. প্রোফাইল ভ্যালিডেশন এবং সেশন এসাইনমেন্ট
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 loggedInUserUID = user.uid;
@@ -420,7 +421,6 @@
                     const uData = userDoc.data();
                     if (uData.role === 'admin') { window.location.replace("./admin-dashboard.html"); return; }
 
-                    // নতুন ৪-বক্স মেকানিজম কি কম্পোজিশন (লকিং কী রেডি)
                     const uYear = uData.profileYear || "1st Year";
                     const uTermNum = uData.profileTermNum || "1st Trimester";
                     const uSess = uData.profileTerm || "Spring";
@@ -435,7 +435,7 @@
 
                     const currentLang = localStorage.getItem('preferredLang') || 'en';
                     const pulseClass = isProfileIncomplete ? 'bg-red-600 hover:bg-red-700 animate-pulse text-white' : 'bg-emerald-950 hover:bg-emerald-900 text-emerald-200';
-                    document.getElementById('navAuthButtons').innerHTML = `<div class="flex items-center space-x-2 gap-1"><button id="openProfileEditBtn" class="${pulseClass} px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-user mr-1"></i> ${currentLang === 'bn' ? 'আমার প্রোফাইল' : 'My Profile'}</button><button id="logoutBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg font-semibold transition text-xs">${currentLang === 'bn' ? 'লগআউট' : 'Logout'}</button></div>`;
+                    document.getElementById('navAuthButtons').innerHTML = `<div class="flex items-center space-x-2 gap-1"><button id="openProfileEditBtn" class="${pulseClass} px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-user mr-1"></i> My Profile</button><button id="logoutBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg font-semibold transition text-xs">Logout</button></div>`;
 
                     document.getElementById('openProfileEditBtn').addEventListener('click', () => {
                         document.getElementById('editProfileName').value = uData.name || ""; document.getElementById('editProfileUID').value = uData.universityUID || "";
@@ -456,10 +456,12 @@
                     if(isProfileIncomplete) setTimeout(() => { document.getElementById('openProfileEditBtn').click(); }, 1500);
                     document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => window.location.reload()); });
 
-                    // গ্লোবাল ড্রপডাউন জেনারেট করে ডিফল্ট নিজের সেমিস্টারে সেট করা
-                    buildDynamicTrimesterOptionsList();
-                    document.getElementById('semesterFilter').value = studentCurrentTrimesterKey;
-                    listenToGlobalArchiveStream(studentCurrentTrimesterKey);
+                    // ডিফল্ট ফিল্টার বাটনগুলোকে স্টুডেন্টের নিজের কারেন্ট প্রোফাইল ডেটা অনুযায়ী সেট করা
+                    document.getElementById('filterYear').value = uYear;
+                    document.getElementById('filterTermNum').value = uTermNum;
+                    document.getElementById('filterSession').value = `${uSess} ${uSessYear}`;
+                    
+                    updateFiltersAndListen();
                 }
             }
         });
@@ -469,14 +471,14 @@
             e.preventDefault(); if(!loggedInUserUID) return;
             const newPass = document.getElementById('newProfilePassword').value.trim();
             try {
-                if(newPass !== "") { if(newPass.length < 6) { alert("Min 6 Chars Required!"); return; } await updatePassword(auth.currentUser, newPass); }
+                if(newPass !== "") { if(newPass.length < 6) { alert("Min 6 chars!"); return; } await updatePassword(auth.currentUser, newPass); }
                 await updateDoc(doc(db, "users", loggedInUserUID), {
                     name: document.getElementById('editProfileName').value.trim(), universityUID: document.getElementById('editProfileUID').value.trim(), batchNumber: document.getElementById('editProfileBatch').value.trim(),
                     profileYear: document.getElementById('editProfileYear').value, profileTermNum: document.getElementById('editProfileTermNum').value, profileTerm: document.getElementById('editProfileTerm').value, profileSessionYear: document.getElementById('editProfileSessionYear').value,
-                    trimester: `${document.getElementById('editProfileYear').value} - ${document.getElementById('editProfileTermNum').value} (${document.getElementById('editProfileTerm').value})`,
+                    trimester: `${document.getElementById('editProfileYear').value} - ${document.getElementById('editProfileTermNum').value} (${document.getElementById('editProfileTerm').value} ${document.getElementById('editProfileSessionYear').value})`,
                     phone: document.getElementById('editProfilePhone').value.trim(), bloodGroup: document.getElementById('editProfileBlood').value, emergencyName: document.getElementById('editProfileEmergencyName').value.trim(), emergencyPhone: document.getElementById('editProfileEmergencyPhone').value.trim(), profilePic: base64PicString
                 });
-                alert("Profile successfully locked & synced!"); window.location.reload();
+                alert("Profile saved successfully!"); window.location.reload();
             } catch (err) { alert(err.message); }
         });
     </script>
