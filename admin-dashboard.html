@@ -117,7 +117,7 @@
 
         // সিকিউরিটি চেক
         onAuthStateChanged(auth, async (user) => {
-            if (!user) window.location.replace("./login.html");
+            if (!user) window.location.replace("./dept-gate-2026.html");
             else { const userDoc = await getDoc(doc(db, "users", user.uid)); if (userDoc.exists() && userDoc.data().role === 'admin') document.body.classList.remove('invisible'); else window.location.replace("./index.html"); }
         });
 
@@ -144,6 +144,10 @@
                 title: document.getElementById('mapCourseTitle').value.trim(),
                 teacher: document.getElementById('mapCourseTeacher').value.trim()
             };
+            if (!payload.code || !payload.title || !payload.teacher) {
+                alert("কোর্স কোড, শিরোনাম ও শিক্ষকের নাম পূরণ করুন।");
+                return;
+            }
             try {
                 const docRef = doc(db, "course_mappings", key);
                 const snap = await getDoc(docRef);
@@ -317,7 +321,7 @@
         window.closeEditModal = () => { document.getElementById('editModal').classList.add('hidden'); document.getElementById('editModal').classList.remove('flex'); activeEditId = null; activeMapDocKey = ""; activeMapIndex = null; };
         window.resetStudentPasswordToDefault = async (uid, name) => { if(confirm(`Reset ${name}?`)) { try { await updateDoc(doc(db, "users", uid), { mustResetPass: true, tempPasswordValue: "DISBIS" }); alert("Reset Flagged!"); } catch (err) { alert(err.message); } } };
         window.deleteDataDocument = async (collectionName, id) => { if(confirm("Permanently delete live item?")) { try { await deleteDoc(doc(db, collectionName, id)); alert("Deleted!"); } catch (err) { alert(err.message); } } };
-        document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => window.location.replace("./login.html")); });
+        document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => window.location.replace("./dept-gate-2026.html")); });
     </script>
 </body>
 </html>
