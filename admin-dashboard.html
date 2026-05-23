@@ -44,9 +44,10 @@
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Batch Number(s)</label>
                         <input type="text" id="batchNumber" required class="w-full p-2 border rounded-md text-sm focus:outline-emerald-600" placeholder="e.g. 52, 53 or 54">
                     </div>
+                    
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Teacher Code</label>
-                        <input type="text" id="teacherCode" required class="w-full p-2 border rounded-md text-sm focus:outline-emerald-600" placeholder="e.g. MKH">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Teacher Code / Name</label>
+                        <input type="text" id="teacherCode" required class="w-full p-2 border rounded-md text-sm focus:outline-emerald-600" placeholder="e.g. MKH or Prof. Yusuf">
                     </div>
                     
                     <div>
@@ -58,7 +59,6 @@
                             <option value="Monday">Monday (সোমবার)</option>
                             <option value="Tuesday">Tuesday (মঙ্গলবার)</option>
                             <option value="Wednesday">Wednesday (বুধবার)</option>
-                            <option value="Thursday">Thursday (বৃহস্পতিবার)</option>
                             <option value="Friday">Friday (শুক্রবার)</option>
                         </select>
                     </div>
@@ -171,7 +171,6 @@
         let activeEditId = null;
         let activeEditCollection = "";
 
-        // ১. ১২ ঘন্টার ফরম্যাটে টাইম কনভার্ট করার হেল্পার ফাংশন
         function formatTimeTo12Hour(timeString) {
             if(!timeString) return "";
             const [hourString, minute] = timeString.split(":");
@@ -182,7 +181,7 @@
             return `${hourFormatted}:${minute} ${ampm}`;
         }
 
-        // ২. সিকিউরিটি চেক
+        // ১. সিকিউরিটি চেক
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.replace("./login.html");
@@ -201,7 +200,7 @@
             }
         });
 
-        // ৩. নতুন রুটিন আপলোড
+        // ২. নতুন রুটিন আপলোড (টিচারের নামসহ)
         const rForm = document.getElementById('routineForm');
         if(rForm) {
             rForm.addEventListener('submit', async (e) => {
@@ -216,11 +215,11 @@
                         courseCode: document.getElementById('courseCode').value.trim(),
                         room: document.getElementById('room').value.trim(),
                         batchNumber: document.getElementById('batchNumber').value.trim(),
-                        teacherCode: document.getElementById('teacherCode').value.trim().toUpperCase(),
+                        teacherCode: document.getElementById('teacherCode').value.trim(), // ডেটাবেজে সেভ হচ্ছে
                         classDay: document.getElementById('classDay').value,
-                        rawStartTime: sTime, // এডিটের সময় ঘড়িতে পুনরায় দেখানোর জন্য
+                        rawStartTime: sTime,
                         rawEndTime: eTime,
-                        timeSlot: formattedTimeSlot, // স্টুডেন্টদের হোমপেজে সুন্দর ১২ ঘন্টার টাইম দেখানোর জন্য
+                        timeSlot: formattedTimeSlot,
                         gender: document.getElementById('gender').value,
                         boardType: document.getElementById('boardType').value,
                         createdAt: new Date().toISOString()
@@ -233,7 +232,7 @@
             });
         }
 
-        // ৪. নতুন নোটিশ আপলোড
+        // ৩. নতুন নোটিশ আপলোড
         const nForm = document.getElementById('noticeForm');
         if(nForm) {
             nForm.addEventListener('submit', async (e) => {
@@ -251,16 +250,12 @@
             });
         }
 
-        // ৫. রুটিন লিস্ট ম্যানেজার
+        // ৪. রুটিন লিস্ট ম্যানেজার
         const adminRoutineList = document.getElementById('adminRoutineList');
         const routineCount = document.getElementById('routineCount');
         onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
             adminRoutineList.innerHTML = '';
             routineCount.innerText = `${snapshot.size} Total`;
-            if(snapshot.empty) {
-                adminRoutineList.innerHTML = '<p class="text-xs text-gray-400 p-2">No active routines on board.</p>';
-                return;
-            }
             snapshot.forEach((res) => {
                 const data = res.data();
                 const id = res.id;
@@ -269,7 +264,7 @@
                     <div class="flex justify-between items-center p-3 bg-slate-50 border rounded-lg text-xs">
                         <div>
                             <p class="font-bold text-emerald-800">${data.subject} (${data.courseCode})<span class="text-amber-600 font-bold">${dayLabel}</span></p>
-                            <p class="text-gray-500">Batches: ${data.batchNumber} | Room: ${data.room} | Time: ${data.timeSlot}</p>
+                            <p class="text-gray-500">Batches: ${data.batchNumber} | Room: ${data.room} | Teacher: <b>${data.teacherCode || 'N/A'}</b></p>
                         </div>
                         <div class="flex space-x-1.5 gap-1">
                             <button onclick="openRoutineEditModal('${id}', ${JSON.stringify(data).replace(/"/g, '&quot;')})" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white h-7 px-2.5 rounded-md transition flex items-center justify-center font-semibold">
@@ -284,16 +279,12 @@
             });
         });
 
-        // ৬. নোটিশ লিস্ট ম্যানেজার
+        // ৫. নোটিশ লিস্ট ম্যানেজার
         const adminNoticeList = document.getElementById('adminNoticeList');
         const noticeCount = document.getElementById('noticeCount');
         onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
             adminNoticeList.innerHTML = '';
             noticeCount.innerText = `${snapshot.size} Total`;
-            if(snapshot.empty) {
-                adminNoticeList.innerHTML = '<p class="text-xs text-gray-400 p-2">No active notices published.</p>';
-                return;
-            }
             snapshot.forEach((res) => {
                 const data = res.data();
                 const id = res.id;
@@ -313,7 +304,7 @@
             });
         });
 
-        // ৭. রেজিস্টার্ড স্টুডেন্ট টেবিল
+        // ৬. রেজিস্টার্ড স্টুডেন্ট টেবিল
         const studentTableBody = document.getElementById('studentTableBody');
         onSnapshot(collection(db, "users"), (snapshot) => {
             studentTableBody.innerHTML = '';
@@ -335,7 +326,7 @@
             });
         });
 
-        // ─── মডাল এডিট ওপেন লজিক ───
+        // ─── মডাল এডিট ওপেন লজিক (টিচারের নামসহ) ───
 
         window.openRoutineEditModal = (id, data) => {
             activeEditId = id;
@@ -359,9 +350,10 @@
                         <label class="block font-semibold text-gray-600 mb-1">Batch Number(s)</label>
                         <input type="text" id="edit_batchNumber" value="${data.batchNumber}" class="w-full p-2 border rounded">
                     </div>
+                    
                     <div>
-                        <label class="block font-semibold text-gray-600 mb-1">Teacher Code</label>
-                        <input type="text" id="edit_teacherCode" value="${data.teacherCode}" class="w-full p-2 border rounded">
+                        <label class="block font-semibold text-gray-600 mb-1">Teacher Code / Name</label>
+                        <input type="text" id="edit_teacherCode" value="${data.teacherCode || ''}" class="w-full p-2 border rounded">
                     </div>
                     <div>
                         <label class="block font-semibold text-gray-600 mb-1">Class Day (বার)</label>
@@ -372,7 +364,6 @@
                             <option value="Monday" ${data.classDay === 'Monday' ? 'selected' : ''}>Monday</option>
                             <option value="Tuesday" ${data.classDay === 'Tuesday' ? 'selected' : ''}>Tuesday</option>
                             <option value="Wednesday" ${data.classDay === 'Wednesday' ? 'selected' : ''}>Wednesday</option>
-                            <option value="Thursday" ${data.classDay === 'Thursday' ? 'selected' : ''}>Thursday</option>
                             <option value="Friday" ${data.classDay === 'Friday' ? 'selected' : ''}>Friday</option>
                         </select>
                     </div>
@@ -425,7 +416,7 @@
                     courseCode: document.getElementById('edit_courseCode').value.trim(),
                     room: document.getElementById('edit_room').value.trim(),
                     batchNumber: document.getElementById('edit_batchNumber').value.trim(),
-                    teacherCode: document.getElementById('edit_teacherCode').value.trim().toUpperCase(),
+                    teacherCode: document.getElementById('edit_teacherCode').value.trim(), // এডিট সেভ হবে
                     classDay: document.getElementById('edit_classDay').value,
                     rawStartTime: sTime,
                     rawEndTime: eTime,
