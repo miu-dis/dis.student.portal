@@ -4,47 +4,69 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_BUCKET } from "./supabase-con
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 function assertConfigured() {
-    if (
-        !SUPABASE_URL ||
-        SUPABASE_URL.includes("YOUR_PROJECT") ||
+    const missingUrl = !SUPABASE_URL || SUPABASE_URL.includes("YOUR_PROJECT");
+    const missingKey =
         !SUPABASE_ANON_KEY ||
-        SUPABASE_ANON_KEY.includes("YOUR_SUPABASE")
-    ) {
+        SUPABASE_ANON_KEY.includes("YOUR_SUPABASE") ||
+        SUPABASE_ANON_KEY.includes("PASTE_YOUR_ANON");
+    if (missingUrl || missingKey) {
         throw new Error(
-            "Supabase is not configured. Edit assets/js/supabase-config.js with your Project URL and anon key."
+            "Supabase সেটআপ হয়নি। assets/js/supabase-config.js এ Project URL এবং anon public key বসান (service_role নয়)।"
+        );
+    }
+    if (SUPABASE_ANON_KEY.includes("service_role")) {
+        throw new Error(
+            "ভুল API key! service_role ব্যবহার করবেন না। Supabase → API Keys → Legacy anon → anon public key বসান।"
         );
     }
 }
 
+function buildPublicUrl(storagePath) {
+    const { data } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(storagePath);
+    return data?.publicUrl || "";
+}
+
 /**
- * Upload study material file to Supabase Storage (free tier friendly).
+ * Upload study material file to Supabase Storage.
  */
 export async function uploadPortalFile(file, userId) {
     assertConfigured();
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const path = `resources/${userId}/${Date.now()}_${safeName}`;
+    const storagePath = `${userId}/${Date.now()}_${safeName}`;
 
-    const { error } = await supabase.storage.from(SUPABASE_BUCKET).upload(path, file, {
+    const { error } = await supabase.storage.from(SUPABASE_BUCKET).upload(storagePath, file, {
         cacheControl: "3600",
         upsert: false,
         contentType: file.type || "application/octet-stream"
     });
-    if (error) throw new Error(error.message);
+    if (error) {
+        throw new Error(
+            "আপলোড ব্যর্থ: " + error.message +
+            " — Storage বাকেট 'resources' Public আছে কিনা এবং SQL policy সেট আছে কিনা চেক করুন।"
+        );
+    }
 
-    const { data } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(path);
-    return {
-        downloadUrl: data.publicUrl,
-        storagePath: path,
-        urlType: "supabase"
-    };
+    const downloadUrl = buildPublicUrl(storagePath);
+    if (!downloadUrl.startsWith("http")) {
+        throw new Error("ফাইল আপলোড হয়েছে কিন্তু public URL তৈরি হয়নি। বাকেট Public চালু করুন।");
+    }
+
+    return { downloadUrl, storagePath, urlType: "supabase" };
 }
 
-/**
- * Remove file from Supabase Storage. Ignores missing objects.
- */
 export async function deletePortalFile(storagePath) {
     if (!storagePath) return;
     assertConfigured();
     const { error } = await supabase.storage.from(SUPABASE_BUCKET).remove([storagePath]);
     if (error) console.warn("Supabase delete:", error.message);
+}
+
+export function getPortalFilePublicUrl(storagePath) {
+    if (!storagePath) return "";
+    try {
+        assertConfigured();
+        return buildPublicUrl(storagePath);
+    } catch {
+        return "";
+    }
 }
