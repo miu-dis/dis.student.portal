@@ -301,15 +301,30 @@
         const daysWithClasses = { Saturday: false, Sunday: false, Monday: false, Tuesday: false, Wednesday: false, Friday: false };
 
         // ৩-ফিল্টার বক্স ডাটা লিসেনার লুপ
-        async function updateFiltersAndListen() {
-            const yr = document.getElementById('filterYear').value; const term = document.getElementById('filterTermNum').value; const sess = document.getElementById('filterSession').value;
-            const combinedTrimesterKey = `${yr} - ${term} (${sess})`;
-
-            const mapDoc = await getDoc(doc(db, "course_mappings", combinedTrimesterKey));
-            let mappedCourses = []; if(mapDoc.exists()) mappedCourses = mapDoc.data().courses || [];
-
-            onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snapshot) => {
-                courseGrid.innerHTML = ''; const currentLang = localStorage.getItem('preferredLang') || 'en';
+       // index.html এ যেখানে ডাটা লোড হচ্ছে, সেখানে নিচের লজিকটি ব্যবহার করুন
+async function updateResources() {
+    // ফিল্টার বাটন থেকে মান নেওয়া
+    const yr = document.getElementById('filterYear').value; // '1st Year'
+    // যেহেতু index.html এর সিলেক্ট বক্সে 'Spring 2026' একসাথে আছে, তাই একে আলাদা করতে হবে
+    const sessionFull = document.getElementById('filterSession').value; // 'Spring 2026'
+    
+    // Key ফরম্যাট: "1st Year - Spring 2026" (অ্যাডমিনের সাথে হুবহু মিল)
+    const key = `${yr} - ${sessionFull}`;
+    
+    console.log("Searching for Key:", key); // এটা চেক করবেন কনসোলে
+    
+    const mapDoc = await getDoc(doc(db, "course_mappings", key));
+    const grid = document.getElementById('courseGrid');
+    grid.innerHTML = '';
+    
+    if (mapDoc.exists()) {
+        mapDoc.data().courses.forEach(c => {
+            grid.innerHTML += `... (আপনার আগের কার্ড লজিক) ...`;
+        });
+    } else {
+        grid.innerHTML = '<p>No courses found for this session.</p>';
+    }
+}
                 if(mappedCourses.length === 0) { courseGrid.innerHTML = `<p class="text-xs text-gray-400 col-span-3 p-6 text-center border border-dashed rounded-xl w-full">${currentLang === 'bn' ? 'এই সিলেক্টেড সেমিস্টারে কোনো লাইভ কোর্স এখনো অ্যাডমিন প্যানেল থেকে তৈরি করা হয়নি।' : 'No courses mapped for this combined filter session by admin yet.'}</p>`; return; }
 
                 mappedCourses.forEach(course => {
