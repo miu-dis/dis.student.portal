@@ -130,12 +130,10 @@
                 </div>
 
                 <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-200 space-y-2">
-                    <p class="font-bold text-blue-800 text-[11px]"><i class="fa-solid fa-lock-keyhole mr-1"></i> Change Password (পাসওয়ার্ড পরিবর্তন করুন)</p>
+                    <p class="font-bold text-blue-800 text-[11px]"><i class="fa-solid fa-lock-keyhole mr-1"></i> Change Password (ঐচ্ছিক - প্রয়োজন হলে পরিবর্তন করুন)</p>
                     <div>
                         <label class="block font-semibold text-gray-700 mb-0.5">New Password (নতুন পাসওয়ার্ড)</label>
-                        <div class="flex gap-2">
-                            <input type="password" id="newProfilePassword" class="w-full p-2 border border-gray-300 rounded" placeholder="Min. 6 characters (ফাঁকা রাখলে আগেরটাই থাকবে)">
-                        </div>
+                        <input type="password" id="newProfilePassword" class="w-full p-2 border border-gray-300 rounded" placeholder="Min. 6 characters (ফাঁকা রাখলে পরিবর্তন হবে না)">
                     </div>
                 </div>
 
@@ -157,7 +155,7 @@
         let base64PicString = "";
         const daysWithClasses = { Saturday: false, Sunday: false, Monday: false, Tuesday: false, Wednesday: false, Friday: false };
 
-        // রুটিন লিসেনার (পূর্বের কোড অনুযায়ী সচল)
+        // রুটিন লিসেনার
         onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
             const dailyContainer = document.getElementById('dailyRoutineList');
             dailyContainer.innerHTML = '';
@@ -175,6 +173,14 @@
             if(!hasDaily) dailyContainer.innerHTML = '<p class="text-xs text-gray-400 col-span-2 p-2">No active updates.</p>';
         });
 
+        // নোটিশ বোর্ড লিসেনার
+        const noticeContainer = document.getElementById('noticeList');
+        onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
+            noticeContainer.innerHTML = '';
+            if(snapshot.empty) { noticeContainer.innerHTML = '<p class="text-xs text-gray-400 p-1">No urgent notices.</p>'; return; }
+            snapshot.forEach((doc) => { const data = doc.data(); noticeContainer.innerHTML += `<div class="p-2.5 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm text-xs"><p class="font-medium text-gray-800">${data.content}</p></div>`; });
+        });
+
         // ফায়ারবেস অথেন্টিকেশন এবং প্রোফাইল স্টেট ট্র্যাক
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -184,11 +190,13 @@
                 if(userDoc.exists()) {
                     const uData = userDoc.data();
                     
+                    // কন্ডিশন চেক: ইমার্জেন্সি তথ্য মিসিং থাকলে ব্যানার অন হবে
                     if(!uData.phone || !uData.bloodGroup || !uData.emergencyPhone) {
                         isProfileIncomplete = true;
                         document.getElementById('warningBanner').classList.remove('hidden');
                     }
 
+                    // বাটন ইন্টারফেস (যদি তথ্য অসম্পূর্ণ থাকে তবে লাল রঙের পালস ব্লিঙ্ক এনিমেশন চলবে)
                     const pulseClass = isProfileIncomplete ? 'bg-red-600 hover:bg-red-700 animate-pulse text-white' : 'bg-emerald-950 hover:bg-emerald-900 text-emerald-200';
                     
                     document.getElementById('navAuthButtons').innerHTML = `
@@ -206,13 +214,14 @@
                         document.getElementById('editProfileBlood').value = uData.bloodGroup || "";
                         document.getElementById('editProfileEmergencyName').value = uData.emergencyName || "";
                         document.getElementById('editProfileEmergencyPhone').value = uData.emergencyPhone || "";
-                        document.getElementById('newProfilePassword').value = ""; // এটি ডিফল্ট ফাঁকা থাকবে
+                        document.getElementById('newProfilePassword').value = ""; // ডিফল্ট ফাঁকা থাকবে
                         
                         if(uData.profilePic) {
                             document.getElementById('avatarPreview').src = uData.profilePic;
                             base64PicString = uData.profilePic;
                         }
 
+                        // প্রোফাইল অসম্পূর্ণ থাকলে ক্যানসেল বাটন হাইড হয়ে থাকবে (বাধ্যতামূলক পূরণ)
                         if(isProfileIncomplete) {
                             document.getElementById('btnCancelProfile').classList.add('hidden');
                         } else {
@@ -223,8 +232,9 @@
                         document.getElementById('profileModal').classList.add('flex');
                     });
 
+                    // ফার্স্ট লগইন বা ইনকমপ্লিট হলে অটো পপআপ ওপেন হবে
                     if(isProfileIncomplete) {
-                        setTimeout(() => { document.getElementById('openProfileEditBtn').click(); }, 1000);
+                        setTimeout(() => { document.getElementById('openProfileEditBtn').click(); }, 1500);
                     }
 
                     document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => window.location.reload()); });
@@ -232,7 +242,7 @@
             }
         });
 
-        // প্রোফাইল পিকচার রূপান্তর রিডার
+        // প্রোফাইল ছবি রিডার
         const fileInput = document.getElementById('profilePicFile');
         if(fileInput) {
             fileInput.addEventListener('change', (e) => {
@@ -248,7 +258,7 @@
             });
         }
 
-        // প্রোফাইল এবং পাসওয়ার্ড একত্রে আপডেট লজিক (আপডেটেড)
+        // প্রোফাইল সাবমিট লজিক
         document.getElementById('profileEditForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(!loggedInUserUID) return;
@@ -256,7 +266,7 @@
             const newPass = document.getElementById('newProfilePassword').value.trim();
 
             try {
-                // ১. যদি স্টুডেন্ট পাসওয়ার্ড বক্সে কিছু টাইপ করে, তবে আগে ফায়ারবেস অথেন্টিকেশনে পাসওয়ার্ড আপডেট হবে
+                // নতুন পাসওয়ার্ড ফিল্ডে কিছু লিখলেই কেবল পাসওয়ার্ড পরিবর্তন ট্রিগার হবে
                 if(newPass !== "") {
                     if(newPass.length < 6) {
                         alert("পাসওয়ার্ড অবশ্যই সর্বনিম্ন ৬ অক্ষরের হতে হবে!");
@@ -264,10 +274,9 @@
                     }
                     const user = auth.currentUser;
                     await updatePassword(user, newPass);
-                    console.log("Auth password updated successfully.");
                 }
 
-                // ২. ফায়ারস্টোর ডাটাবেজে স্টুডেন্টের বাকি প্রোফাইল তথ্য সেভ হবে
+                // ম্যান্ডেটরি তথ্য ডাটাবেজে সেভ
                 await updateDoc(doc(db, "users", loggedInUserUID), {
                     name: document.getElementById('editProfileName').value.trim(),
                     universityUID: document.getElementById('editProfileUID').value.trim(),
@@ -280,12 +289,11 @@
                     profilePic: base64PicString
                 });
 
-                alert("Profile and Password updated successfully!");
+                alert("Profile completed and saved successfully!");
                 window.location.reload();
             } catch (err) {
-                // যদি রিসেন্ট লগইন না থাকার কারণে পাসওয়ার্ড চেঞ্জ ব্লক হয় (Firebase Security Rule)
                 if(err.code === 'auth/requires-recent-login') {
-                    alert("নিরাপত্তার স্বার্থে পাসওয়ার্ড পরিবর্তনের জন্য আপনাকে পেজটি লগআউট করে আবার নতুন করে লগইন করে এসে পরিবর্তন করতে হবে।");
+                    alert("নিরাপত্তার স্বার্থে পাসওয়ার্ড পরিবর্তনের জন্য পেজটি একবার Logout করে আবার লগইন করে এসে পরিবর্তন করুন।");
                 } else {
                     alert("Update error: " + err.message);
                 }
@@ -294,7 +302,7 @@
 
         window.closeProfileModal = () => {
             if(isProfileIncomplete) {
-                alert("প্রোফাইলটি পূরণ করা বাধ্যতামূলক! ক্যানসেল করা যাবে না।");
+                alert("আপনার ইমার্জেন্সি তথ্য এবং ব্লাড গ্রুপ পূরণ করা বাধ্যতামূলক!");
                 return;
             }
             document.getElementById('profileModal').classList.add('hidden');
