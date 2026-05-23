@@ -31,9 +31,7 @@
                     <input type="text" id="teacherCode" placeholder="Teacher Name/Code" required class="p-2 border rounded-md text-sm">
                     <select id="classDay" class="p-2 border rounded-md text-sm">
                         <option value="N/A">Not Applicable</option>
-                        <option value="Saturday">Saturday</option><option value="Sunday">Sunday</option>
-                        <option value="Monday">Monday</option><option value="Tuesday">Tuesday</option>
-                        <option value="Wednesday">Wednesday</option><option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option><option value="Sunday">Sunday</option><option value="Monday">Monday</option><option value="Tuesday">Tuesday</option><option value="Wednesday">Wednesday</option><option value="Friday">Friday</option>
                     </select>
                     <input type="time" id="startTime" required class="p-2 border rounded-md text-sm">
                     <input type="time" id="endTime" required class="p-2 border rounded-md text-sm">
@@ -51,7 +49,16 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8" id="managersLists"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8" id="managersLists">
+            <div class="bg-white p-6 rounded-xl shadow">
+                <h3 class="text-md font-bold text-gray-700 mb-4 flex items-center justify-between"><span>Manage Routines</span><span id="routineCount" class="text-xs bg-slate-100 px-2 py-1 rounded-full text-gray-500">0 Total</span></h3>
+                <div id="adminRoutineList" class="space-y-3 max-h-96 overflow-y-auto pr-1"><p class="text-xs text-gray-400 p-2">Loading...</p></div>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow">
+                <h3 class="text-md font-bold text-gray-700 mb-4 flex items-center justify-between"><span>Manage Notices</span><span id="noticeCount" class="text-xs bg-slate-100 px-2 py-1 rounded-full text-gray-500">0 Total</span></h3>
+                <div id="adminNoticeList" class="space-y-3 max-h-96 overflow-y-auto pr-1"><p class="text-xs text-gray-400 p-2">Loading...</p></div>
+            </div>
+        </div>
 
         <div class="bg-white p-6 rounded-xl shadow border-t-4 border-blue-600">
             <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fa-solid fa-hospital-user text-blue-600 mr-2"></i> Student Directory & Emergency Contacts Base</h3>
@@ -64,8 +71,7 @@
                             <th class="px-4 py-3 text-red-600">Blood</th>
                             <th class="px-4 py-3">Mobile No</th>
                             <th class="px-4 py-3">Emergency Contact (Person)</th>
-                            <th class="px-4 py-3">Email Address</th>
-                            <th class="px-4 py-3 text-center">Admin Controls</th>
+                            <th class="px-4 py-3">Role Status</th> <th class="px-4 py-3 text-center">Admin Controls</th>
                         </tr>
                     </thead>
                     <tbody id="studentTableBody">
@@ -75,16 +81,6 @@
             </div>
         </div>
     </main>
-
-    <div id="editModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-lg w-full p-6 relative">
-            <div id="modalFormContainer"></div>
-            <div class="flex justify-end space-x-2 mt-4 pt-3 border-t">
-                <button onclick="closeEditModal()" class="px-4 py-2 bg-gray-200 rounded text-xs">Cancel</button>
-                <button id="modalSaveBtn" class="px-4 py-2 bg-emerald-700 text-white rounded text-xs">Save Changes</button>
-            </div>
-        </div>
-    </div>
 
     <script type="module">
         import { auth, db } from "./assets/js/app.js";
@@ -101,19 +97,32 @@
             }
         });
 
-        // রুটিন/নোটিশ রেন্ডারিং কোড ব্যাকএন্ড স্ক্রিপ্ট (সংক্ষিপ্ত ফ্লো)
-        const rForm = document.getElementById('routineForm');
-        // (বাকি রুটিন/নোটিশ লিসেনার পূর্বের রুলসে সচল থাকবে...)
+        // রুটিন লিসেনার (অ্যাডমিন ভিউ)
+        onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
+            const adminRoutineList = document.getElementById('adminRoutineList'); const routineCount = document.getElementById('routineCount');
+            adminRoutineList.innerHTML = ''; routineCount.innerText = `${snapshot.size} Total`;
+            snapshot.forEach((res) => {
+                const data = res.data(); const id = res.id;
+                adminRoutineList.innerHTML += `<div class="flex justify-between items-center p-3 bg-slate-50 border rounded-lg text-xs"><div><p class="font-bold text-emerald-800">${data.subject} (${data.courseCode})</p><p class="text-gray-500">Batches: ${data.batchNumber} | Room: ${data.room}</p></div><button onclick="deleteDataDocument('routines', '${id}')" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white h-7 w-7 rounded-md transition flex items-center justify-center"><i class="fa-solid fa-trash-can"></i></button></div>`;
+            });
+        });
 
-        // ২. রেজিস্টার্ড স্টুডেন্ট ইমার্জেন্সি ডেটাবেজ ও পাসওয়ার্ড রিসেট রেন্ডার
+        // নোটিশ লিসেনার (অ্যাডমিন ভিউ)
+        onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
+            const adminNoticeList = document.getElementById('adminNoticeList'); const noticeCount = document.getElementById('noticeCount');
+            adminNoticeList.innerHTML = ''; noticeCount.innerText = `${snapshot.size} Total`;
+            snapshot.forEach((res) => {
+                const data = res.data(); const id = res.id;
+                adminNoticeList.innerHTML += `<div class="flex justify-between items-start p-3 bg-amber-50/60 border border-amber-200 rounded-lg text-xs"><p class="text-gray-700 font-medium max-w-[85%]">${data.content}</p><button onclick="deleteDataDocument('notices', '${id}')" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white h-7 w-7 rounded-md transition flex items-center justify-center shrink-0"><i class="fa-solid fa-trash-can"></i></button></div>`;
+            });
+        });
+
+        // ২. রেজিস্টার্ড স্টুডেন্ট ইমার্জেন্সি ডেটাবেজ ও রোল রেন্ডার
         const studentTableBody = document.getElementById('studentTableBody');
         onSnapshot(collection(db, "users"), (snapshot) => {
             studentTableBody.innerHTML = '';
             snapshot.forEach((res) => {
-                const data = res.data();
-                const id = res.id;
-                
-                // যদি এডমিন নিজে হয় তবে তাকে রিসেট বাটন দেখাবে না
+                const data = res.data(); const id = res.id;
                 const isBtnVisible = data.role === 'admin' ? 'hidden' : 'inline-block';
 
                 studentTableBody.innerHTML += `
@@ -123,7 +132,13 @@
                         <td class="px-4 py-3 font-extrabold text-red-600 text-sm">${data.bloodGroup || '🔴 PENDING'}</td>
                         <td class="px-4 py-3 font-medium">${data.phone || 'PENDING'}</td>
                         <td class="px-4 py-3"><b>${data.emergencyPhone || 'PENDING'}</b><br><span class="text-[10px] text-gray-500">(${data.emergencyName || 'N/A'})</span></td>
-                        <td class="px-4 py-3 text-gray-400">${data.email}</td>
+                        
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-0.5 rounded-full font-bold text-[10px] ${data.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">
+                                ${data.role ? data.role.toUpperCase() : 'STUDENT'}
+                            </span>
+                        </td>
+                        
                         <td class="px-4 py-3 text-center">
                             <button onclick="resetStudentPasswordToDefault('${id}', '${data.name}')" class="${isBtnVisible} bg-amber-100 text-amber-800 hover:bg-amber-600 hover:text-white px-2 py-1 rounded font-bold transition text-[10px]">
                                 <i class="fa-solid fa-key-skeleton"></i> Reset to DISBIS
@@ -134,22 +149,17 @@
             });
         });
 
-        // ৩. স্টুডেন্ট পাসওয়ার্ড রিসেট লজিক ফাংশন (উইন্ডো ইনজেকশন)
         window.resetStudentPasswordToDefault = async (uid, name) => {
             if(confirm(`আপনি কি নিশ্চিত যে '${name}' এর পাসওয়ার্ড রিসেট করে ডিফল্ট 'DISBIS' করে দিতে চান?`)) {
                 try {
-                    // যেহেতু আমরা ক্লায়েন্ট এন্ডে সরাসরি অন্য ইউজারের Auth পাসওয়ার্ড চেঞ্জ করতে পারি না সিকিউরিটি রুলসের জন্য,
-                    // তাই আমরা ফায়ারস্টোর ডেটাবেজে একটি 'passwordResetQueue' ট্রিগার রাইট করে দেব, যা রিয়েলটাইম রিডাইরেকশনে ফোর্স করবে অথবা অ্যাডমিন লগইন ট্র্যাকে এসাইন রাখবে। 
-                    // অথবা ক্লায়েন্ট-এন্ড সবচেয়ে সহজ হ্যাক হলো ইউজারের ডক ফাইলে একটি ট্যাগ ট্র্যাকিং করা:
-                    await updateDoc(doc(db, "users", uid), {
-                        mustResetPass: true,
-                        tempPasswordValue: "DISBIS"
-                    });
+                    await updateDoc(doc(db, "users", uid), { mustResetPass: true, tempPasswordValue: "DISBIS" });
                     alert(`Success! ${name} এর পাসওয়ার্ড ডাটাবেজ ফ্লোতে 'DISBIS' হিসেবে ফ্ল্যাগ করা হয়েছে।`);
-                } catch (err) {
-                    alert("Reset Error: " + err.message);
-                }
+                } catch (err) { alert("Reset Error: " + err.message); }
             }
+        };
+
+        window.deleteDataDocument = async (collectionName, id) => {
+            if(confirm("Are you sure?")) { try { await deleteDoc(doc(db, collectionName, id)); alert("Deleted!"); } catch (err) { alert(err.message); } }
         };
 
         document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => window.location.replace("./login.html")); });
