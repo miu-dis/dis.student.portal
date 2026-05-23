@@ -418,8 +418,18 @@
             return u.startsWith("http") || u.startsWith("data:");
         }
 
+        function normalizePersonName(name) {
+            return String(name || "").trim().toLowerCase();
+        }
+
         function canManageResource(rData) {
-            return Boolean(loggedInUserUID) && rData.uploadedBy && rData.uploadedBy === loggedInUserUID;
+            if (!loggedInUserUID) return false;
+            if (rData.uploadedBy && rData.uploadedBy === loggedInUserUID) return true;
+            // পুরনো আপলোডে uploadedBy না থাকলে প্রোফাইলের নাম == author হলে নিজেরটা ধরা
+            if (!rData.uploadedBy && loggedInUserName && normalizePersonName(rData.author) === normalizePersonName(loggedInUserName)) {
+                return true;
+            }
+            return false;
         }
 
         async function uploadFileToStorage(file) {
