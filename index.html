@@ -119,7 +119,7 @@
                     </select>
                 </div>
 
-                <div id="uploadSizeNotice" class="bg-amber-50 border border-amber-300 text-amber-900 text-[10px] p-2.5 rounded-lg leading-relaxed font-medium"></div>
+                <div id="uploadSizeNotice" class="bg-amber-50 border border-amber-300 text-amber-900 text-[10px] p-2.5 rounded-lg leading-relaxed font-medium">⚠️ Direct upload limit: 2MB. If your file is larger, upload it to Google Drive or YouTube first, set sharing to Public, then paste the link here.</div>
 
                 <div class="bg-slate-50 p-3 rounded-xl border border-dashed border-slate-300 space-y-2">
                     <label id="lblUploadMethod" class="block font-bold text-gray-700 mb-1">Choose upload method:</label>
@@ -140,7 +140,7 @@
                 </div>
 
                 <div id="lockSemNotice" class="bg-indigo-50 p-2.5 rounded-lg text-indigo-900 font-medium text-[11px] border border-indigo-200 leading-relaxed">
-                    <span id="lockSemNoticeBefore"></span> <b id="lockedSemLabel">...</b><span id="lockSemNoticeAfter"></span>
+                    <span id="lockSemNoticeBefore">🔒 This file will be saved under your running semester</span> <b id="lockedSemLabel">...</b><span id="lockSemNoticeAfter">. Classmates can view it in this course.</span>
                 </div>
 
                 <div class="flex justify-end space-x-2 pt-2 border-t">
@@ -505,8 +505,16 @@
             document.getElementById('shareFileField').value = "";
             document.getElementById('shareUrl').value = "";
             window.switchUploadMethod('file');
+            refreshShareModalLabels();
             openShareModalFromModule();
         }
+
+        function refreshShareModalLabels() {
+            document.getElementById('uploadSizeNotice').innerText = window.portalT('uploadSizeWarn');
+            document.getElementById('lockSemNoticeBefore').innerText = window.portalT('lockSemBefore');
+            document.getElementById('lockSemNoticeAfter').innerText = window.portalT('lockSemAfter');
+        }
+        window.refreshShareModalLabels = refreshShareModalLabels;
         window.triggerLockedUploadFlow = triggerLockedUploadFlow;
 
         courseGrid.addEventListener('click', (e) => {
