@@ -75,6 +75,17 @@
             </div>
         </div>
 
+        <div class="bg-white p-6 rounded-xl shadow border-t-4 border-purple-600 mb-8">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center justify-between">
+                <span><i class="fa-solid fa-folder-open text-purple-600 mr-2"></i> Student Uploaded Resources</span>
+                <span id="resourceAdminCount" class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-bold">0</span>
+            </h3>
+            <p class="text-[10px] text-gray-500 mb-3">সকল স্টুডেন্টের আপলোড করা নোট/ফাইল এখান থেকে এডিট বা ডিলিট করুন।</p>
+            <div id="adminResourceList" class="space-y-2 max-h-[28rem] overflow-y-auto text-xs pr-1 border border-dashed rounded-lg p-2">
+                <p class="text-gray-400 text-center py-4">Loading resources...</p>
+            </div>
+        </div>
+
         <div class="bg-white p-6 rounded-xl shadow border-t-4 border-blue-600">
             <h3 class="text-lg font-bold text-gray-800 mb-4"><i class="fa-solid fa-hospital-user text-blue-600 mr-2"></i> Student Directory Base</h3>
             <div class="overflow-x-auto">
@@ -100,9 +111,10 @@
     </div>
 
     <script type="module">
-        import { auth, db } from "./assets/js/app.js";
+        import { auth, db, storage } from "./assets/js/app.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { doc, getDoc, setDoc, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { ref, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         let activeEditId = null;
         let activeEditCollection = "";
@@ -224,6 +236,49 @@
             adminMappingList.innerHTML = rows.join("");
         });
 
+        onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snapshot) => {
+            const adminResourceList = document.getElementById('adminResourceList');
+            document.getElementById('resourceAdminCount').innerText = snapshot.size;
+            if (snapshot.empty) {
+                adminResourceList.innerHTML = '<p class="text-gray-400 text-center py-4">No student resources uploaded yet.</p>';
+                return;
+            }
+            const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+            adminResourceList.innerHTML = snapshot.docs.map(res => {
+                const d = res.data();
+                const viewUrl = (d.url && (d.url.startsWith("http") || d.url.startsWith("data:"))) ? d.url : (d.url || "#");
+                const payload = encodeURIComponent(JSON.stringify(d));
+                return `
+                    <div class="p-2.5 bg-purple-50/40 border border-purple-100 rounded-lg">
+                        <div class="flex justify-between gap-2 items-start">
+                            <div class="min-w-0 flex-1">
+                                <p class="font-bold text-gray-800 break-words">${esc(d.title || 'Untitled')}</p>
+                                <p class="text-[9px] text-gray-500 mt-0.5">${esc(d.courseCode || 'N/A')} | ${esc(d.semester || 'N/A')}</p>
+                                <p class="text-[9px] text-gray-400">By: ${esc(d.author || 'Unknown')} | ${esc(d.type || 'File')}</p>
+                            </div>
+                            <div class="flex flex-col gap-1 shrink-0">
+                                <a href="${esc(viewUrl)}" target="_blank" rel="noopener" class="text-[9px] px-2 py-0.5 rounded bg-white border text-indigo-700 text-center font-bold">View</a>
+                                <button type="button" data-admin-edit-resource="${res.id}" data-resource-payload="${payload}" class="text-[9px] px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 font-bold">Edit</button>
+                                <button type="button" data-admin-delete-resource="${res.id}" class="text-[9px] px-2 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 font-bold">Delete</button>
+                            </div>
+                        </div>
+                    </div>`;
+            }).join("");
+        });
+
+        document.getElementById('adminResourceList').addEventListener('click', (e) => {
+            const editBtn = e.target.closest('[data-admin-edit-resource]');
+            if (editBtn) {
+                try {
+                    const data = JSON.parse(decodeURIComponent(editBtn.dataset.resourcePayload));
+                    openResourceEditModal(editBtn.dataset.adminEditResource, data);
+                } catch (err) { alert("Could not open editor: " + err.message); }
+                return;
+            }
+            const delBtn = e.target.closest('[data-admin-delete-resource]');
+            if (delBtn) deleteResourceAdmin(delBtn.dataset.adminDeleteResource);
+        });
+
         // নোটিশ লিসেনার
         onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
             const adminNoticeList = document.getElementById('adminNoticeList');
@@ -270,6 +325,44 @@
             document.getElementById('editModal').classList.remove('hidden'); document.getElementById('editModal').classList.add('flex');
         };
 
+        window.openResourceEditModal = (id, data) => {
+            activeEditId = id;
+            activeEditCollection = "resources";
+            const safeUrl = (data.url || "").replace(/"/g, "&quot;");
+            document.getElementById('modalFormContainer').innerHTML = `
+                <div class="space-y-3 text-xs">
+                    <p class="font-bold text-purple-800">Resource ID: ${id}</p>
+                    <div><label class="font-bold text-gray-600">Title</label><input type="text" id="m_res_title" value="${(data.title || '').replace(/"/g, '&quot;')}" class="w-full p-2 border rounded"></div>
+                    <div><label class="font-bold text-gray-600">Contributor</label><input type="text" id="m_res_author" value="${(data.author || '').replace(/"/g, '&quot;')}" class="w-full p-2 border rounded"></div>
+                    <div><label class="font-bold text-gray-600">Course Code</label><input type="text" id="m_res_code" value="${data.courseCode || ''}" class="w-full p-2 border rounded"></div>
+                    <div><label class="font-bold text-gray-600">Semester Key</label><input type="text" id="m_res_sem" value="${data.semester || ''}" class="w-full p-2 border rounded"></div>
+                    <div><label class="font-bold text-gray-600">Type</label>
+                        <select id="m_res_type" class="w-full p-2 border rounded bg-white">
+                            <option value="PDF/Handnote" ${data.type === 'PDF/Handnote' ? 'selected' : ''}>PDF / Handnote</option>
+                            <option value="Video Lecture" ${data.type === 'Video Lecture' ? 'selected' : ''}>Video</option>
+                            <option value="Audio/Voice" ${data.type === 'Audio/Voice' ? 'selected' : ''}>Audio</option>
+                            <option value="Image/Document" ${data.type === 'Image/Document' ? 'selected' : ''}>Image</option>
+                        </select>
+                    </div>
+                    <div><label class="font-bold text-gray-600">File / Link URL</label><input type="text" id="m_res_url" value="${safeUrl}" class="w-full p-2 border rounded text-[10px]"></div>
+                    <a href="${data.url || '#'}" target="_blank" class="text-indigo-600 underline text-[10px]">Preview open in new tab</a>
+                </div>`;
+            document.getElementById('editModal').classList.remove('hidden');
+            document.getElementById('editModal').classList.add('flex');
+        };
+
+        window.deleteResourceAdmin = async (id) => {
+            if (!confirm("Delete this student resource permanently?")) return;
+            try {
+                const snap = await getDoc(doc(db, "resources", id));
+                if (snap.exists() && snap.data().storagePath) {
+                    try { await deleteObject(ref(storage, snap.data().storagePath)); } catch (e) { console.warn(e); }
+                }
+                await deleteDoc(doc(db, "resources", id));
+                alert("Resource deleted!");
+            } catch (err) { alert(err.message); }
+        };
+
         window.openCourseEditModal = (docKey, index, course) => {
             activeEditCollection = "course_mappings"; activeMapDocKey = docKey; activeMapIndex = index;
             document.getElementById('modalFormContainer').innerHTML = `
@@ -299,6 +392,17 @@
                         timeSlot: `${formatTimeTo12Hour(sTime)} - ${formatTimeTo12Hour(eTime)}`
                     });
                     alert("Routine updated successfully!");
+                } else if (activeEditCollection === "resources") {
+                    await updateDoc(doc(db, "resources", activeEditId), {
+                        title: document.getElementById('m_res_title').value.trim(),
+                        author: document.getElementById('m_res_author').value.trim(),
+                        courseCode: document.getElementById('m_res_code').value.trim(),
+                        semester: document.getElementById('m_res_sem').value.trim(),
+                        type: document.getElementById('m_res_type').value,
+                        url: document.getElementById('m_res_url').value.trim(),
+                        updatedAt: new Date().toISOString()
+                    });
+                    alert("Resource updated successfully!");
                 } else if (activeEditCollection === "course_mappings") {
                     const docRef = doc(db, "course_mappings", activeMapDocKey);
                     const mapDoc = await getDoc(docRef);
