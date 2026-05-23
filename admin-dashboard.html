@@ -111,10 +111,10 @@
     </div>
 
     <script type="module">
-        import { auth, db, storage } from "./assets/js/app.js";
+        import { auth, db } from "./assets/js/app.js";
+        import { deletePortalFile } from "./assets/js/fileStorage.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { doc, getDoc, setDoc, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { ref, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         let activeEditId = null;
         let activeEditCollection = "";
@@ -355,8 +355,8 @@
             if (!confirm("Delete this student resource permanently?")) return;
             try {
                 const snap = await getDoc(doc(db, "resources", id));
-                if (snap.exists() && snap.data().storagePath) {
-                    try { await deleteObject(ref(storage, snap.data().storagePath)); } catch (e) { console.warn(e); }
+                if (snap.exists() && snap.data().storagePath && snap.data().urlType !== "external") {
+                    await deletePortalFile(snap.data().storagePath);
                 }
                 await deleteDoc(doc(db, "resources", id));
                 alert("Resource deleted!");
