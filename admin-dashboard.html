@@ -254,33 +254,49 @@ document.getElementById('courseMapForm').addEventListener('submit', async (e) =>
         };
 
         // মডাল সেভ বাটন মাস্টার ইভেন্ট
-        document.getElementById('modalSaveBtn').addEventListener('click', async () => {
-            if(activeEditCollection === "routines") {
-                const sTime = document.getElementById('m_routine_start').value; const eTime = document.getElementById('m_routine_end').value;
-                try {
-                    await updateDoc(doc(db, "routines", activeEditId), {
-                        subject: document.getElementById('m_routine_sub').value.trim(), courseCode: document.getElementById('m_routine_code').value.trim(), room: document.getElementById('m_routine_room').value.trim(), batchNumber: document.getElementById('m_routine_batch').value.trim(), teacherCode: document.getElementById('m_routine_teacher').value.trim(), boardType: document.getElementById('m_routine_board').value, rawStartTime: sTime, rawEndTime: eTime, timeSlot: `${formatTimeTo12Hour(sTime)} - ${formatTimeTo12Hour(eTime)}`
-                    });
-                    alert("Routine updated!"); closeEditModal();
-                } catch(err) { alert(err.message); }
-            } 
-            else if(activeEditCollection === "course_mappings") {
-                try {
-                    const mapDoc = await getDoc(doc(db, "course_mappings", activeMapDocKey));
-                    if(mapDoc.exists()) {
-                        let courses = mapDoc.data().courses || [];
-                        courses[activeMapIndex] = {
-                            code: document.getElementById('m_course_code').value.trim().toUpperCase(),
-                            title: document.getElementById('m_course_title').value.trim(),
-                            teacher: document.getElementById('m_course_teacher').value.trim()
-                        };
-                        await updateDoc(doc(db, "course_mappings", activeMapDocKey), { courses: courses });
-                        alert("Course Matrix Updated!"); closeEditModal();
-                    }
-                } catch(err) { alert(err.message); }
+        // admin-dashboard.html এর এই অংশটুকু রিপ্লেস করুন
+document.getElementById('modalSaveBtn').addEventListener('click', async () => {
+    try {
+        if(activeEditCollection === "routines") {
+            const sTime = document.getElementById('m_routine_start').value;
+            const eTime = document.getElementById('m_routine_end').value;
+            
+            // আপডেট লজিক
+            await updateDoc(doc(db, "routines", activeEditId), {
+                subject: document.getElementById('m_routine_sub').value.trim(),
+                courseCode: document.getElementById('m_routine_code').value.trim(),
+                room: document.getElementById('m_routine_room').value.trim(),
+                batchNumber: document.getElementById('m_routine_batch').value.trim(),
+                teacherCode: document.getElementById('m_routine_teacher').value.trim(),
+                boardType: document.getElementById('m_routine_board').value,
+                rawStartTime: sTime,
+                rawEndTime: eTime,
+                timeSlot: `${formatTimeTo12Hour(sTime)} - ${formatTimeTo12Hour(eTime)}`
+            });
+            alert("Routine updated successfully!");
+        } 
+        else if(activeEditCollection === "course_mappings") {
+            const docRef = doc(db, "course_mappings", activeMapDocKey);
+            const mapDoc = await getDoc(docRef);
+            if(mapDoc.exists()) {
+                let courses = mapDoc.data().courses || [];
+                // নির্দিষ্ট ইনডেক্স ধরে আপডেট
+                courses[activeMapIndex] = {
+                    code: document.getElementById('m_course_code').value.trim().toUpperCase(),
+                    title: document.getElementById('m_course_title').value.trim(),
+                    teacher: document.getElementById('m_course_teacher').value.trim()
+                };
+                await updateDoc(docRef, { courses: courses });
+                alert("Course Matrix updated successfully!");
             }
-        });
-
+        }
+        closeEditModal();
+        window.location.reload(); // পেজ রিফ্রেশ করে নিশ্চিত করুন ডাটা দেখা যাচ্ছে
+    } catch(err) {
+        console.error("Save Error: ", err);
+        alert("Failed to save: " + err.message);
+    }
+});
         // কোর্স ম্যাপিং থেকে স্পেসিফিক ইভেন্ট ডিলিট লজিক
         window.deleteCourseMappingEntry = async (docKey, index) => {
             if(confirm("Are you sure you want to delete this course mapping entry?")) {
