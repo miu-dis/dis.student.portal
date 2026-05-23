@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIS Portal - Secure Gateway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 flex flex-col items-center justify-center min-h-screen p-4 transition-all duration-300">
+
+    <div class="absolute top-4 right-4 bg-slate-800 shadow rounded-lg p-1 flex items-center space-x-1 border border-slate-700">
+        <span class="text-sm px-2">🌐</span>
+        <select id="langSelector" class="bg-transparent text-sm font-semibold text-gray-300 outline-none p-1 cursor-pointer">
+            <option value="en" class="bg-slate-800">English</option>
+            <option value="ar" class="bg-slate-800">العربية</option>
+            <option value="bn" class="bg-slate-800">বাংলা</option>
+        </select>
+    </div>
+
+    <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700">
+        
+        <div class="flex justify-center mb-6">
+            <img src="assets/img/logo.png" alt="University Logo" class="h-24 w-auto mx-auto transition-all duration-300">
+        </div>
+        
+        <div class="text-center mb-8 border-t pt-5 border-slate-700">
+            <h2 id="txtAdminTitle" class="text-2xl font-bold text-white">Central Admin Gateway</h2>
+            <p id="txtAdminSubtitle" class="text-slate-400 text-sm mt-1">Authorized personnel only</p>
+        </div>
+
+        <form id="adminLoginForm" class="space-y-5">
+            <div>
+                <label id="lblAdminEmail" class="block text-sm font-medium text-slate-300 mb-1">Secret Email ID</label>
+                <input type="email" id="adminEmail" required class="w-full bg-slate-900 text-white px-4 py-2.5 border border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none transition" placeholder="admin@email.com">
+            </div>
+            <div>
+                <label id="lblAdminPassword" class="block text-sm font-medium text-slate-300 mb-1">Master Password</label>
+                <input type="password" id="adminPassword" required class="w-full bg-slate-900 text-white px-4 py-2.5 border border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none transition" placeholder="••••••••">
+            </div>
+            <button type="submit" id="btnAdminLogin" class="w-full bg-emerald-600 text-white py-2.5 rounded-lg font-semibold hover:bg-emerald-700 transition shadow-lg shadow-emerald-900/30 mt-2">Verify & Enter</button>
+        </form>
+
+    </div>
+
+    <script>
+        const translations = {
+            en: {
+                dir: "ltr",
+                title: "Central Admin Gateway",
+                subtitle: "Authorized personnel only",
+                lblEmail: "Secret Email ID",
+                lblPassword: "Master Password",
+                btn: "Verify & Enter"
+            },
+            ar: {
+                dir: "rtl",
+                title: "بوابة المسؤول المركزية",
+                subtitle: "للموظفين المصرح لهم فقط",
+                lblEmail: "البريد الإلكتروني السري",
+                lblPassword: "كلمة المرور الرئيسية",
+                btn: "التحقق والدخول"
+            },
+            bn: {
+                dir: "ltr",
+                title: "সেন্ট্রাল অ্যাডমিন গেটওয়ে",
+                subtitle: "শুধুমাত্র অনুমোদিত ব্যক্তিদের জন্য",
+                lblEmail: "গোপন ইমেইল আইডি",
+                lblPassword: "মাস্টার পাসওয়ার্ড",
+                btn: "যাচাই করুন এবং প্রবেশ করুন"
+            }
+        };
+
+        const langSelector = document.getElementById('langSelector');
+
+        function applyLanguage(lang) {
+            const t = translations[lang];
+            document.body.dir = t.dir;
+            
+            if(t.dir === "rtl") {
+                document.body.classList.add('text-right');
+            } else {
+                document.body.classList.remove('text-right');
+            }
+
+            document.getElementById('txtAdminTitle').innerText = t.title;
+            document.getElementById('txtAdminSubtitle').innerText = t.subtitle;
+            document.getElementById('lblAdminEmail').innerText = t.lblEmail;
+            document.getElementById('lblAdminPassword').innerText = t.lblPassword;
+            document.getElementById('btnAdminLogin').innerText = t.btn;
+        }
+
+        langSelector.addEventListener('change', (e) => {
+            const selectedLang = e.target.value;
+            localStorage.setItem('preferredLang', selectedLang);
+            applyLanguage(selectedLang);
+        });
+
+        const savedLang = localStorage.getItem('preferredLang') || 'en';
+        langSelector.value = savedLang;
+        applyLanguage(savedLang);
+    </script>
+
+    <script type="module">
+        import { auth, db } from "./assets/js/app.js";
+        import { signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const adminLoginForm = document.getElementById('adminLoginForm');
+
+        // অ্যালার্ট মেসেজ ডিকশনারী
+        const msgs = {
+            en: { accessDenied: "Access Denied! You do not have admin privileges.", success: "Access Granted! Welcome to Master Panel.", error: "Invalid Credentials!" },
+            ar: { accessDenied: "تم رفض الدخول! ليس لديك صلاحيات المسؤول.", success: "تم منح الدخول! مرحبًا بك في اللوحة الرئيسية.", error: "بيانات الاعتماد غير صالحة!" },
+            bn: { accessDenied: "অ্যাক্সেস রিফিউজড! আপনার অ্যাডমিন পারমিশন নেই।", success: "অ্যাক্সেস গ্রান্টেড! মাস্টার প্যানেলে স্বাগতম।", error: "ভুল ইমেইল বা পাসওয়ার্ড!" }
+        };
+
+        adminLoginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const curLang = localStorage.getItem('preferredLang') || 'en';
+
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value;
+
+            try {
+                // ১. প্রথমে ফায়ারবেস অথেনটিকেশন দিয়ে লগইন করা হচ্ছে
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // ২. লগইন হওয়া ইউজারের ডাটাবেজ ডকুমেন্ট চেক করা হচ্ছে
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
+
+                if (userDoc.exists() && userDoc.data().role === 'admin') {
+                    // যদি রোল 'admin' হয়, তবে ড্যাশবোর্ডে প্রবেশ করবে
+                    alert(msgs[curLang].success);
+                    window.location.href = "admin-dashboard.html";
+                } else {
+                    // যদি রোল 'admin' না হয়, তবে লগআউট করিয়ে বের করে দেওয়া হবে
+                    alert(msgs[curLang].accessDenied);
+                    await signOut(auth);
+                    window.location.reload();
+                }
+
+            } catch (error) {
+                alert(msgs[curLang].error);
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html>

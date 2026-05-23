@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Islamic Studies Study Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans transition-all duration-300">
+
+    <nav class="bg-emerald-800 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center transition-all duration-300" id="navContainer">
+            <div class="flex items-center space-x-3 gap-2" id="navLogoTitle">
+                <img src="assets/img/logo.png" alt="University Logo" class="h-10 w-auto ml-2"> 
+                <h1 id="navTitle" class="text-xl font-bold tracking-wide">DIS Study Portal</h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <select id="langSelector" class="bg-emerald-900 text-white text-sm font-semibold rounded p-1 border border-emerald-700 outline-none cursor-pointer">
+                    <option value="en">English</option>
+                    <option value="ar">العربية</option>
+                    <option value="bn">বাংলা</option>
+                </select>
+                <div id="navAuthButtons">
+                    <a href="login.html" id="btnNavLogin" class="bg-white text-emerald-800 px-4 py-1.5 rounded-lg font-semibold hover:bg-emerald-50 transition shadow text-sm">Login / Register</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white py-12 text-center shadow-inner">
+        <div class="container mx-auto px-4">
+            <h2 id="heroTitle" class="text-3xl md:text-4xl font-extrabold mb-3">Islamic Studies Study Portal</h2>
+            <p id="heroSubtitle" class="text-emerald-100 text-lg max-w-xl mx-auto">An open platform for classmates to share notes, video lectures, and academic resources.</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-1 space-y-8">
+            <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-emerald-600">
+                <h3 id="lblNoticeBoard" class="text-xl font-bold text-gray-900 mb-4 flex items-center">📢 Notice Board</h3>
+                <div id="noticeList" class="space-y-4 overflow-y-auto max-h-60 p-1">
+                    <div class="p-3 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg">
+                        <p class="text-sm font-semibold text-gray-800">Loading notices...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-amber-500">
+                <h3 id="lblDailyRoutine" class="text-xl font-bold text-gray-900 mb-4 flex items-center">⏳ Daily Routine Update</h3>
+                <div id="dailyRoutineList" class="space-y-3 overflow-y-auto max-h-80 p-1">
+                    <p class="text-sm text-gray-500">Loading today's updates...</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-teal-600">
+                <h3 id="lblPermanentRoutine" class="text-xl font-bold text-gray-900 mb-4 flex items-center">📅 Permanent Routine Board</h3>
+                <div id="permanentRoutineList" class="space-y-3 overflow-y-auto max-h-80 p-1">
+                    <p class="text-sm text-gray-500">Loading main board...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 border-b border-gray-200 gap-2">
+                <h3 id="lblCourses" class="text-2xl font-bold text-emerald-800 mb-2 md:mb-0">Academic Courses</h3>
+                <select id="semesterFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 outline-none">
+                    <option value="all" id="optAllSem">All Semesters</option>
+                    <option value="1-1">1st Year - 1st Semester</option>
+                </select>
+            </div>
+
+            <div id="courseGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 flex flex-col justify-between hover:shadow-md transition">
+                    <div>
+                        <span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded">IS-1102</span>
+                        <h4 class="text-lg font-bold text-gray-800 mt-2">Al-Qur'an & Ulumul Qur'an</h4>
+                        <p class="text-xs text-gray-500 mt-1">Lecturer: Dr. Muhammad Abdullah</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
+                        <span class="text-xs text-gray-500">Notes: 0</span>
+                        <button class="text-sm font-medium text-emerald-700 hover:underline">View Notes →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const translations = {
+            en: {
+                dir: "ltr", navTitle: "DIS Study Portal", btnNavLogin: "Login / Register",
+                heroTitle: "Islamic Studies Study Portal", heroSubtitle: "An open platform for classmates to share notes, video lectures, and academic resources.",
+                lblNoticeBoard: "📢 Notice Board", lblDailyRoutine: "⏳ Daily Routine Update",
+                lblPermanentRoutine: "📅 Permanent Board", lblCourses: "Academic Courses", optAllSem: "All Semesters"
+            },
+            ar: {
+                dir: "rtl", navTitle: "بوابة الدراسة DIS", btnNavLogin: "تسجيل الدخول / التسجيل",
+                heroTitle: "بوابة الدراسة لقسم الدراسات الإسلامية", heroSubtitle: "منصة مفتوحة للزملاء لمشاركة الملاحظات ومحاضرات الفيديو والموارد الأكاديمية.",
+                lblNoticeBoard: "📢 لوحة الإعلانات", lblDailyRoutine: "⏳ تحديث الجدول اليومي",
+                lblPermanentRoutine: "📅 جدول المواد الثابت", lblCourses: "المواد الأكاديمية", optAllSem: "جميع الفصول الدراسية"
+            },
+            bn: {
+                dir: "ltr", navTitle: "ডিআইএস স্টাডি পোর্টাল", btnNavLogin: "লগইন / রেজিস্টার",
+                heroTitle: "ইসলামিক স্টাডিজ বিভাগ পোর্টাল", heroSubtitle: "সহপাঠীদের মাঝে ক্লাস নোট, ভিডিও লেকচার এবং একাডেমিক তথ্য শেয়ার করার উন্মুক্ত প্ল্যাটফর্ম।",
+                lblNoticeBoard: "📢 নোটিশ বোর্ড", lblDailyRoutine: "⏳ আজকের সাময়িক রুটিন",
+                lblPermanentRoutine: "📅 স্থায়ী মূল রুটিন বোর্ড", lblCourses: "একাডেমিক কোর্সসমূহ", optAllSem: "সব সেমিস্টার"
+            }
+        };
+
+        const langSelector = document.getElementById('langSelector');
+        const navContainer = document.getElementById('navContainer');
+        const navLogoTitle = document.getElementById('navLogoTitle');
+
+        function applyLanguage(lang) {
+            const t = translations[lang];
+            document.body.dir = t.dir;
+            if(t.dir === "rtl") {
+                document.body.classList.add('text-right');
+                navContainer.classList.add('flex-row-reverse');
+                navLogoTitle.classList.add('flex-row-reverse', 'space-x-reverse');
+            } else {
+                document.body.classList.remove('text-right');
+                navContainer.classList.remove('flex-row-reverse');
+                navLogoTitle.classList.remove('flex-row-reverse', 'space-x-reverse');
+            }
+            document.getElementById('navTitle').innerText = t.navTitle;
+            if(document.getElementById('btnNavLogin')) document.getElementById('btnNavLogin').innerText = t.btnNavLogin;
+            document.getElementById('heroTitle').innerText = t.heroTitle;
+            document.getElementById('heroSubtitle').innerText = t.heroSubtitle;
+            document.getElementById('lblNoticeBoard').innerText = t.lblNoticeBoard;
+            document.getElementById('lblDailyRoutine').innerText = t.lblDailyRoutine;
+            document.getElementById('lblPermanentRoutine').innerText = t.lblPermanentRoutine;
+            document.getElementById('lblCourses').innerText = t.lblCourses;
+            document.getElementById('optAllSem').innerText = t.optAllSem;
+        }
+
+        langSelector.addEventListener('change', (e) => {
+            localStorage.setItem('preferredLang', e.target.value);
+            applyLanguage(e.target.value);
+            window.location.reload();
+        });
+        const savedLang = localStorage.getItem('preferredLang') || 'en';
+        langSelector.value = savedLang;
+        applyLanguage(savedLang);
+    </script>
+
+    <script type="module">
+        import { auth, db } from "./assets/js/app.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const dailyContainer = document.getElementById('dailyRoutineList');
+        const permanentContainer = document.getElementById('permanentRoutineList');
+        const noticeContainer = document.getElementById('noticeList');
+
+        // ১. রুটিন ডাটা লাইভ পুশ লিসেনার
+        onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
+            dailyContainer.innerHTML = '';
+            permanentContainer.innerHTML = '';
+            let hasDaily = false;
+            let hasPermanent = false;
+
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const currentLang = localStorage.getItem('preferredLang') || 'en';
+                
+                // জেন্ডার টেক্সট ট্রান্সলেশন
+                let genderLabel = data.gender === 'Male' ? 'Male' : 'Female';
+                if(currentLang === 'bn') genderLabel = data.gender === 'Male' ? 'ভাইদের শাখা' : 'বোনদের শাখা';
+                if(currentLang === 'ar') genderLabel = data.gender === 'Male' ? 'قسم البنين' : 'قسم البنات';
+
+                const card = `
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl shadow-sm space-y-1">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold text-emerald-800 text-sm">${data.subject}</h4>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${data.gender === 'Male' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${genderLabel}</span>
+                        </div>
+                        <div class="text-xs text-gray-600 grid grid-cols-2 gap-1">
+                            <p><b>Code:</b> ${data.courseCode}</p>
+                            <p><b>Room:</b> ${data.room}</p>
+                            <p><b>Batch:</b> ${data.batchNumber}</p>
+                            <p><b>Teacher:</b> ${data.teacherCode}</p>
+                        </div>
+                        <p class="text-xs font-bold text-slate-700 pt-1 border-t border-dashed border-slate-200"><i class="fa-regular fa-clock text-emerald-600 mr-1"></i> ${data.timeSlot}</p>
+                    </div>
+                `;
+
+                if (data.boardType === 'daily') {
+                    dailyContainer.innerHTML += card;
+                    hasDaily = true;
+                } else if (data.boardType === 'permanent') {
+                    permanentContainer.innerHTML += card;
+                    hasPermanent = true;
+                }
+            });
+
+            if(!hasDaily) dailyContainer.innerHTML = '<p class="text-xs text-gray-400 p-2">No active daily adjustments.</p>';
+            if(!hasPermanent) permanentContainer.innerHTML = '<p class="text-xs text-gray-400 p-2">No permanent schedule uploaded.</p>';
+        });
+
+        // ২. নোটিশ বোর্ড লাইভ পুশ লিসেনার
+        onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
+            noticeContainer.innerHTML = '';
+            if(snapshot.empty) {
+                noticeContainer.innerHTML = '<p class="text-xs text-gray-400 p-2">No notices found.</p>';
+                return;
+            }
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                noticeContainer.innerHTML += `
+                    <div class="p-3 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm">
+                        <p class="text-sm font-medium text-gray-800">${data.content}</p>
+                    </div>
+                `;
+            });
+        });
+
+        // ৩. ইউজার অথেনটিকেশন স্টেট হ্যান্ডেলার
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const currentLang = localStorage.getItem('preferredLang') || 'en';
+                const logoutText = currentLang === 'bn' ? 'লগআউট' : (currentLang === 'ar' ? 'تسجيل الخروج' : 'Logout');
+                const panelText = currentLang === 'bn' ? 'স্টুডেন্ট প্যানেল' : (currentLang === 'ar' ? 'لوحة الطلاب' : 'Student Panel');
+
+                document.getElementById('navAuthButtons').innerHTML = `
+                    <div class="flex items-center space-x-4 gap-2">
+                        <span class="text-sm bg-emerald-900 px-3 py-1 rounded-full text-emerald-200">${panelText}</span>
+                        <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg font-semibold transition shadow text-sm">${logoutText}</button>
+                    </div>
+                `;
+                document.getElementById('logoutBtn').addEventListener('click', () => {
+                    signOut(auth).then(() => window.location.reload());
+                });
+            }
+        });
+    </script>
+</body>
+</html>
