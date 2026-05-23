@@ -300,43 +300,36 @@
         const courseGrid = document.getElementById('courseGrid');
         const daysWithClasses = { Saturday: false, Sunday: false, Monday: false, Tuesday: false, Wednesday: false, Friday: false };
 
-        // ৩-ফিল্টার বক্স ডাটা লিসেনার লুপ
-       // index.html এ যেখানে ডাটা লোড হচ্ছে, সেখানে নিচের লজিকটি ব্যবহার করুন
-async function updateResources() {
-    // ফিল্টার বাটন থেকে মান নেওয়া
-    const yr = document.getElementById('filterYear').value; // '1st Year'
-    // যেহেতু index.html এর সিলেক্ট বক্সে 'Spring 2026' একসাথে আছে, তাই একে আলাদা করতে হবে
-    const sessionFull = document.getElementById('filterSession').value; // 'Spring 2026'
-    
-    // Key ফরম্যাট: "1st Year - Spring 2026" (অ্যাডমিনের সাথে হুবহু মিল)
-    const key = `${yr} - ${sessionFull}`;
-    
-    console.log("Searching for Key:", key); // এটা চেক করবেন কনসোলে
-    
-    const mapDoc = await getDoc(doc(db, "course_mappings", key));
-    const grid = document.getElementById('courseGrid');
-    grid.innerHTML = '';
-    
-    if (mapDoc.exists()) {
-        mapDoc.data().courses.forEach(c => {
-            grid.innerHTML += `... (আপনার আগের কার্ড লজিক) ...`;
-        });
-    } else {
-        grid.innerHTML = '<p>No courses found for this session.</p>';
-    }
-}
-                if(mappedCourses.length === 0) { courseGrid.innerHTML = `<p class="text-xs text-gray-400 col-span-3 p-6 text-center border border-dashed rounded-xl w-full">${currentLang === 'bn' ? 'এই সিলেক্টেড সেমিস্টারে কোনো লাইভ কোর্স এখনো অ্যাডমিন প্যানেল থেকে তৈরি করা হয়নি।' : 'No courses mapped for this combined filter session by admin yet.'}</p>`; return; }
+        let latestMappedCourses = [];
+        let resourcesSnapshot = null;
 
-                mappedCourses.forEach(course => {
-                    let sharedItemsHTML = "";
-                    snapshot.forEach(resDoc => {
+        function getCombinedTrimesterKey() {
+            const yr = document.getElementById('filterYear').value;
+            const termNum = document.getElementById('filterTermNum').value;
+            const sessionFull = document.getElementById('filterSession').value;
+            return `${yr} - ${termNum} (${sessionFull})`;
+        }
+
+        function renderCourseGrid() {
+            const currentLang = localStorage.getItem('preferredLang') || 'en';
+            const combinedTrimesterKey = getCombinedTrimesterKey();
+            courseGrid.innerHTML = '';
+
+            if (latestMappedCourses.length === 0) {
+                courseGrid.innerHTML = `<p class="text-xs text-gray-400 col-span-3 p-6 text-center border border-dashed rounded-xl w-full">${currentLang === 'bn' ? 'এই সিলেক্টেড সেমিস্টারে কোনো লাইভ কোর্স এখনো অ্যাডমিন প্যানেল থেকে তৈরি করা হয়নি।' : 'No courses mapped for this combined filter session by admin yet.'}</p>`;
+                return;
+            }
+
+            latestMappedCourses.forEach(course => {
+                let sharedItemsHTML = "";
+                if (resourcesSnapshot) {
+                    resourcesSnapshot.forEach(resDoc => {
                         const rData = resDoc.data();
-                        if(rData.courseCode === course.code && rData.semester === combinedTrimesterKey) {
+                        if (rData.courseCode === course.code && rData.semester === combinedTrimesterKey) {
                             let icon = "fa-file-pdf text-red-500";
-                            if(rData.type.includes("Video")) icon = "fa-video text-blue-500";
-                            if(rData.type.includes("Audio")) icon = "fa-microphone text-purple-500";
-                            if(rData.type.includes("Image")) icon = "fa-image text-amber-500";
-
+                            if (rData.type && rData.type.includes("Video")) icon = "fa-video text-blue-500";
+                            if (rData.type && rData.type.includes("Audio")) icon = "fa-microphone text-purple-500";
+                            if (rData.type && rData.type.includes("Image")) icon = "fa-image text-amber-500";
                             sharedItemsHTML += `
                                 <a href="${rData.url}" target="_blank" class="flex justify-between items-center p-2 bg-indigo-50/50 border border-indigo-100 rounded-md hover:bg-indigo-100 transition text-[11px] font-medium text-gray-700">
                                     <span class="truncate"><i class="fa-solid ${icon} mr-1"></i> ${rData.title} <span class="text-[9px] text-gray-400 font-normal">(By: ${rData.author})</span></span>
@@ -344,12 +337,14 @@ async function updateResources() {
                                 </a>`;
                         }
                     });
+                }
 
-                    if(sharedItemsHTML === "") sharedItemsHTML = `<p class="text-[10px] text-gray-400 italic p-1">No shared files.</p>`;
-                    const isMyOwnSemester = (combinedTrimesterKey === studentCurrentTrimesterKey);
-                    const btnColorClass = isMyOwnSemester ? "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-600 hover:text-white shadow-sm font-bold" : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed text-center";
+                if (sharedItemsHTML === "") sharedItemsHTML = `<p class="text-[10px] text-gray-400 italic p-1">No shared files.</p>`;
+                const isMyOwnSemester = (combinedTrimesterKey === studentCurrentTrimesterKey);
+                const btnColorClass = isMyOwnSemester ? "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-600 hover:text-white shadow-sm font-bold" : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed text-center";
+                const safeTitle = (course.title || "").replace(/'/g, "\\'");
 
-                    courseGrid.innerHTML += `
+                courseGrid.innerHTML += `
                         <div class="border border-gray-200 rounded-xl p-4 bg-gray-50 flex flex-col justify-between hover:shadow-md hover:border-indigo-600 transition duration-200">
                             <div>
                                 <div class="flex justify-between items-start">
@@ -361,16 +356,33 @@ async function updateResources() {
                                 <div class="space-y-1.5 border-t border-dashed pt-2.5">${sharedItemsHTML}</div>
                             </div>
                             <div class="mt-4 pt-2.5 flex">
-                                <button onclick="triggerLockedUploadFlow('${course.code}', '${course.title}', ${isMyOwnSemester})" class="w-full ${btnColorClass} border text-center text-xs py-2 rounded-lg transition flex items-center justify-center gap-1"><i class="fa-solid fa-plus-circle"></i> ${currentLang === 'bn' ? 'নোট / লিংক যোগ করুন' : 'Add Resource Link'}</button>
+                                <button onclick="triggerLockedUploadFlow('${course.code}', '${safeTitle}', ${isMyOwnSemester})" class="w-full ${btnColorClass} border text-center text-xs py-2 rounded-lg transition flex items-center justify-center gap-1"><i class="fa-solid fa-plus-circle"></i> ${currentLang === 'bn' ? 'নোট / লিংক যোগ করুন' : 'Add Resource Link'}</button>
                             </div>
                         </div>`;
-                });
             });
         }
+
+        async function updateFiltersAndListen() {
+            const key = getCombinedTrimesterKey();
+            try {
+                const mapDoc = await getDoc(doc(db, "course_mappings", key));
+                latestMappedCourses = mapDoc.exists() ? (mapDoc.data().courses || []) : [];
+                renderCourseGrid();
+            } catch (err) {
+                console.error(err);
+                courseGrid.innerHTML = '<p class="text-xs text-red-500 p-4 text-center">Failed to load courses. Please refresh.</p>';
+            }
+        }
+
+        onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snapshot) => {
+            resourcesSnapshot = snapshot;
+            renderCourseGrid();
+        });
 
         document.getElementById('filterYear').addEventListener('change', updateFiltersAndListen);
         document.getElementById('filterTermNum').addEventListener('change', updateFiltersAndListen);
         document.getElementById('filterSession').addEventListener('change', updateFiltersAndListen);
+        updateFiltersAndListen();
 
         window.triggerLockedUploadFlow = (courseCode, courseTitle, isAllowed) => {
             if(!isAllowed) { alert("🔴 এক্সেস লক! আপনি শুধু আপনার নিজের রানিং সেমিস্টারের ফাইল আপলোড করতে পারবেন। অন্য সেমিস্টারের ফাইল শুধুমাত্র দেখার অনুমতি রয়েছে।"); return; }
@@ -421,11 +433,13 @@ async function updateResources() {
                     author: document.getElementById('shareAuthor').value.trim(), title: document.getElementById('shareTitle').value.trim(), type: document.getElementById('shareType').value, courseCode: document.getElementById('resourceShareForm').dataset.lockedCode, semester: studentCurrentTrimesterKey, url: finalUrlPayload, createdAt: new Date().toISOString()
                 });
                 alert("Study Resource Published Successfully!"); document.getElementById('resourceShareForm').reset(); closeShareModal();
+                updateFiltersAndListen();
             } catch (err) { alert(err.message); }
         });
 
         // রুটিন ও নোটিশ লিসেনার
         onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
+            let hasDaily = false;
             dailyContainer.innerHTML = ''; Object.keys(daysWithClasses).forEach(day => { const el = document.getElementById(`day-${day}`); if(el) el.innerHTML = ''; daysWithClasses[day] = false; });
             snapshot.forEach((doc) => {
                 const data = doc.data(); const currentLang = localStorage.getItem('preferredLang') || 'en';
@@ -442,9 +456,10 @@ async function updateResources() {
 
         // প্রোফাইল ভ্যালিডেশন
         onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                loggedInUserUID = user.uid; const userDoc = await getDoc(doc(db, "users", loggedInUserUID));
-                if(userDoc.exists()) {
+            if (!user) return;
+            loggedInUserUID = user.uid;
+            const userDoc = await getDoc(doc(db, "users", loggedInUserUID));
+            if (userDoc.exists()) {
                     const uData = userDoc.data(); if (uData.role === 'admin') { window.location.replace("./admin-dashboard.html"); return; }
                     const uYear = uData.profileYear || "1st Year"; const uTermNum = uData.profileTermNum || "1st Trimester"; const uSess = uData.profileTerm || "Spring"; const uSessYear = uData.profileSessionYear || "2026";
                     studentCurrentTrimesterKey = `${uYear} - ${uTermNum} (${uSess} ${uSessYear})`;
@@ -472,7 +487,6 @@ async function updateResources() {
                     document.getElementById('filterTermNum').value = uTermNum;
                     document.getElementById('filterSession').value = `${uSess} ${uSessYear}`;
                     updateFiltersAndListen();
-                }
             }
         });
 
