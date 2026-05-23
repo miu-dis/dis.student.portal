@@ -179,7 +179,6 @@
         import { collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const dailyContainer = document.getElementById('dailyRoutineList');
-        // বৃহস্পতিবারের বদলে ফ্রাইডে ট্র্যাক করার অবজেক্ট
         const daysWithClasses = { Saturday: false, Sunday: false, Monday: false, Tuesday: false, Wednesday: false, Friday: false };
 
         onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
@@ -199,29 +198,33 @@
                 const currentLang = localStorage.getItem('preferredLang') || 'en';
                 
                 let genderLabel = data.gender === 'Male' ? (currentLang === 'bn' ? 'ভাইদের শাখা' : 'Male') : (currentLang === 'bn' ? 'বোনদের শাখা' : 'Female');
+                let batchLabel = currentLang === 'bn' ? 'ব্যাচ' : 'Batch';
 
-                // কার্ড লেআউটে সরাসরি টিচারের নাম বা কোড বড় এবং বোল্ড আকারে দেখার ব্যবস্থা
+                // ফিক্সড কার্ড লেআউট: এখানে `data.batchNumber` স্পষ্টভাবে যোগ করা হয়েছে
                 const cardHTML = `
                     <div class="p-2.5 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-emerald-600 transition">
-                        <div class="flex justify-between items-center mb-1">
+                        <div class="flex justify-between items-center mb-0.5">
                             <h5 class="font-extrabold text-emerald-800 text-sm">${data.subject}</h5>
                             <span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${data.gender === 'Male' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${genderLabel}</span>
+                        </div>
+                        <div class="mb-1 text-[11px] text-amber-700 font-bold">
+                            <i class="fa-solid fa-users text-amber-500 mr-1"></i>${batchLabel}: ${data.batchNumber || 'N/A'}
                         </div>
                         <div class="grid grid-cols-2 text-[11px] text-gray-600 gap-y-0.5 border-t border-dashed pt-1 mt-1">
                             <p><i class="fa-solid fa-barcode text-gray-400 mr-1"></i><b>Code:</b> ${data.courseCode}</p>
                             <p><i class="fa-solid fa-door-open text-gray-400 mr-1"></i><b>Room:</b> ${data.room}</p>
-                            <p class="text-emerald-700 font-bold"><i class="fa-solid fa-user-tie text-emerald-600 mr-1"></i><b>Teacher:</b> ${data.teacherCode}</p>
-                            <p class="font-bold text-slate-700"><i class="fa-regular fa-clock text-emerald-600 mr-1"></i>${data.timeSlot}</p>
+                            <p class="text-emerald-700 font-bold col-span-2"><i class="fa-solid fa-user-tie text-emerald-600 mr-1"></i><b>Teacher:</b> ${data.teacherCode}</p>
+                            <p class="font-bold text-slate-700 col-span-2 mt-0.5"><i class="fa-regular fa-clock text-emerald-600 mr-1"></i>${data.timeSlot}</p>
                         </div>
                     </div>
                 `;
 
-                // সাময়িক রুটিন আপলোড
+                // সাময়িক রুটিন ভিউ
                 if (data.boardType === 'daily') {
                     dailyContainer.innerHTML += cardHTML;
                     hasDaily = true;
                 } 
-                // স্থায়ী রুটিন আপলোড
+                // স্থায়ী রুটিন ভিউ
                 else if (data.boardType === 'permanent' && data.classDay && data.classDay !== "N/A") {
                     const targetDayBox = document.getElementById(`day-${data.classDay}`);
                     if (targetDayBox) {
@@ -231,7 +234,7 @@
                 }
             });
 
-            // ক্লাস না থাকা দিনগুলোর হ্যান্ডলিং
+            // ক্লাস না থাকা দিনগুলো রেন্ডার
             Object.keys(daysWithClasses).forEach(day => {
                 const el = document.getElementById(`day-${day}`);
                 if (el && !daysWithClasses[day]) {
@@ -260,7 +263,7 @@
             });
         });
 
-        // অথেনটিকেশন স্টেট হ্যান্ডেলার
+        // অথেনটিকেশন স্টেট
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 const currentLang = localStorage.getItem('preferredLang') || 'en';
