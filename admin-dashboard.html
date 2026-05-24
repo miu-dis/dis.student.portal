@@ -58,21 +58,26 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="bg-white p-4 rounded-xl shadow border-t-4 border-emerald-600">
-                <h3 class="text-xs font-bold text-gray-700 mb-3 flex items-center justify-between"><span>Manage Routines</span><span id="routineCount" class="text-[10px] bg-slate-100 px-2 py-0.5 rounded-full">0</span></h3>
-                <div id="adminRoutineList" class="space-y-2 max-h-96 overflow-y-auto text-xs pr-1"><p class="text-gray-400">Loading...</p></div>
-            </div>
-            
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-white p-4 rounded-xl shadow border-t-4 border-amber-500">
                 <h3 class="text-xs font-bold text-gray-700 mb-3 flex items-center justify-between"><span>Manage Notices</span><span id="noticeCount" class="text-[10px] bg-slate-100 px-2 py-0.5 rounded-full">0</span></h3>
                 <div id="adminNoticeList" class="space-y-2 max-h-96 overflow-y-auto text-xs pr-1"><p class="text-gray-400">Loading...</p></div>
             </div>
             
             <div class="bg-white p-4 rounded-xl shadow border-t-4 border-indigo-600">
-                <h3 class="text-xs font-bold text-gray-700 mb-3 flex items-center justify-between"><span>Course Mappings Matrix</span><span id="mappingCount" class="text-[10px] bg-indigo-50 px-2 py-0.5 rounded-full text-indigo-700 font-bold">0</span></h3>
+                <h3 class="text-xs font-bold text-gray-700 mb-3 flex items-center justify-between"><span>Course Mappings Matrix</span><span id="mappingCount" class="text-[10px] bg-indigo-50 px-2 py-0.5 rounded-full text-indigo-700 font-bold" title="Total mapped courses">0 courses</span></h3>
                 <div id="adminMappingList" class="space-y-2 max-h-96 overflow-y-auto text-xs pr-1"><p class="text-gray-400">Loading master mappings...</p></div>
             </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow border-t-4 border-emerald-600 mt-6">
+            <h3 class="text-sm font-bold text-gray-700 mb-2 flex items-center justify-between flex-wrap gap-2">
+                <span>Manage Routines</span>
+                <span id="routineCount" class="text-[10px] bg-slate-100 px-2 py-0.5 rounded-full">0 total</span>
+            </h3>
+            <p class="text-[10px] text-gray-400 mb-2">দিন বা Daily ট্যাবে ক্লিক করে শুধু সেই দিনের রুটিন এডিট/ডিলিট করুন।</p>
+            <div id="routineDayTabs" class="flex flex-wrap gap-1 mb-2 border-b border-slate-200 pb-2"></div>
+            <div id="adminRoutineList" class="space-y-2 max-h-[22rem] overflow-y-auto text-xs pr-1"><p class="text-gray-400">Loading...</p></div>
         </div>
 
         <div class="bg-white p-6 rounded-xl shadow border-t-4 border-purple-600 mb-8">
@@ -214,46 +219,91 @@
             e.preventDefault(); try { await addDoc(collection(db, "notices"), { content: document.getElementById('noticeContent').value.trim(), createdAt: new Date().toISOString() }); alert("Notice Broadcasted!"); document.getElementById('noticeForm').reset(); } catch (err) { alert(err.message); }
         });
 
-        // রুটিন লিসেনার (ট্যাগিং এবং এডিট বাটনসহ আপগ্রেড)
-        onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
-            const adminRoutineList = document.getElementById('adminRoutineList');
-            document.getElementById('routineCount').innerText = snapshot.size;
-            const sortedDocs = [...snapshot.docs].sort((a, b) => {
-                const da = a.data(); const db = b.data();
-                if (da.boardType !== db.boardType) return da.boardType === 'permanent' ? -1 : 1;
-                if (da.classDay !== db.classDay) return String(da.classDay || "").localeCompare(String(db.classDay || ""));
-                return compareRoutineByTime(da, db);
-            });
-            adminRoutineList.innerHTML = sortedDocs.map(res => {
-                const data = res.data(); const id = res.id;
-                const isDaily = data.boardType === 'daily';
-                const tagColor = isDaily ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-emerald-100 text-emerald-800 border-emerald-300";
-                const tagLabel = isDaily ? "Daily" : "Permanent";
-                const dayInfo = isDaily ? "" : ` | ${data.classDay || "—"}`;
-                const timeInfo = data.timeSlot ? ` | ${data.timeSlot}` : "";
-                const dataJson = JSON.stringify(data).replace(/"/g, '&quot;');
-                return `
-                    <div class="p-2.5 bg-slate-50 border rounded-lg flex flex-col gap-1.5 shadow-sm">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="font-bold text-gray-800">${data.subject} (${data.courseCode})</p>
-                                <p class="text-[10px] text-gray-400">Room: ${data.room} | Batch: ${data.batchNumber}${dayInfo}${timeInfo}</p>
-                            </div>
-                            <span class="text-[9px] font-bold px-1.5 py-0.5 border rounded ${tagColor}">${tagLabel}</span>
+        const ROUTINE_TAB_ORDER = ["Daily", "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Friday", "Unassigned"];
+        let activeRoutineTab = "Saturday";
+        let cachedRoutineGroups = {};
+
+        function routineTabKey(data) {
+            if (data.boardType === "daily") return "Daily";
+            if (data.classDay && data.classDay !== "N/A") return data.classDay;
+            return "Unassigned";
+        }
+
+        function renderRoutineCard(res) {
+            const data = res.data(); const id = res.id;
+            const isDaily = data.boardType === 'daily';
+            const tagColor = isDaily ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-emerald-100 text-emerald-800 border-emerald-300";
+            const tagLabel = isDaily ? "Daily" : "Permanent";
+            const genderTag = data.gender ? ` | ${data.gender}` : "";
+            const timeInfo = data.timeSlot ? ` | ${data.timeSlot}` : "";
+            const dataJson = JSON.stringify(data).replace(/"/g, '&quot;');
+            return `
+                <div class="p-2.5 bg-slate-50 border rounded-lg flex flex-col gap-1.5 shadow-sm">
+                    <div class="flex justify-between items-start gap-2">
+                        <div class="min-w-0">
+                            <p class="font-bold text-gray-800">${data.subject} (${data.courseCode})</p>
+                            <p class="text-[10px] text-gray-400">Room: ${data.room} | Batch: ${data.batchNumber}${genderTag}${timeInfo}</p>
                         </div>
-                        <div class="flex justify-end space-x-1 gap-1">
-                            <button onclick="openRoutineEditModal('${id}', ${dataJson})" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2 py-0.5 rounded transition text-[10px] font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>
-                            <button onclick="deleteDataDocument('routines', '${id}')" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-2 py-0.5 rounded transition text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Delete</button>
-                        </div>
-                    </div>`;
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 border rounded shrink-0 ${tagColor}">${tagLabel}</span>
+                    </div>
+                    <div class="flex justify-end space-x-1 gap-1">
+                        <button onclick="openRoutineEditModal('${id}', ${dataJson})" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2 py-0.5 rounded transition text-[10px] font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>
+                        <button onclick="deleteDataDocument('routines', '${id}')" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-2 py-0.5 rounded transition text-[10px] font-semibold"><i class="fa-solid fa-trash"></i> Delete</button>
+                    </div>
+                </div>`;
+        }
+
+        function renderRoutineTabBar(groups) {
+            const tabsEl = document.getElementById('routineDayTabs');
+            const tabsWithItems = ROUTINE_TAB_ORDER.filter(key => (groups[key] || []).length > 0);
+            if (!tabsWithItems.includes(activeRoutineTab)) {
+                activeRoutineTab = tabsWithItems[0] || "Saturday";
+            }
+            tabsEl.innerHTML = ROUTINE_TAB_ORDER.map(key => {
+                const count = (groups[key] || []).length;
+                if (!count) return "";
+                const active = key === activeRoutineTab;
+                return `<button type="button" data-routine-tab="${key}" class="routine-tab-btn px-2 py-1 rounded-md text-[10px] font-bold border transition ${active ? 'bg-emerald-700 text-white border-emerald-800' : 'bg-white text-gray-600 border-gray-200 hover:bg-emerald-50'}">${key} <span class="opacity-80">(${count})</span></button>`;
             }).join("");
+            tabsEl.querySelectorAll(".routine-tab-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    activeRoutineTab = btn.dataset.routineTab;
+                    renderRoutineTabBar(cachedRoutineGroups);
+                    renderRoutineListForTab(cachedRoutineGroups);
+                });
+            });
+        }
+
+        function renderRoutineListForTab(groups) {
+            const adminRoutineList = document.getElementById('adminRoutineList');
+            const items = groups[activeRoutineTab] || [];
+            adminRoutineList.innerHTML = items.length
+                ? items.map(renderRoutineCard).join("")
+                : `<p class="text-gray-400 text-center py-4">No routines in "${activeRoutineTab}".</p>`;
+        }
+
+        // রুটিন লিসেনার — দিনভিত্তিক ট্যাব
+        onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
+            document.getElementById('routineCount').innerText = `${snapshot.size} total`;
+            const groups = {};
+            ROUTINE_TAB_ORDER.forEach(k => { groups[k] = []; });
+            const sortedDocs = [...snapshot.docs].sort((a, b) => compareRoutineByTime(a.data(), b.data()));
+            sortedDocs.forEach(res => {
+                const key = routineTabKey(res.data());
+                if (!groups[key]) groups[key] = [];
+                groups[key].push(res);
+            });
+            cachedRoutineGroups = groups;
+            renderRoutineTabBar(groups);
+            renderRoutineListForTab(groups);
         });
 
         // কোর্স ম্যাপিং লিসেনার (এডিট ম্যানেজার প্যানেল)
         onSnapshot(collection(db, "course_mappings"), (snapshot) => {
             const adminMappingList = document.getElementById('adminMappingList');
-            document.getElementById('mappingCount').innerText = snapshot.size;
+            let totalCourses = 0;
             if (snapshot.empty) {
+                document.getElementById('mappingCount').innerText = "0 courses";
                 adminMappingList.innerHTML = '<p class="text-gray-400 text-center py-2">No mappings created.</p>';
                 return;
             }
@@ -261,6 +311,7 @@
             snapshot.forEach((docSnap) => {
                 const docKey = docSnap.id;
                 const courses = docSnap.data().courses || [];
+                totalCourses += courses.length;
                 courses.forEach((course, index) => {
                     const courseJson = JSON.stringify(course).replace(/"/g, '&quot;');
                     rows.push(`
@@ -276,7 +327,12 @@
                         </div>`);
                 });
             });
-            adminMappingList.innerHTML = rows.join("");
+            const semesterCount = snapshot.size;
+            const courseLabel = totalCourses === 1 ? "1 course" : `${totalCourses} courses`;
+            const semLabel = semesterCount === 1 ? "1 semester" : `${semesterCount} semesters`;
+            document.getElementById('mappingCount').innerText = `${courseLabel} · ${semLabel}`;
+            document.getElementById('mappingCount').title = "Courses listed below · semester keys in Firestore";
+            adminMappingList.innerHTML = rows.join("") || '<p class="text-gray-400 text-center py-2">No courses in mappings.</p>';
         });
 
         onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snapshot) => {
