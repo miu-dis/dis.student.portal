@@ -64,10 +64,7 @@
                     <select id="filterTermNum" class="bg-gray-50 border border-gray-300 text-emerald-800 p-2 rounded-lg outline-none">
                         <option value="1st Trimester">1st Trimester</option><option value="2nd Trimester">2nd Trimester</option><option value="3rd Trimester">3rd Trimester</option>
                     </select>
-                    <select id="filterSession" class="bg-gray-50 border border-gray-300 text-emerald-800 p-2 rounded-lg outline-none">
-                        <option value="Spring 2026">Spring 2026</option><option value="Summer 2026">Summer 2026</option><option value="Fall 2026">Fall 2026</option>
-                        <option value="Spring 2027">Spring 2027</option><option value="Summer 2027">Summer 2027</option><option value="Fall 2027">Fall 2027</option>
-                    </select>
+                    <select id="filterSession" class="bg-gray-50 border border-gray-300 text-emerald-800 p-2 rounded-lg outline-none"></select>
                     <span id="displayStudentCurrentSem" class="bg-indigo-50 text-indigo-800 font-bold px-3 py-2 rounded-lg border border-indigo-200 shrink-0">Syncing...</span>
                 </div>
             </div>
@@ -174,7 +171,7 @@
                             <select id="editProfileTermNum" required class="w-full p-1.5 border rounded bg-white text-gray-700"><option value="1st Trimester">1st Trimester</option><option value="2nd Trimester">2nd Trimester</option><option value="3rd Trimester">3rd Trimester</option></select>
                         </div>
                         <div>
-                            <select id="editProfileTerm" required class="w-full p-1.5 border rounded bg-white text-gray-700"><option value="Spring">Spring</option><option value="Summer">Summer</option><option value="Fall">Fall</option></select>
+                            <select id="editProfileTerm" required class="w-full p-1.5 border rounded bg-white text-gray-700"></select>
                         </div>
                         <div>
                             <select id="editProfileSessionYear" required class="w-full p-1.5 border rounded bg-white text-gray-700"><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select>
@@ -390,8 +387,12 @@
         import { auth, db } from "./assets/js/app.js";
         import { formatNoticeContent } from "./assets/js/noticeFormat.js";
         import { uploadPortalFile, deletePortalFile, openResourceFile } from "./assets/js/fileStorage.js";
+        import { fillSessionTermSelect, fillSessionFilterSelect, buildTrimesterKey, normalizeSessionTerm, normalizeTrimesterKey, sessionFilterValue, toLegacyTrimesterKey } from "./assets/js/academicTerms.js";
         import { onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { collection, onSnapshot, query, orderBy, doc, getDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        fillSessionTermSelect(document.getElementById("editProfileTerm"));
+        fillSessionFilterSelect(document.getElementById("filterSession"));
 
         let loggedInUserUID = null; let loggedInUserName = ""; let isProfileIncomplete = false; let base64PicString = "";
         let studentCurrentTrimesterKey = ""; 
@@ -472,7 +473,7 @@
             const yr = document.getElementById('filterYear').value;
             const termNum = document.getElementById('filterTermNum').value;
             const sessionFull = document.getElementById('filterSession').value;
-            return `${yr} - ${termNum} (${sessionFull})`;
+            return normalizeTrimesterKey(`${yr} - ${termNum} (${sessionFull})`);
         }
 
         function buildResourcesByCourse(combinedTrimesterKey) {
@@ -480,7 +481,7 @@
             if (!resourcesSnapshot) return byCourse;
             resourcesSnapshot.forEach(resDoc => {
                 const rData = { id: resDoc.id, ...resDoc.data() };
-                if (rData.semester !== combinedTrimesterKey) return;
+                if (normalizeTrimesterKey(rData.semester) !== normalizeTrimesterKey(combinedTrimesterKey)) return;
                 const code = rData.courseCode;
                 if (!byCourse[code]) byCourse[code] = [];
                 byCourse[code].push(rData);
@@ -661,10 +662,20 @@
             if (delBtn) { deleteResourceById(delBtn.dataset.deleteResource); }
         });
 
+        async function fetchCourseMappingForKey(key) {
+            let mapDoc = await getDoc(doc(db, "course_mappings", key));
+            if (mapDoc.exists()) return mapDoc;
+            const legacyKey = toLegacyTrimesterKey(key);
+            if (legacyKey && legacyKey !== key) {
+                mapDoc = await getDoc(doc(db, "course_mappings", legacyKey));
+            }
+            return mapDoc;
+        }
+
         async function updateFiltersAndListen() {
             const key = getCombinedTrimesterKey();
             try {
-                const mapDoc = await getDoc(doc(db, "course_mappings", key));
+                const mapDoc = await fetchCourseMappingForKey(key);
                 latestMappedCourses = mapDoc.exists() ? (mapDoc.data().courses || []) : [];
                 renderCourseGrid();
             } catch (err) {
@@ -873,10 +884,10 @@
             if (userDoc.exists()) {
                     const uData = userDoc.data(); if (uData.role === 'admin') { window.location.replace("./admin-dashboard.html"); return; }
                     loggedInUserName = (uData.name || "").trim();
-                    const uYear = uData.profileYear || "1st Year"; const uTermNum = uData.profileTermNum || "1st Trimester"; const uSess = uData.profileTerm || "Spring"; const uSessYear = uData.profileSessionYear || "2026";
+                    const uYear = uData.profileYear || "1st Year"; const uTermNum = uData.profileTermNum || "1st Trimester"; const uSess = normalizeSessionTerm(uData.profileTerm || "Spring"); const uSessYear = uData.profileSessionYear || "2026";
                     studentCurrentTrimesterKey = uData.trimester && uData.trimester.includes("(")
-                        ? uData.trimester
-                        : `${uYear} - ${uTermNum} (${uSess} ${uSessYear})`;
+                        ? normalizeTrimesterKey(uData.trimester)
+                        : buildTrimesterKey(uYear, uTermNum, uSess, uSessYear);
                     document.getElementById('displayStudentCurrentSem').innerText = uData.profileYear ? `${uYear} - ${uTermNum}` : window.portalT('profileIncomplete');
 
                     if(!uData.phone || !uData.bloodGroup || !uData.emergencyPhone || !uData.profileYear || !uData.profileTermNum) {
@@ -888,7 +899,7 @@
                     document.getElementById('openProfileEditBtn').addEventListener('click', () => {
                         document.getElementById('editProfileName').value = uData.name || ""; document.getElementById('editProfileUID').value = uData.universityUID || ""; document.getElementById('editProfileBatch').value = uData.batchNumber || "";
                         document.getElementById('editProfilePhone').value = uData.phone || ""; document.getElementById('editProfileBlood').value = uData.bloodGroup || ""; document.getElementById('editProfileEmergencyName').value = uData.emergencyName || ""; document.getElementById('editProfileEmergencyPhone').value = uData.emergencyPhone || "";
-                        document.getElementById('editProfileYear').value = uData.profileYear || "1st Year"; document.getElementById('editProfileTermNum').value = uData.profileTermNum || "1st Trimester"; document.getElementById('editProfileTerm').value = uData.profileTerm || "Spring"; document.getElementById('editProfileSessionYear').value = uData.profileSessionYear || "2026";
+                        document.getElementById('editProfileYear').value = uData.profileYear || "1st Year"; document.getElementById('editProfileTermNum').value = uData.profileTermNum || "1st Trimester"; fillSessionTermSelect(document.getElementById('editProfileTerm'), uData.profileTerm); document.getElementById('editProfileSessionYear').value = uData.profileSessionYear || "2026";
                         if(uData.profilePic) { document.getElementById('avatarPreview').src = uData.profilePic; base64PicString = uData.profilePic; }
                         if(isProfileIncomplete) document.getElementById('btnCancelProfile').classList.add('hidden'); else document.getElementById('btnCancelProfile').classList.remove('hidden');
                         document.getElementById('profileModal').className = "fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm";
@@ -898,7 +909,7 @@
 
                     document.getElementById('filterYear').value = uYear;
                     document.getElementById('filterTermNum').value = uTermNum;
-                    document.getElementById('filterSession').value = `${uSess} ${uSessYear}`;
+                    fillSessionFilterSelect(document.getElementById('filterSession'), sessionFilterValue(uSess, uSessYear));
                     await updateFiltersAndListen();
                     renderCourseGrid();
                     document.body.classList.remove('invisible');
@@ -918,7 +929,7 @@
                 await updateDoc(doc(db, "users", loggedInUserUID), {
                     name: document.getElementById('editProfileName').value.trim(), universityUID: document.getElementById('editProfileUID').value.trim(), batchNumber: document.getElementById('editProfileBatch').value.trim(),
                     profileYear: document.getElementById('editProfileYear').value, profileTermNum: document.getElementById('editProfileTermNum').value, profileTerm: document.getElementById('editProfileTerm').value, profileSessionYear: document.getElementById('editProfileSessionYear').value,
-                    trimester: `${document.getElementById('editProfileYear').value} - ${document.getElementById('editProfileTermNum').value} (${document.getElementById('editProfileTerm').value} ${document.getElementById('editProfileSessionYear').value})`,
+                    trimester: buildTrimesterKey(document.getElementById('editProfileYear').value, document.getElementById('editProfileTermNum').value, document.getElementById('editProfileTerm').value, document.getElementById('editProfileSessionYear').value),
                     phone: document.getElementById('editProfilePhone').value.trim(), bloodGroup: document.getElementById('editProfileBlood').value, emergencyName: document.getElementById('editProfileEmergencyName').value.trim(), emergencyPhone: document.getElementById('editProfileEmergencyPhone').value.trim(), profilePic: base64PicString
                 });
                 alert(window.portalT('alertProfileSaved')); window.location.reload();
