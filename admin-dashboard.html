@@ -28,7 +28,7 @@
                     <input type="text" id="subject" placeholder="Subject Name" required class="p-2 border rounded"><input type="text" id="courseCode" placeholder="Course Code" required class="p-2 border rounded"><input type="text" id="room" placeholder="Room No" required class="p-2 border rounded"><input type="text" id="batchNumber" placeholder="Batch" required class="p-2 border rounded"><input type="text" id="teacherCode" placeholder="Teacher Name/Code" required class="p-2 border rounded">
                     <select id="classDay" class="p-2 border rounded"><option value="N/A">Not Applicable</option><option value="Saturday">Saturday</option><option value="Sunday">Sunday</option><option value="Monday">Monday</option><option value="Tuesday">Tuesday</option><option value="Wednesday">Wednesday</option><option value="Friday">Friday</option></select>
                     <input type="time" id="startTime" required class="p-2 border rounded"><input type="time" id="endTime" required class="p-2 border rounded">
-                    <select id="gender" class="p-2 border rounded"><option value="Male">Male</option><option value="Female">Female</option></select><select id="boardType" class="p-2 border rounded"><option value="daily">Daily Adjustment</option><option value="permanent">Permanent Board</option></select>
+                    <select id="gender" class="p-2 border rounded"><option value="Male">Male</option><option value="Female">Female</option><option value="Combined">Combined</option></select><select id="boardType" class="p-2 border rounded"><option value="daily">Daily Adjustment</option><option value="permanent">Permanent Board</option></select>
                     <button type="submit" class="md:col-span-2 bg-emerald-700 text-white py-2 rounded font-bold">Publish Schedule</button>
                 </form>
             </div>
@@ -331,6 +331,14 @@
                     <div><label class="font-bold text-gray-600">Batch Number</label><input type="text" id="m_routine_batch" value="${data.batchNumber}" class="w-full p-2 border rounded"></div>
                     <div><label class="font-bold text-gray-600">Teacher Code</label><input type="text" id="m_routine_teacher" value="${data.teacherCode}" class="w-full p-2 border rounded"></div>
                     <div>
+                        <label class="font-bold text-gray-600">Section</label>
+                        <select id="m_routine_gender" class="w-full p-2 border rounded bg-white">
+                            <option value="Male" ${data.gender === 'Male' ? 'selected' : ''}>Male</option>
+                            <option value="Female" ${data.gender === 'Female' ? 'selected' : ''}>Female</option>
+                            <option value="Combined" ${data.gender === 'Combined' ? 'selected' : ''}>Combined</option>
+                        </select>
+                    </div>
+                    <div>
                         <label class="font-bold text-gray-600">Routine Type</label>
                         <select id="m_routine_board" class="w-full p-2 border rounded bg-white">
                             <option value="daily" ${data.boardType === 'daily' ? 'selected' : ''}>Daily Adjustment</option>
@@ -413,6 +421,7 @@
                         room: document.getElementById('m_routine_room').value.trim(),
                         batchNumber: document.getElementById('m_routine_batch').value.trim(),
                         teacherCode: document.getElementById('m_routine_teacher').value.trim(),
+                        gender: document.getElementById('m_routine_gender').value,
                         boardType: document.getElementById('m_routine_board').value,
                         rawStartTime: sTime,
                         rawEndTime: eTime,
