@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DIS Portal - Secure Gateway</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/portal-ui.css">
 </head>
-<body class="bg-slate-900 flex flex-col items-center justify-center min-h-screen p-4 transition-all duration-300">
+<body class="portal-page-enter bg-slate-900 flex flex-col items-center justify-center min-h-screen p-4">
 
     <div class="absolute top-4 right-4 bg-slate-800 shadow rounded-lg p-1 flex items-center space-x-1 border border-slate-700">
         <span class="text-sm px-2">🌐</span>
@@ -17,7 +18,7 @@
         </select>
     </div>
 
-    <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700">
+    <div class="portal-card bg-slate-800 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-slate-700">
         
         <div class="flex justify-center mb-6">
             <img src="assets/img/logo.png" alt="University Logo" class="h-24 w-auto mx-auto transition-all duration-300">
@@ -37,7 +38,7 @@
                 <label id="lblAdminPassword" class="block text-sm font-medium text-slate-300 mb-1">Master Password</label>
                 <input type="password" id="adminPassword" required class="w-full bg-slate-900 text-white px-4 py-2.5 border border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none transition" placeholder="••••••••">
             </div>
-            <button type="submit" id="btnAdminLogin" class="w-full bg-emerald-600 text-white py-2.5 rounded-lg font-semibold hover:bg-emerald-700 transition shadow-lg shadow-emerald-900/30 mt-2">Verify & Enter</button>
+            <button type="submit" id="btnAdminLogin" class="portal-btn w-full bg-emerald-600 text-white py-2.5 rounded-lg font-semibold hover:bg-emerald-700 shadow-lg shadow-emerald-900/30 mt-2">Verify & Enter</button>
         </form>
 
     </div>
@@ -146,6 +147,10 @@
                 console.error(error);
             }
         });
+    </script>
+    <script type="module">
+        import { initPortalUI } from "./assets/js/portal-ui.js";
+        initPortalUI();
     </script>
 </body>
 </html>
