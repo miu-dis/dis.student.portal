@@ -1,5 +1,5 @@
 /**
- * Shared UI: mobile-friendly nav menu, ripple, modals, stagger grids
+ * Shared UI: mobile-friendly nav menu, ripple, modals
  */
 export function initPortalNavMenu(options = {}) {
     const btn = document.getElementById(options.triggerId || "navMenuBtn");
@@ -13,9 +13,36 @@ export function initPortalNavMenu(options = {}) {
     panel.classList.remove("hidden");
     if (backdrop) backdrop.classList.remove("hidden");
 
+    /** Fixed menus must be on body — avoids clip/transform bugs on mobile */
+    if (backdrop && backdrop.parentElement !== document.body) {
+        document.body.appendChild(backdrop);
+    }
+    if (panel.parentElement !== document.body) {
+        document.body.appendChild(panel);
+    }
+
+    const isMobile = () => window.matchMedia("(max-width: 639px)").matches;
+
+    const positionPanel = () => {
+        if (isMobile()) {
+            panel.style.top = "";
+            panel.style.right = "";
+            panel.style.left = "";
+            panel.style.bottom = "";
+            return;
+        }
+        const rect = btn.getBoundingClientRect();
+        const gap = 8;
+        panel.style.top = `${Math.round(rect.bottom + gap)}px`;
+        panel.style.right = `${Math.round(Math.max(12, window.innerWidth - rect.right))}px`;
+        panel.style.left = "auto";
+        panel.style.bottom = "auto";
+    };
+
     const isOpen = () => panel.classList.contains("is-open");
 
     const setOpen = (open) => {
+        if (open) positionPanel();
         panel.classList.toggle("is-open", open);
         panel.setAttribute("aria-hidden", open ? "false" : "true");
         btn.setAttribute("aria-expanded", open ? "true" : "false");
@@ -23,15 +50,20 @@ export function initPortalNavMenu(options = {}) {
             backdrop.classList.toggle("is-open", open);
             backdrop.setAttribute("aria-hidden", open ? "false" : "true");
         }
-        document.body.classList.toggle("portal-menu-open", open);
+        document.body.classList.toggle("portal-menu-open", open && isMobile());
     };
 
     const close = () => setOpen(false);
-    const toggle = () => setOpen(!isOpen());
+    let ignoreOutsideClick = false;
 
     btn.addEventListener("click", (e) => {
+        e.preventDefault();
         e.stopPropagation();
-        toggle();
+        ignoreOutsideClick = true;
+        setOpen(!isOpen());
+        setTimeout(() => {
+            ignoreOutsideClick = false;
+        }, 0);
     });
 
     if (backdrop) {
@@ -39,7 +71,7 @@ export function initPortalNavMenu(options = {}) {
     }
 
     document.addEventListener("click", (e) => {
-        if (!isOpen()) return;
+        if (ignoreOutsideClick || !isOpen()) return;
         if (panel.contains(e.target) || btn.contains(e.target)) return;
         close();
     });
@@ -48,9 +80,13 @@ export function initPortalNavMenu(options = {}) {
         if (e.key === "Escape" && isOpen()) close();
     });
 
+    window.addEventListener("resize", () => {
+        if (isOpen()) positionPanel();
+    });
+
     panel.addEventListener("click", (e) => {
         e.stopPropagation();
-        if (e.target.closest("button, a[href]") && !e.target.closest("select")) {
+        if (e.target.closest("#openProfileEditBtn, #logoutBtn, a[href]")) {
             close();
         }
     });
@@ -88,16 +124,21 @@ export function initRipple(selector = ".portal-ripple-host, .portal-btn") {
 }
 
 export function initModalAnimations() {
-    document.querySelectorAll("#shareModal, #profileModal").forEach((modal) => {
-        modal.classList.add("portal-modal-backdrop");
+    document.querySelectorAll("#shareModal, #profileModal, #editModal").forEach((modal) => {
+        if (!modal.classList.contains("portal-modal-backdrop")) {
+            modal.classList.add("portal-modal-backdrop");
+        }
         const inner = modal.querySelector(":scope > div");
-        if (inner) inner.classList.add("portal-modal-panel");
+        if (inner && !inner.classList.contains("portal-modal-panel")) {
+            inner.classList.add("portal-modal-panel");
+        }
     });
 }
 
 export function initNavScrollShadow(navSelector = "nav") {
     const nav = document.querySelector(navSelector);
     if (!nav) return;
+    nav.classList.add("portal-nav-root");
     const onScroll = () => {
         nav.classList.toggle("portal-nav-scrolled", window.scrollY > 8);
     };
@@ -113,7 +154,6 @@ export function initPortalUI() {
     document.body.classList.add("portal-page-enter");
 }
 
-/** Call after dynamic HTML (e.g. login buttons in nav) */
 export function refreshPortalUI() {
     initPortalNavMenu();
     initRipple();
