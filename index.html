@@ -6,6 +6,7 @@
     <title>Islamic Studies Study Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/portal-ui.css">
     <style>
         /* Tailwind CDN ব্যর্থ হলেও মৌলিক ডিজাইন দৃশ্যমান থাকবে */
         body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #f9fafb; color: #1f2937; }
@@ -14,31 +15,35 @@
         header { background: linear-gradient(to right, #065f46, #0f766e); color: #fff; }
         select, input, button { font: inherit; }
         #courseGrid > p { padding: 1rem; color: #6b7280; }
-        #navMenuBtn.flex { display: flex; }
+        #navMenuBtn.flex { display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans" id="studentAppBody">
 
-    <nav class="bg-emerald-800 text-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-3 gap-2">
-                <img src="assets/img/logo.png" alt="University Logo" class="h-10 w-auto ml-2"> 
-                <h1 id="navTitle" class="text-xl font-bold tracking-wide">DIS Study Portal</h1>
+    <nav class="bg-emerald-800 text-white shadow-lg sticky top-0 z-50 transition-shadow duration-300">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center gap-3">
+            <div class="flex items-center space-x-3 gap-2 min-w-0">
+                <img src="assets/img/logo.png" alt="University Logo" class="h-10 w-auto ml-2 shrink-0"> 
+                <h1 id="navTitle" class="text-lg sm:text-xl font-bold tracking-wide truncate">DIS Study Portal</h1>
             </div>
-            <div class="flex items-center relative">
-                <a href="login.html" id="btnNavLogin" class="bg-white text-emerald-800 px-4 py-1.5 rounded-lg font-semibold hover:bg-emerald-50 transition shadow text-sm">Login / Register</a>
-                <button type="button" id="navMenuBtn" class="hidden h-10 w-10 items-center justify-center rounded-lg bg-emerald-900/90 hover:bg-emerald-950 border border-emerald-600 text-lg" aria-label="Menu" aria-expanded="false">
-                    <i class="fa-solid fa-ellipsis-vertical"></i>
+            <div class="flex items-center relative shrink-0">
+                <a href="login.html" id="btnNavLogin" class="portal-btn portal-btn-light bg-white text-emerald-800 px-4 py-2 rounded-lg font-semibold hover:bg-emerald-50 shadow text-sm">Login / Register</a>
+                <button type="button" id="navMenuBtn" class="portal-menu-trigger portal-btn hidden h-11 w-11 items-center justify-center rounded-xl bg-emerald-900/90 hover:bg-emerald-950 border border-emerald-600 text-lg ml-0" aria-label="Menu" aria-expanded="false" aria-controls="navMenuDropdown">
+                    <i class="fa-solid fa-bars"></i>
                 </button>
-                <div id="navMenuDropdown" class="hidden absolute right-0 top-full mt-2 w-52 bg-white text-gray-800 rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-[70]">
-                    <div class="px-3 py-2.5 border-b border-gray-100 bg-gray-50">
-                        <label id="lblNavLang" class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">Language</label>
-                        <select id="langSelector" class="w-full mt-1 text-xs font-semibold border border-gray-200 rounded-lg p-2 text-emerald-900 bg-white outline-none cursor-pointer">
-                            <option value="en">English</option>
-                            <option value="bn">বাংলা</option>
-                        </select>
+                <div id="navMenuBackdrop" class="portal-menu-backdrop hidden" aria-hidden="true"></div>
+                <div id="navMenuDropdown" class="portal-menu-panel hidden bg-white text-gray-800 rounded-xl shadow-2xl border border-gray-100 overflow-hidden" role="menu" aria-hidden="true">
+                    <div class="portal-menu-stagger">
+                        <div class="px-3 py-3 border-b border-gray-100 bg-gradient-to-b from-gray-50 to-white">
+                            <p id="lblNavMenuTitle" class="text-[10px] font-bold text-emerald-800 uppercase tracking-wide mb-2">Menu</p>
+                            <label id="lblNavLang" class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">Language</label>
+                            <select id="langSelector" class="portal-field w-full mt-1 text-xs font-semibold border border-gray-200 rounded-lg p-2.5 text-emerald-900 bg-white outline-none cursor-pointer">
+                                <option value="en">English</option>
+                                <option value="bn">বাংলা</option>
+                            </select>
+                        </div>
+                        <div id="navAuthButtons" class="py-1"></div>
                     </div>
-                    <div id="navAuthButtons" class="py-1"></div>
                 </div>
             </div>
         </div>
@@ -58,18 +63,18 @@
     </header>
 
     <main class="container mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="bg-white rounded-xl shadow-md p-5 border-t-4 border-emerald-600">
+        <div class="portal-card bg-white rounded-xl shadow-md p-5 border-t-4 border-emerald-600">
             <h3 id="lblNoticeBoard" class="text-lg font-bold text-gray-900 mb-3 flex items-center">📢 Notice Board</h3>
             <div id="noticeList" class="space-y-3 overflow-y-auto max-h-48 p-1"><p class="text-xs text-gray-400">Loading notices...</p></div>
         </div>
-        <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-5 border-t-4 border-amber-500">
+        <div class="portal-card lg:col-span-2 bg-white rounded-xl shadow-md p-5 border-t-4 border-amber-500">
             <h3 id="lblDailyRoutine" class="text-lg font-bold text-gray-900 mb-3 flex items-center">⏳ Daily Routine Update</h3>
             <div id="dailyRoutineList" class="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto max-h-48 p-1"><p class="text-xs text-gray-400">Loading today's updates...</p></div>
         </div>
     </main>
 
     <section class="container mx-auto px-4 pb-12">
-        <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-indigo-600">
+        <div class="portal-card bg-white rounded-xl shadow-md p-6 border-t-4 border-indigo-600">
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 pb-4 border-b border-gray-200 gap-4">
                 <div>
                     <h3 id="lblCourses" class="text-2xl font-bold text-emerald-800 mb-0.5">Academic Resources Directory</h3>
@@ -96,14 +101,14 @@
                 </div>
             </div>
             
-            <div id="courseGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div id="courseGrid" class="portal-stagger-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <p class="text-xs text-gray-400 p-2">Loading academic course archive...</p>
             </div>
         </div>
     </section>
 
     <section class="container mx-auto px-4 pb-12">
-        <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-teal-600">
+        <div class="portal-card bg-white rounded-xl shadow-md p-6 border-t-4 border-teal-600">
             <div class="border-b pb-3 mb-6"><h3 id="lblPermanentRoutine" class="text-xl font-bold text-emerald-800">📅 Permanent Weekly Schedule Board</h3></div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="weeklyRoutineGrid">
                 <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col min-h-0"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 shrink-0" id="dayLabel-Saturday">Saturday</h4><div id="day-Saturday" class="space-y-2 text-xs text-gray-500 flex-1 min-h-0 max-h-[28rem] overflow-y-auto pr-1">No classes.</div></div>
@@ -119,13 +124,13 @@
 
     <div id="courseDetailView" class="hidden pb-12 bg-gray-50 min-h-[60vh]">
         <div class="container mx-auto px-4 pt-5">
-            <button type="button" id="courseDetailBack" class="inline-flex items-center gap-2 text-sm font-bold text-emerald-800 hover:text-emerald-600 mb-4">
+            <button type="button" id="courseDetailBack" class="portal-btn inline-flex items-center gap-2 text-sm font-bold text-emerald-800 hover:text-emerald-600 mb-4 px-2 py-1 rounded-lg hover:bg-emerald-50">
                 <i class="fa-solid fa-arrow-left"></i> <span id="courseDetailBackLbl">Back to courses</span>
             </button>
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <aside class="lg:col-span-4 space-y-3">
                     <div id="courseDetailMeta" class="bg-white rounded-xl shadow-md p-5 border-t-4 border-indigo-600 text-sm"></div>
-                    <button type="button" id="courseDetailUpload" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-lg shadow flex items-center justify-center gap-2">
+                    <button type="button" id="courseDetailUpload" class="portal-btn w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-lg shadow flex items-center justify-center gap-2">
                         <i class="fa-solid fa-plus-circle"></i> <span id="courseDetailUploadLbl">Add Note / Link</span>
                     </button>
                 </aside>
@@ -137,8 +142,8 @@
         </div>
     </div>
 
-    <div id="shareModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
+    <div id="shareModal" class="portal-modal-backdrop fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="portal-modal-panel bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
             <h3 id="sm_title" class="text-lg font-bold text-indigo-900 mb-4 border-b pb-2 flex items-center"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> Share / Upload Study Material</h3>
             
             <form id="resourceShareForm" class="space-y-3 text-xs" data-edit-id="">
@@ -169,8 +174,8 @@
                 <div class="bg-slate-50 p-3 rounded-xl border border-dashed border-slate-300 space-y-2">
                     <label id="lblUploadMethod" class="block font-bold text-gray-700 mb-1">Choose upload method:</label>
                     <div class="grid grid-cols-2 gap-2 mb-2">
-                        <button type="button" onclick="switchUploadMethod('file')" id="methodFileBtn" class="py-2 text-center text-[11px] font-bold rounded-lg bg-indigo-100 text-indigo-800 border border-indigo-300 w-full">📁 Direct File</button>
-                        <button type="button" onclick="switchUploadMethod('link')" id="methodLinkBtn" class="py-2 text-center text-[11px] font-bold rounded-lg bg-gray-100 text-gray-600 border border-gray-300 w-full">🔗 Cloud Link</button>
+                        <button type="button" onclick="switchUploadMethod('file')" id="methodFileBtn" class="portal-btn py-2 text-center text-[11px] font-bold rounded-lg bg-indigo-100 text-indigo-800 border border-indigo-300 w-full">📁 Direct File</button>
+                        <button type="button" onclick="switchUploadMethod('link')" id="methodLinkBtn" class="portal-btn py-2 text-center text-[11px] font-bold rounded-lg bg-gray-100 text-gray-600 border border-gray-300 w-full">🔗 Cloud Link</button>
                     </div>
 
                     <div id="uploadFileSection">
@@ -189,15 +194,15 @@
                 </div>
 
                 <div class="flex justify-end space-x-2 pt-2 border-t">
-                    <button type="button" onclick="closeShareModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold transition" id="sm_cancel">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition" id="sm_submit">Publish Live</button>
+                    <button type="button" onclick="closeShareModal()" class="portal-btn px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold" id="sm_cancel">Cancel</button>
+                    <button type="submit" class="portal-btn px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold" id="sm_submit">Publish Live</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="profileModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative max-h-[90vh] overflow-y-auto">
+    <div id="profileModal" class="portal-modal-backdrop fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
+        <div class="portal-modal-panel bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative max-h-[90vh] overflow-y-auto">
             <h3 id="m_title" class="text-lg font-bold text-emerald-800 mb-4 border-b pb-2 flex items-center"><i class="fa-solid fa-id-card mr-2"></i> My Personal Profile Card</h3>
             <form id="profileEditForm" class="space-y-3 text-xs">
                 <div class="flex items-center space-x-4 bg-slate-50 p-2.5 rounded-xl border border-dashed">
@@ -248,8 +253,8 @@
                     <div class="relative"><input type="password" id="newProfilePassword" class="w-full p-2 border border-gray-300 rounded pr-10"><button type="button" onclick="toggleProfilePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"><i id="eyeIconProfile" class="fa-solid fa-eye-slash"></i></button></div>
                 </div>
                 <div class="flex justify-end space-x-2 pt-2 border-t">
-                    <button type="button" id="btnCancelProfile" onclick="closeProfileModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold transition">Cancel</button>
-                    <button type="submit" id="btnSaveProfileText" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-semibold transition">Save Profile Info</button>
+                    <button type="button" id="btnCancelProfile" onclick="closeProfileModal()" class="portal-btn px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold">Cancel</button>
+                    <button type="submit" id="btnSaveProfileText" class="portal-btn px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-semibold">Save Profile Info</button>
                 </div>
             </form>
         </div>
@@ -287,7 +292,7 @@
                 sat: "Saturday", sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", fri: "Friday", friWeekend: "Weekend",
                 noCourses: "No live courses mapped for this semester yet (admin panel).", noSharedFiles: "No shared files yet.", activeCourse: "Active Course", faculty: "Faculty",
                 btnAddResource: "Upload", btnViewMaterials: "View materials", resourceCount: "shared items", sharedAcrossSemesters: "Same course in other semesters shares these files.",
-                courseDetailResourcesTitle: "Study materials by type", courseDetailBack: "Back to courses", lblNavLang: "Language",
+                courseDetailResourcesTitle: "Study materials by type", courseDetailBack: "Back to courses", lblNavLang: "Language", lblNavMenuTitle: "Account & settings",
                 loginToUpload: "Login to upload", uploadOwnSemOnly: "Upload only in your running semester",
                 m_title: "My Personal Profile Card", m_pic: "Upload Profile Picture", m_name: "Full Name", m_uid: "University ID (UID)", m_batch: "Batch Number",
                 m_academic_title: "Academic Trimester Status", m_emg_title: "⚠️ Emergency Data", m_phone: "My Mobile Number", m_emg_name: "Emergency Contact Name",
@@ -324,7 +329,7 @@
                 sat: "শনিবার", sun: "রবিবার", mon: "সোমবার", tue: "মঙ্গলবার", wed: "বুধবার", fri: "শুক্রবার", friWeekend: "উইকেন্ড",
                 noCourses: "এই সেমিস্টারে এখনো কোনো কোর্স ম্যাপ করা হয়নি (অ্যাডমিন প্যানেল)।", noSharedFiles: "এখনো কোনো শেয়ার নেই।", activeCourse: "সক্রিয় কোর্স", faculty: "শিক্ষক",
                 btnAddResource: "আপলোড", btnViewMaterials: "মেটেরিয়াল দেখুন", resourceCount: "টি শেয়ার", sharedAcrossSemesters: "একই কোর্স অন্য সেমিস্টার/বছরে থাকলেও একই ফাইল দেখা যাবে।",
-                courseDetailResourcesTitle: "ধরন অনুযায়ী রিসোর্স", courseDetailBack: "কোর্স তালিকায় ফিরুন", lblNavLang: "ভাষা",
+                courseDetailResourcesTitle: "ধরন অনুযায়ী রিসোর্স", courseDetailBack: "কোর্স তালিকায় ফিরুন", lblNavLang: "ভাষা", lblNavMenuTitle: "অ্যাকাউন্ট ও সেটিংস",
                 loginToUpload: "আপলোডের জন্য লগইন করুন", uploadOwnSemOnly: "শুধু আপনার রানিং সেমিস্টারে আপলোড",
                 m_title: "আমার প্রোফাইল", m_pic: "প্রোফাইল ছবি (ঐচ্ছিক)", m_name: "পূর্ণ নাম", m_uid: "ইউনিভার্সিটি আইডি", m_batch: "ব্যাচ নম্বর",
                 m_academic_title: "একাডেমিক সেশন (বর্ষ / ট্রাইমেস্টার / সেশন / সাল)", m_emg_title: "⚠️ জরুরি তথ্য", m_phone: "আমার মোবাইল",
@@ -376,6 +381,8 @@
             document.getElementById('dayLabel-Friday').innerHTML = `${t.fri} <span class="text-[10px] font-semibold opacity-90">(${t.friWeekend})</span>`;
             const lblNavLang = document.getElementById('lblNavLang');
             if (lblNavLang) lblNavLang.innerText = t.lblNavLang;
+            const lblNavMenuTitle = document.getElementById("lblNavMenuTitle");
+            if (lblNavMenuTitle) lblNavMenuTitle.innerText = t.lblNavMenuTitle;
             const courseDetailBackLbl = document.getElementById('courseDetailBackLbl');
             if (courseDetailBackLbl) courseDetailBackLbl.innerText = t.courseDetailBack;
             const courseDetailUploadLbl = document.getElementById('courseDetailUploadLbl');
@@ -445,24 +452,6 @@
         if (langSelectorInit) langSelectorInit.value = savedLang;
         applyLanguage(savedLang);
 
-        function setupNavMenu() {
-            const btn = document.getElementById('navMenuBtn');
-            const menu = document.getElementById('navMenuDropdown');
-            if (!btn || !menu || btn.dataset.bound === '1') return;
-            btn.dataset.bound = '1';
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const open = !menu.classList.contains('hidden');
-                menu.classList.toggle('hidden', open);
-                btn.setAttribute('aria-expanded', open ? 'false' : 'true');
-            });
-            document.addEventListener('click', () => {
-                menu.classList.add('hidden');
-                btn.setAttribute('aria-expanded', 'false');
-            });
-            menu.addEventListener('click', (e) => e.stopPropagation());
-        }
-        setupNavMenu();
 
         function openShareModal() {
             const modal = document.getElementById('shareModal');
@@ -483,6 +472,7 @@
     <script type="module">
         import { auth, db } from "./assets/js/app.js";
         import { formatNoticeContent } from "./assets/js/noticeFormat.js";
+        import { initPortalUI, refreshPortalUI } from "./assets/js/portal-ui.js";
         import { onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { collection, onSnapshot, query, orderBy, doc, getDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -545,6 +535,8 @@
                 if (yearEl && sessionYear) yearEl.value = String(sessionYear);
             };
         }
+
+        initPortalUI();
 
         try {
             fillSessionTermSelect(document.getElementById("editProfileTerm"));
@@ -820,7 +812,7 @@
                 const lockHint = !loggedInUserUID ? t("loginToUpload") : t("uploadOwnSemOnly");
 
                 cards.push(`
-                    <div class="border border-gray-200 rounded-xl p-4 bg-gray-50 flex flex-col justify-between hover:shadow-md hover:border-indigo-600 transition duration-200">
+                    <div class="portal-card border border-gray-200 rounded-xl p-4 bg-gray-50 flex flex-col justify-between hover:border-indigo-600">
                         <div>
                             <div class="flex justify-between items-start gap-2">
                                 <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded">${escapeHtml(course.code)}</span>
@@ -831,11 +823,11 @@
                         </div>
                         <div class="mt-4 pt-2.5 grid grid-cols-2 gap-2">
                             <button type="button" data-view-course="${courseIndex}"
-                                class="border bg-white text-emerald-800 border-emerald-200 hover:bg-emerald-700 hover:text-white text-center text-xs py-2 rounded-lg font-bold transition flex items-center justify-center gap-1">
+                                class="portal-btn border bg-white text-emerald-800 border-emerald-200 hover:bg-emerald-700 hover:text-white text-center text-xs py-2 rounded-lg font-bold flex items-center justify-center gap-1">
                                 <i class="fa-solid fa-folder-open"></i> ${t("btnViewMaterials")}
                             </button>
                             <button type="button" data-upload-course="${courseIndex}" ${canUpload ? "" : `disabled title="${lockHint}"`}
-                                class="border text-center text-xs py-2 rounded-lg font-bold transition flex items-center justify-center gap-1 ${uploadClass}">
+                                class="portal-btn border text-center text-xs py-2 rounded-lg font-bold flex items-center justify-center gap-1 ${uploadClass}">
                                 <i class="fa-solid fa-plus-circle"></i> ${t("btnAddResource")}
                             </button>
                         </div>
@@ -1244,14 +1236,14 @@
                 navMenuBtn.classList.remove("hidden");
                 navMenuBtn.classList.add("flex");
                 document.getElementById("navAuthButtons").innerHTML = `
-                    <button type="button" id="openProfileEditBtn" class="w-full text-left px-3 py-2.5 text-xs font-semibold hover:bg-emerald-50 text-emerald-900 border-b border-gray-50 ${pulseClass}">
+                    <button type="button" id="openProfileEditBtn" class="portal-menu-panel__item portal-btn w-full px-3 py-3 text-xs font-semibold hover:bg-emerald-50 text-emerald-900 border-b border-gray-50 ${pulseClass}">
                         <i class="fa-solid fa-user mr-2"></i>${window.portalT("btnMyProfile")}
                     </button>
-                    <button type="button" id="logoutBtn" class="w-full text-left px-3 py-2.5 text-xs font-semibold hover:bg-red-50 text-red-700">
+                    <button type="button" id="logoutBtn" class="portal-menu-panel__item portal-btn w-full px-3 py-3 text-xs font-semibold hover:bg-red-50 text-red-700">
                         <i class="fa-solid fa-right-from-bracket mr-2"></i>${window.portalT("btnLogout")}
                     </button>`;
                 bindLangSelector();
-                setupNavMenu();
+                refreshPortalUI();
 
                 document.getElementById("openProfileEditBtn").addEventListener("click", () => {
                     document.getElementById("editProfileName").value = uData.name || "";
