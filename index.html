@@ -388,6 +388,7 @@
 
     <script type="module">
         import { auth, db } from "./assets/js/app.js";
+        import { formatNoticeContent } from "./assets/js/noticeFormat.js";
         import { uploadPortalFile, deletePortalFile, openResourceFile } from "./assets/js/fileStorage.js";
         import { onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { collection, onSnapshot, query, orderBy, doc, getDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -855,7 +856,10 @@
         });
         onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
             const noticeContainer = document.getElementById('noticeList'); noticeContainer.innerHTML = '';
-            snapshot.forEach((doc) => { const data = doc.data(); noticeContainer.innerHTML += `<div class="p-2.5 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm text-xs"><p class="font-medium text-gray-800">${data.content}</p></div>`; });
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                noticeContainer.innerHTML += `<div class="p-2.5 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm text-xs"><p class="font-medium text-gray-800 leading-relaxed break-words">${formatNoticeContent(data.content)}</p></div>`;
+            });
         });
 
         // প্রোফাইল ভ্যালিডেশন — লগইন ছাড়া পেজে প্রবেশ বন্ধ
