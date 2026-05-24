@@ -14,6 +14,7 @@
         header { background: linear-gradient(to right, #065f46, #0f766e); color: #fff; }
         select, input, button { font: inherit; }
         #courseGrid > p { padding: 1rem; color: #6b7280; }
+        #navMenuBtn.flex { display: flex; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans" id="studentAppBody">
@@ -24,13 +25,20 @@
                 <img src="assets/img/logo.png" alt="University Logo" class="h-10 w-auto ml-2"> 
                 <h1 id="navTitle" class="text-xl font-bold tracking-wide">DIS Study Portal</h1>
             </div>
-            <div class="flex items-center space-x-4">
-                <select id="langSelector" class="bg-emerald-900 text-white text-sm font-semibold rounded p-1 border border-emerald-700 outline-none cursor-pointer">
-                    <option value="en">English</option>
-                    <option value="bn">বাংলা</option>
-                </select>
-                <div id="navAuthButtons">
-                    <a href="login.html" id="btnNavLogin" class="bg-white text-emerald-800 px-4 py-1.5 rounded-lg font-semibold hover:bg-emerald-50 transition shadow text-sm">Login / Register</a>
+            <div class="flex items-center relative">
+                <a href="login.html" id="btnNavLogin" class="bg-white text-emerald-800 px-4 py-1.5 rounded-lg font-semibold hover:bg-emerald-50 transition shadow text-sm">Login / Register</a>
+                <button type="button" id="navMenuBtn" class="hidden h-10 w-10 items-center justify-center rounded-lg bg-emerald-900/90 hover:bg-emerald-950 border border-emerald-600 text-lg" aria-label="Menu" aria-expanded="false">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+                <div id="navMenuDropdown" class="hidden absolute right-0 top-full mt-2 w-52 bg-white text-gray-800 rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-[70]">
+                    <div class="px-3 py-2.5 border-b border-gray-100 bg-gray-50">
+                        <label id="lblNavLang" class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">Language</label>
+                        <select id="langSelector" class="w-full mt-1 text-xs font-semibold border border-gray-200 rounded-lg p-2 text-emerald-900 bg-white outline-none cursor-pointer">
+                            <option value="en">English</option>
+                            <option value="bn">বাংলা</option>
+                        </select>
+                    </div>
+                    <div id="navAuthButtons" class="py-1"></div>
                 </div>
             </div>
         </div>
@@ -41,6 +49,7 @@
         ⚠️ আপনার প্রোফাইলটি অসম্পূর্ণ! অনুগ্রহ করে 'My Profile' বাটনে ক্লিক করে তথ্য সম্পূর্ণ করুন।
     </div>
 
+    <div id="homeMainContent">
     <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white py-8 text-center shadow-inner">
         <div class="container mx-auto px-4">
             <h2 id="heroTitle" class="text-2xl md:text-3xl font-extrabold mb-2">Islamic Studies Study Portal</h2>
@@ -106,6 +115,27 @@
             </div>
         </div>
     </section>
+    </div>
+
+    <div id="courseDetailView" class="hidden pb-12 bg-gray-50 min-h-[60vh]">
+        <div class="container mx-auto px-4 pt-5">
+            <button type="button" id="courseDetailBack" class="inline-flex items-center gap-2 text-sm font-bold text-emerald-800 hover:text-emerald-600 mb-4">
+                <i class="fa-solid fa-arrow-left"></i> <span id="courseDetailBackLbl">Back to courses</span>
+            </button>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <aside class="lg:col-span-4 space-y-3">
+                    <div id="courseDetailMeta" class="bg-white rounded-xl shadow-md p-5 border-t-4 border-indigo-600 text-sm"></div>
+                    <button type="button" id="courseDetailUpload" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-lg shadow flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus-circle"></i> <span id="courseDetailUploadLbl">Add Note / Link</span>
+                    </button>
+                </aside>
+                <div class="lg:col-span-8">
+                    <h3 id="courseDetailResourcesTitle" class="text-lg font-bold text-emerald-800 mb-3">Shared materials</h3>
+                    <div id="courseDetailResources" class="space-y-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="shareModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
@@ -254,9 +284,11 @@
                 heroTitle: "Islamic Studies Study Portal", heroSubtitle: "Open platform to share class notes and lectures.",
                 lblNoticeBoard: "📢 Notice Board", lblDailyRoutine: "⏳ Daily Routine Update", lblPermanentRoutine: "📅 Permanent Weekly Schedule Board",
                 lblCourses: "Class Shared Resources Archive", lblSubTitleCourses: "Select year, trimester and session above to browse any semester.",
-                sat: "Saturday", sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", fri: "Friday",
+                sat: "Saturday", sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", fri: "Friday", friWeekend: "Weekend",
                 noCourses: "No live courses mapped for this semester yet (admin panel).", noSharedFiles: "No shared files yet.", activeCourse: "Active Course", faculty: "Faculty",
-                btnAddResource: "Add Note / Link", loginToUpload: "Login to upload", uploadOwnSemOnly: "Upload only in your running semester",
+                btnAddResource: "Upload", btnViewMaterials: "View materials", resourceCount: "shared items", sharedAcrossSemesters: "Same course in other semesters shares these files.",
+                courseDetailResourcesTitle: "Study materials by type", courseDetailBack: "Back to courses", lblNavLang: "Language",
+                loginToUpload: "Login to upload", uploadOwnSemOnly: "Upload only in your running semester",
                 m_title: "My Personal Profile Card", m_pic: "Upload Profile Picture", m_name: "Full Name", m_uid: "University ID (UID)", m_batch: "Batch Number",
                 m_academic_title: "Academic Trimester Status", m_emg_title: "⚠️ Emergency Data", m_phone: "My Mobile Number", m_emg_name: "Emergency Contact Name",
                 m_emg_phone: "Emergency Contact Mobile", m_pass_title: "🔒 Change Password (optional)", m_pass_ph: "Min. 6 characters",
@@ -289,9 +321,11 @@
                 heroTitle: "ইসলামিক স্টাডিজ বিভাগ পোর্টাল", heroSubtitle: "সহপাঠীদের মাঝে ক্লাস নোট ও লেকচার শেয়ার করার উন্মুক্ত প্ল্যাটফর্ম।",
                 lblNoticeBoard: "📢 নোটিশ বোর্ড", lblDailyRoutine: "⏳ আজকের সাময়িক রুটিন", lblPermanentRoutine: "📅 স্থায়ী সাপ্তাহিক রুটিন বোর্ড",
                 lblCourses: "ক্লাস শেয়ারড রিসোর্স আর্কাইভ", lblSubTitleCourses: "উপরের বছর, ট্রাইমেস্টার ও সেশন সিলেক্ট করে যেকোনো সেমিস্টারের ফাইল দেখুন।",
-                sat: "শনিবার", sun: "রবিবার", mon: "সোমবার", tue: "মঙ্গলবার", wed: "বুধবার", fri: "শুক্রবার",
+                sat: "শনিবার", sun: "রবিবার", mon: "সোমবার", tue: "মঙ্গলবার", wed: "বুধবার", fri: "শুক্রবার", friWeekend: "উইকেন্ড",
                 noCourses: "এই সেমিস্টারে এখনো কোনো কোর্স ম্যাপ করা হয়নি (অ্যাডমিন প্যানেল)।", noSharedFiles: "এখনো কোনো শেয়ার নেই।", activeCourse: "সক্রিয় কোর্স", faculty: "শিক্ষক",
-                btnAddResource: "নোট / লিংক যোগ করুন", loginToUpload: "আপলোডের জন্য লগইন করুন", uploadOwnSemOnly: "শুধু আপনার রানিং সেমিস্টারে আপলোড",
+                btnAddResource: "আপলোড", btnViewMaterials: "মেটেরিয়াল দেখুন", resourceCount: "টি শেয়ার", sharedAcrossSemesters: "একই কোর্স অন্য সেমিস্টার/বছরে থাকলেও একই ফাইল দেখা যাবে।",
+                courseDetailResourcesTitle: "ধরন অনুযায়ী রিসোর্স", courseDetailBack: "কোর্স তালিকায় ফিরুন", lblNavLang: "ভাষা",
+                loginToUpload: "আপলোডের জন্য লগইন করুন", uploadOwnSemOnly: "শুধু আপনার রানিং সেমিস্টারে আপলোড",
                 m_title: "আমার প্রোফাইল", m_pic: "প্রোফাইল ছবি (ঐচ্ছিক)", m_name: "পূর্ণ নাম", m_uid: "ইউনিভার্সিটি আইডি", m_batch: "ব্যাচ নম্বর",
                 m_academic_title: "একাডেমিক সেশন (বর্ষ / ট্রাইমেস্টার / সেশন / সাল)", m_emg_title: "⚠️ জরুরি তথ্য", m_phone: "আমার মোবাইল",
                 m_emg_name: "জরুরি যোগাযোগের নাম", m_emg_phone: "জরুরি মোবাইল নম্বর", m_pass_title: "🔒 পাসওয়ার্ড (ঐচ্ছিক)", m_pass_ph: "কমপক্ষে ৬ অক্ষর",
@@ -338,7 +372,16 @@
 
             document.getElementById('dayLabel-Saturday').innerText = t.sat; document.getElementById('dayLabel-Sunday').innerText = t.sun;
             document.getElementById('dayLabel-Monday').innerText = t.mon; document.getElementById('dayLabel-Tuesday').innerText = t.tue;
-            document.getElementById('dayLabel-Wednesday').innerText = t.wed; document.getElementById('dayLabel-Friday').innerText = t.fri;
+            document.getElementById('dayLabel-Wednesday').innerText = t.wed;
+            document.getElementById('dayLabel-Friday').innerHTML = `${t.fri} <span class="text-[10px] font-semibold opacity-90">(${t.friWeekend})</span>`;
+            const lblNavLang = document.getElementById('lblNavLang');
+            if (lblNavLang) lblNavLang.innerText = t.lblNavLang;
+            const courseDetailBackLbl = document.getElementById('courseDetailBackLbl');
+            if (courseDetailBackLbl) courseDetailBackLbl.innerText = t.courseDetailBack;
+            const courseDetailUploadLbl = document.getElementById('courseDetailUploadLbl');
+            if (courseDetailUploadLbl) courseDetailUploadLbl.innerText = t.btnAddResource;
+            const courseDetailResourcesTitle = document.getElementById('courseDetailResourcesTitle');
+            if (courseDetailResourcesTitle) courseDetailResourcesTitle.innerText = t.courseDetailResourcesTitle;
 
             document.getElementById('m_title').innerHTML = `<i class="fa-solid fa-id-card mr-2"></i> ` + t.m_title;
             document.getElementById('m_pic').innerText = t.m_pic; document.getElementById('m_name').innerText = t.m_name;
@@ -386,11 +429,40 @@
             if (typeof window.refreshCourseGridLang === 'function') window.refreshCourseGridLang();
         }
 
-        const langSelector = document.getElementById('langSelector');
-        langSelector.addEventListener('change', (e) => { localStorage.setItem('preferredLang', e.target.value); applyLanguage(e.target.value); window.location.reload(); });
+        function bindLangSelector() {
+            const langSelector = document.getElementById('langSelector');
+            if (!langSelector || langSelector.dataset.bound === '1') return;
+            langSelector.dataset.bound = '1';
+            langSelector.addEventListener('change', (e) => {
+                localStorage.setItem('preferredLang', e.target.value);
+                applyLanguage(e.target.value);
+                window.location.reload();
+            });
+        }
+        bindLangSelector();
         const savedLang = localStorage.getItem('preferredLang') || 'en';
-        langSelector.value = savedLang;
+        const langSelectorInit = document.getElementById('langSelector');
+        if (langSelectorInit) langSelectorInit.value = savedLang;
         applyLanguage(savedLang);
+
+        function setupNavMenu() {
+            const btn = document.getElementById('navMenuBtn');
+            const menu = document.getElementById('navMenuDropdown');
+            if (!btn || !menu || btn.dataset.bound === '1') return;
+            btn.dataset.bound = '1';
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const open = !menu.classList.contains('hidden');
+                menu.classList.toggle('hidden', open);
+                btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+            });
+            document.addEventListener('click', () => {
+                menu.classList.add('hidden');
+                btn.setAttribute('aria-expanded', 'false');
+            });
+            menu.addEventListener('click', (e) => e.stopPropagation());
+        }
+        setupNavMenu();
 
         function openShareModal() {
             const modal = document.getElementById('shareModal');
@@ -496,6 +568,38 @@
         let resourcesSnapshot = null;
         let renderCourseGridTimer = null;
         let pendingUploadFile = null;
+        let activeDetailCourseIndex = null;
+
+        let buildCourseIdentityKey, resourceMatchesCourse, categorizeResource, RESOURCE_CATEGORY_ORDER, RESOURCE_CATEGORY_LABELS;
+        try {
+            const courseUtils = await import("./assets/js/courseUtils.js");
+            ({
+                buildCourseIdentityKey,
+                resourceMatchesCourse,
+                categorizeResource,
+                RESOURCE_CATEGORY_ORDER,
+                RESOURCE_CATEGORY_LABELS,
+            } = courseUtils);
+        } catch (cuErr) {
+            console.warn("courseUtils.js load failed", cuErr);
+            buildCourseIdentityKey = (code, title, teacher) =>
+                `${String(code || "").trim().toUpperCase()}|${String(title || "").trim().toUpperCase()}|${String(teacher || "").trim().toUpperCase()}`;
+            resourceMatchesCourse = (rData, course) =>
+                String(rData.courseCode || "").trim().toUpperCase() === String(course.code || "").trim().toUpperCase();
+            categorizeResource = (rData) => {
+                const type = String(rData.type || "");
+                if (type.includes("Video")) return "video";
+                if (type.includes("Audio")) return "audio";
+                if (type.includes("Image")) return "image";
+                if (rData.urlType === "external") return "link";
+                return "pdf";
+            };
+            RESOURCE_CATEGORY_ORDER = ["pdf", "video", "audio", "image", "link"];
+            RESOURCE_CATEGORY_LABELS = {
+                en: { pdf: "PDF", video: "Video", audio: "Audio", image: "Image", link: "Links" },
+                bn: { pdf: "পিডিএফ", video: "ভিডিও", audio: "অডিও", image: "ছবি", link: "লিংক" },
+            };
+        }
 
         function escapeHtml(text) {
             return String(text || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
@@ -580,70 +684,171 @@
             return normalizeTrimesterKey(`${yr} - ${termNum} (${sessionFull})`);
         }
 
-        function buildResourcesByCourse(combinedTrimesterKey) {
-            const byCourse = {};
-            if (!resourcesSnapshot) return byCourse;
-            resourcesSnapshot.forEach(resDoc => {
+        function getResourcesForCourse(course) {
+            const list = [];
+            if (!resourcesSnapshot || !course) return list;
+            resourcesSnapshot.forEach((resDoc) => {
                 const rData = { id: resDoc.id, ...resDoc.data() };
-                if (normalizeTrimesterKey(rData.semester) !== normalizeTrimesterKey(combinedTrimesterKey)) return;
-                const code = rData.courseCode;
-                if (!byCourse[code]) byCourse[code] = [];
-                byCourse[code].push(rData);
+                if (resourceMatchesCourse(rData, course)) list.push(rData);
             });
-            return byCourse;
+            return list;
+        }
+
+        function countResourcesForCourse(course) {
+            return getResourcesForCourse(course).length;
+        }
+
+        function canUploadInCurrentView() {
+            const combinedTrimesterKey = getCombinedTrimesterKey();
+            return Boolean(loggedInUserUID) && Boolean(studentCurrentTrimesterKey)
+                && normalizeTrimesterKey(combinedTrimesterKey) === normalizeTrimesterKey(studentCurrentTrimesterKey);
         }
 
         function scheduleRenderCourseGrid() {
             clearTimeout(renderCourseGridTimer);
-            renderCourseGridTimer = setTimeout(renderCourseGrid, 120);
+            renderCourseGridTimer = setTimeout(() => {
+                renderCourseGrid();
+                if (activeDetailCourseIndex !== null && latestMappedCourses[activeDetailCourseIndex]) {
+                    renderCourseDetail(latestMappedCourses[activeDetailCourseIndex]);
+                }
+            }, 120);
         }
+
+        function openCourseDetail(courseIndex) {
+            const course = latestMappedCourses[courseIndex];
+            if (!course) return;
+            activeDetailCourseIndex = courseIndex;
+            document.getElementById("homeMainContent").classList.add("hidden");
+            document.getElementById("courseDetailView").classList.remove("hidden");
+            window.location.hash = `course=${encodeURIComponent(course.code)}`;
+            renderCourseDetail(course);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function closeCourseDetail() {
+            activeDetailCourseIndex = null;
+            document.getElementById("courseDetailView").classList.add("hidden");
+            document.getElementById("homeMainContent").classList.remove("hidden");
+            if (window.location.hash) {
+                history.replaceState(null, "", window.location.pathname + window.location.search);
+            }
+        }
+
+        function parseCourseHash() {
+            const m = window.location.hash.match(/course=([^&]+)/);
+            if (!m || !latestMappedCourses.length) return;
+            const code = decodeURIComponent(m[1]);
+            const idx = latestMappedCourses.findIndex((c) => c.code === code);
+            if (idx >= 0) openCourseDetail(idx);
+        }
+
+        function renderCourseDetail(course) {
+            const t = window.portalT;
+            const files = getResourcesForCourse(course);
+            const lang = window.getPortalLang();
+            const catLabels = (RESOURCE_CATEGORY_LABELS && RESOURCE_CATEGORY_LABELS[lang]) || RESOURCE_CATEGORY_LABELS.en;
+            const viewKey = getCombinedTrimesterKey();
+            const canUpload = canUploadInCurrentView();
+
+            document.getElementById("courseDetailMeta").innerHTML = `
+                <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded">${escapeHtml(course.code)}</span>
+                <h2 class="text-xl font-extrabold text-gray-900 mt-3">${escapeHtml(course.title)}</h2>
+                <p class="text-sm text-gray-600 mt-2"><i class="fa-solid fa-user-tie mr-1 text-slate-400"></i>${t("faculty")}: <b>${escapeHtml(course.teacher)}</b></p>
+                <p class="text-[11px] text-indigo-700 mt-2 font-medium">${escapeHtml(viewKey)}</p>
+                <p class="text-[10px] text-gray-500 mt-2 border-t pt-2">${files.length} ${t("resourceCount")}</p>
+                <p class="text-[10px] text-emerald-700 mt-1 leading-relaxed">${t("sharedAcrossSemesters")}</p>`;
+
+            const grouped = {};
+            RESOURCE_CATEGORY_ORDER.forEach((c) => { grouped[c] = []; });
+            files.forEach((rData) => {
+                const cat = categorizeResource(rData);
+                if (!grouped[cat]) grouped[cat] = [];
+                grouped[cat].push(rData);
+            });
+
+            let sectionsHtml = "";
+            RESOURCE_CATEGORY_ORDER.forEach((cat) => {
+                if (!grouped[cat].length) return;
+                sectionsHtml += `
+                    <section class="bg-white rounded-xl shadow-md p-4 border border-gray-100">
+                        <h4 class="font-bold text-emerald-800 text-sm mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-folder-open text-indigo-500"></i> ${catLabels[cat] || cat}
+                            <span class="text-[10px] font-normal text-gray-400">(${grouped[cat].length})</span>
+                        </h4>
+                        <div class="space-y-2">${grouped[cat].map((r) => renderResourceItemHTML(r, t)).join("")}</div>
+                    </section>`;
+            });
+            document.getElementById("courseDetailResources").innerHTML = sectionsHtml
+                || `<p class="text-sm text-gray-400 p-6 text-center border border-dashed rounded-xl bg-white">${t("noSharedFiles")}</p>`;
+
+            const uploadBtn = document.getElementById("courseDetailUpload");
+            uploadBtn.disabled = !canUpload;
+            uploadBtn.className = canUpload
+                ? "w-full bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold py-2.5 rounded-lg shadow flex items-center justify-center gap-2"
+                : "w-full bg-gray-200 text-gray-400 text-xs font-bold py-2.5 rounded-lg cursor-not-allowed flex items-center justify-center gap-2";
+            uploadBtn.title = canUpload ? "" : (!loggedInUserUID ? t("loginToUpload") : t("uploadOwnSemOnly"));
+        }
+
+        document.getElementById("courseDetailBack").addEventListener("click", closeCourseDetail);
+        document.getElementById("courseDetailUpload").addEventListener("click", () => {
+            if (activeDetailCourseIndex !== null) triggerLockedUploadFlow(activeDetailCourseIndex);
+        });
+        document.getElementById("courseDetailResources").addEventListener("click", handleResourceGridClick);
+        window.addEventListener("hashchange", () => {
+            if (!window.location.hash.includes("course=")) {
+                if (activeDetailCourseIndex !== null) closeCourseDetail();
+                return;
+            }
+            parseCourseHash();
+        });
 
         function renderCourseGrid() {
             const t = window.portalT;
-            const combinedTrimesterKey = getCombinedTrimesterKey();
-            const resourcesByCourse = buildResourcesByCourse(combinedTrimesterKey);
-            const isMyOwnSemester = Boolean(studentCurrentTrimesterKey)
-                && normalizeTrimesterKey(combinedTrimesterKey) === normalizeTrimesterKey(studentCurrentTrimesterKey);
-            const canUpload = Boolean(loggedInUserUID) && isMyOwnSemester;
+            const canUpload = canUploadInCurrentView();
             const cards = [];
 
             if (latestMappedCourses.length === 0) {
-                courseGrid.innerHTML = `<p class="text-xs text-gray-400 col-span-3 p-6 text-center border border-dashed rounded-xl w-full">${t('noCourses')}</p>`;
+                courseGrid.innerHTML = `<p class="text-xs text-gray-400 col-span-3 p-6 text-center border border-dashed rounded-xl w-full">${t("noCourses")}</p>`;
                 return;
             }
 
             latestMappedCourses.forEach((course, courseIndex) => {
-                const files = resourcesByCourse[course.code] || [];
-                let sharedItemsHTML = files.map(rData => renderResourceItemHTML(rData, t)).join("");
-                if (!sharedItemsHTML) sharedItemsHTML = `<p class="text-[10px] text-gray-400 italic p-1">${t('noSharedFiles')}</p>`;
-
-                const btnColorClass = canUpload
-                    ? "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-600 hover:text-white shadow-sm font-bold"
-                    : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-80";
-                const lockHint = !loggedInUserUID ? t('loginToUpload') : t('uploadOwnSemOnly');
+                const fileCount = countResourcesForCourse(course);
+                const uploadClass = canUpload
+                    ? "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-600 hover:text-white"
+                    : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed";
+                const lockHint = !loggedInUserUID ? t("loginToUpload") : t("uploadOwnSemOnly");
 
                 cards.push(`
                     <div class="border border-gray-200 rounded-xl p-4 bg-gray-50 flex flex-col justify-between hover:shadow-md hover:border-indigo-600 transition duration-200">
                         <div>
-                            <div class="flex justify-between items-start">
-                                <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded">${course.code}</span>
-                                <span class="text-[9px] bg-slate-200 font-bold px-1.5 py-0.5 rounded text-slate-700">${t('activeCourse')}</span>
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded">${escapeHtml(course.code)}</span>
+                                <span class="text-[9px] bg-slate-200 font-bold px-1.5 py-0.5 rounded text-slate-700 shrink-0">${fileCount} ${t("resourceCount")}</span>
                             </div>
-                            <h4 class="text-base font-extrabold text-gray-800 mt-2">${course.title}</h4>
-                            <p class="text-xs text-gray-500 mt-1 mb-3"><i class="fa-solid fa-user-tie mr-1 text-slate-400"></i>${t('faculty')}: ${course.teacher}</p>
-                            <div class="space-y-1.5 border-t border-dashed pt-2.5">${sharedItemsHTML}</div>
+                            <h4 class="text-base font-extrabold text-gray-800 mt-2">${escapeHtml(course.title)}</h4>
+                            <p class="text-xs text-gray-500 mt-1"><i class="fa-solid fa-user-tie mr-1 text-slate-400"></i>${t("faculty")}: ${escapeHtml(course.teacher)}</p>
                         </div>
-                        <div class="mt-4 pt-2.5 flex">
+                        <div class="mt-4 pt-2.5 grid grid-cols-2 gap-2">
+                            <button type="button" data-view-course="${courseIndex}"
+                                class="border bg-white text-emerald-800 border-emerald-200 hover:bg-emerald-700 hover:text-white text-center text-xs py-2 rounded-lg font-bold transition flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-folder-open"></i> ${t("btnViewMaterials")}
+                            </button>
                             <button type="button" data-upload-course="${courseIndex}" ${canUpload ? "" : `disabled title="${lockHint}"`}
-                                class="w-full ${btnColorClass} border text-center text-xs py-2 rounded-lg transition flex items-center justify-center gap-1">
-                                <i class="fa-solid fa-plus-circle"></i> ${t('btnAddResource')}
+                                class="border text-center text-xs py-2 rounded-lg font-bold transition flex items-center justify-center gap-1 ${uploadClass}">
+                                <i class="fa-solid fa-plus-circle"></i> ${t("btnAddResource")}
                             </button>
                         </div>
                     </div>`);
             });
             courseGrid.innerHTML = cards.join("");
         }
-        window.refreshCourseGridLang = () => { if (latestMappedCourses.length >= 0) renderCourseGrid(); };
+        window.refreshCourseGridLang = () => {
+            renderCourseGrid();
+            if (activeDetailCourseIndex !== null && latestMappedCourses[activeDetailCourseIndex]) {
+                renderCourseDetail(latestMappedCourses[activeDetailCourseIndex]);
+            }
+        };
 
         function openShareModalFromModule() {
             const modal = document.getElementById('shareModal');
@@ -663,20 +868,20 @@
                 window.location.href = './login.html';
                 return;
             }
-            const combinedTrimesterKey = getCombinedTrimesterKey();
-            if (combinedTrimesterKey !== studentCurrentTrimesterKey) {
-                alert(window.portalT('alertSemLock'));
+            if (!canUploadInCurrentView()) {
+                alert(window.portalT("alertSemLock"));
                 return;
             }
             const course = latestMappedCourses[courseIndex];
             if (!course) return;
 
-            document.getElementById('shareAuthor').value = loggedInUserName || auth.currentUser.displayName || "";
-            document.getElementById('lockedCourseDisplay').value = `${course.code}: ${course.title}`;
-            document.getElementById('shareTitle').value = "";
-            document.getElementById('lockedSemLabel').innerText = studentCurrentTrimesterKey;
-            document.getElementById('resourceShareForm').dataset.lockedCode = course.code;
-            document.getElementById('resourceShareForm').dataset.lockedCourseTitle = course.title;
+            document.getElementById("shareAuthor").value = loggedInUserName || auth.currentUser.displayName || "";
+            document.getElementById("lockedCourseDisplay").value = `${course.code}: ${course.title}`;
+            document.getElementById("shareTitle").value = "";
+            document.getElementById("lockedSemLabel").innerText = studentCurrentTrimesterKey;
+            document.getElementById("resourceShareForm").dataset.lockedCode = course.code;
+            document.getElementById("resourceShareForm").dataset.lockedCourseTitle = course.title;
+            document.getElementById("resourceShareForm").dataset.lockedCourseTeacher = course.teacher || "";
             document.getElementById('resourceShareForm').dataset.editId = "";
             pendingUploadFile = null;
             base64UploadedFileString = "";
@@ -704,8 +909,9 @@
             document.getElementById('shareTitle').value = titleParts.length > 1 ? titleParts.slice(1).join(" — ") : rData.title;
             document.getElementById('shareType').value = rData.type || "PDF/Handnote";
             document.getElementById('shareUrl').value = (rData.urlType === "external") ? (rData.url || "") : "";
-            document.getElementById('resourceShareForm').dataset.lockedCode = rData.courseCode;
-            document.getElementById('resourceShareForm').dataset.lockedCourseTitle = course?.title || rData.courseCode;
+            document.getElementById("resourceShareForm").dataset.lockedCode = rData.courseCode;
+            document.getElementById("resourceShareForm").dataset.lockedCourseTitle = course?.title || rData.courseTitle || rData.courseCode;
+            document.getElementById("resourceShareForm").dataset.lockedCourseTeacher = course?.teacher || rData.courseTeacher || "";
             document.getElementById('resourceShareForm').dataset.editId = resourceId;
             document.getElementById('lockedSemLabel').innerText = rData.semester || studentCurrentTrimesterKey;
             pendingUploadFile = null;
@@ -745,13 +951,18 @@
         window.refreshShareModalLabels = refreshShareModalLabels;
         window.triggerLockedUploadFlow = triggerLockedUploadFlow;
 
-        courseGrid.addEventListener('click', async (e) => {
-            const uploadBtn = e.target.closest('[data-upload-course]');
+        async function handleResourceGridClick(e) {
+            const viewCourseBtn = e.target.closest("[data-view-course]");
+            if (viewCourseBtn) {
+                openCourseDetail(parseInt(viewCourseBtn.dataset.viewCourse, 10));
+                return;
+            }
+            const uploadBtn = e.target.closest("[data-upload-course]");
             if (uploadBtn && !uploadBtn.disabled) {
                 triggerLockedUploadFlow(parseInt(uploadBtn.dataset.uploadCourse, 10));
                 return;
             }
-            const viewBtn = e.target.closest('[data-view-resource]');
+            const viewBtn = e.target.closest("[data-view-resource]");
             if (viewBtn) {
                 e.preventDefault();
                 try {
@@ -759,15 +970,16 @@
                     if (!snap.exists()) return;
                     const { openResourceFile } = await loadFileStorage();
                     const ok = await openResourceFile({ id: snap.id, ...snap.data() });
-                    if (!ok) alert(window.portalT('alertOpenFileFailed'));
+                    if (!ok) alert(window.portalT("alertOpenFileFailed"));
                 } catch (err) { alert(err.message); }
                 return;
             }
-            const editBtn = e.target.closest('[data-edit-resource]');
+            const editBtn = e.target.closest("[data-edit-resource]");
             if (editBtn) { openEditResourceModal(editBtn.dataset.editResource); return; }
-            const delBtn = e.target.closest('[data-delete-resource]');
+            const delBtn = e.target.closest("[data-delete-resource]");
             if (delBtn) { deleteResourceById(delBtn.dataset.deleteResource); }
-        });
+        }
+        courseGrid.addEventListener("click", handleResourceGridClick);
 
         async function fetchCourseMappingForKey(key) {
             let mapDoc = await getDoc(doc(db, "course_mappings", key));
@@ -785,6 +997,7 @@
                 const mapDoc = await fetchCourseMappingForKey(key);
                 latestMappedCourses = mapDoc.exists() ? (mapDoc.data().courses || []) : [];
                 renderCourseGrid();
+                if (window.location.hash.includes("course=")) parseCourseHash();
             } catch (err) {
                 console.error(err);
                 courseGrid.innerHTML = `<p class="text-xs text-red-500 p-4 text-center">${window.portalT('loadFail')}</p>`;
@@ -880,17 +1093,22 @@
                     return;
                 }
 
+                const courseTitle = formEl.dataset.lockedCourseTitle || "";
+                const courseTeacher = formEl.dataset.lockedCourseTeacher || "";
                 const payload = {
-                    author: document.getElementById('shareAuthor').value.trim(),
+                    author: document.getElementById("shareAuthor").value.trim(),
                     title: fullTitle,
-                    type: document.getElementById('shareType').value,
+                    type: document.getElementById("shareType").value,
                     courseCode: formEl.dataset.lockedCode,
+                    courseTitle,
+                    courseTeacher,
+                    courseIdentityKey: buildCourseIdentityKey(formEl.dataset.lockedCode, courseTitle, courseTeacher),
                     semester: semesterKey,
                     url: urlPayload,
                     urlType,
                     storagePath,
                     uploadedBy: loggedInUserUID,
-                    updatedAt: new Date().toISOString()
+                    updatedAt: new Date().toISOString(),
                 };
 
                 if (editId) {
@@ -1021,7 +1239,19 @@
                 const pulseClass = isProfileIncomplete
                     ? "bg-red-600 hover:bg-red-700 animate-pulse text-white"
                     : "bg-emerald-950 hover:bg-emerald-900 text-emerald-200";
-                document.getElementById("navAuthButtons").innerHTML = `<div class="flex items-center space-x-2 gap-1"><button id="openProfileEditBtn" class="${pulseClass} px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-user mr-1"></i> ${window.portalT("btnMyProfile")}</button><button id="logoutBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg font-semibold transition text-xs">${window.portalT("btnLogout")}</button></div>`;
+                document.getElementById("btnNavLogin").classList.add("hidden");
+                const navMenuBtn = document.getElementById("navMenuBtn");
+                navMenuBtn.classList.remove("hidden");
+                navMenuBtn.classList.add("flex");
+                document.getElementById("navAuthButtons").innerHTML = `
+                    <button type="button" id="openProfileEditBtn" class="w-full text-left px-3 py-2.5 text-xs font-semibold hover:bg-emerald-50 text-emerald-900 border-b border-gray-50 ${pulseClass}">
+                        <i class="fa-solid fa-user mr-2"></i>${window.portalT("btnMyProfile")}
+                    </button>
+                    <button type="button" id="logoutBtn" class="w-full text-left px-3 py-2.5 text-xs font-semibold hover:bg-red-50 text-red-700">
+                        <i class="fa-solid fa-right-from-bracket mr-2"></i>${window.portalT("btnLogout")}
+                    </button>`;
+                bindLangSelector();
+                setupNavMenu();
 
                 document.getElementById("openProfileEditBtn").addEventListener("click", () => {
                     document.getElementById("editProfileName").value = uData.name || "";
