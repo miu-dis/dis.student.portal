@@ -10,7 +10,7 @@
 </head>
 <body class="bg-gray-100 font-sans invisible portal-page-enter">
 
-    <nav class="bg-emerald-900 text-white shadow-md p-4 sticky top-0 z-50 transition-shadow duration-300">
+    <nav class="portal-nav-root bg-emerald-900 text-white shadow-md p-4 sticky top-0 z-50 transition-shadow duration-300">
         <div class="container mx-auto flex justify-between items-center gap-3">
             <div class="flex items-center space-x-3 min-w-0">
                 <img src="assets/img/logo.png" alt="Logo" class="h-10 w-auto shrink-0">
@@ -20,20 +20,21 @@
                 <button type="button" id="navMenuBtn" class="portal-menu-trigger portal-btn flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-950/80 hover:bg-emerald-950 border border-emerald-700 text-lg" aria-label="Menu" aria-expanded="false" aria-controls="navMenuDropdown">
                     <i class="fa-solid fa-bars"></i>
                 </button>
-                <div id="navMenuBackdrop" class="portal-menu-backdrop" aria-hidden="true"></div>
-                <div id="navMenuDropdown" class="portal-menu-panel bg-white text-gray-800 rounded-xl shadow-2xl border border-gray-100 overflow-hidden" role="menu" aria-hidden="true">
-                    <div class="portal-menu-stagger py-1">
-                        <button type="button" id="logoutBtn" class="portal-menu-panel__item portal-btn w-full px-4 py-3 text-left text-xs font-semibold text-red-700 hover:bg-red-50">
-                            <i class="fa-solid fa-right-from-bracket mr-2"></i>Logout
-                        </button>
-                        <a href="index.html" class="portal-menu-panel__item portal-btn block w-full px-4 py-3 text-left text-xs font-semibold text-emerald-800 hover:bg-emerald-50 border-t border-gray-50">
-                            <i class="fa-solid fa-user-graduate mr-2"></i>Student Portal
-                        </a>
-                    </div>
-                </div>
             </div>
         </div>
     </nav>
+
+    <div id="navMenuBackdrop" class="portal-menu-backdrop" aria-hidden="true"></div>
+    <div id="navMenuDropdown" class="portal-menu-panel bg-white text-gray-800 rounded-xl border border-gray-100" role="menu" aria-hidden="true">
+        <div class="portal-menu-stagger py-1">
+            <button type="button" id="logoutBtn" class="portal-menu-panel__item portal-btn w-full px-4 py-3 text-left text-xs font-semibold text-red-700 hover:bg-red-50">
+                <i class="fa-solid fa-right-from-bracket mr-2"></i>Logout
+            </button>
+            <a href="index.html" class="portal-menu-panel__item portal-btn block w-full px-4 py-3 text-left text-xs font-semibold text-emerald-800 hover:bg-emerald-50 border-t border-gray-50">
+                <i class="fa-solid fa-user-graduate mr-2"></i>Student Portal
+            </a>
+        </div>
+    </div>
 
     <main class="container mx-auto px-4 py-8 space-y-8">
         
