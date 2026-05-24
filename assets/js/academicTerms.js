@@ -116,7 +116,10 @@ export function fillArchiveSessionFilters({ seasonEl, programEl, yearEl, profile
         yearEl.innerHTML = getCalendarSessionYears()
             .map((y) => `<option value="${y}">${y}</option>`)
             .join("");
+        if (!yearEl.value && yearEl.options.length) yearEl.selectedIndex = 0;
     }
+    if (seasonEl && !seasonEl.value && seasonEl.options.length) seasonEl.selectedIndex = 0;
+    if (programEl && !programEl.value && programEl.options.length) programEl.selectedIndex = 0;
     if (profileTerm !== undefined || sessionYear !== undefined) {
         const { season, program } = splitSessionTerm(profileTerm);
         if (seasonEl && SESSION_SEASONS.includes(season)) seasonEl.value = season;
