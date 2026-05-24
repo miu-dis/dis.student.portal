@@ -251,7 +251,7 @@
                 alertLoginUpload: "Please login first to upload.", alertSemLock: "🔒 Locked! You can only upload in your own running semester.",
                 alertFileSize: "🔴 File exceeds 2MB! Upload to Drive/YouTube and paste a public link.", alertPickFile: "Select a file under 2MB.", alertPasteLink: "Paste a link.", alertPublished: "Resource published successfully!",
                 alertProfileSaved: "Profile saved!", alertProfileRequired: "Emergency info and blood group are required!", alertPassMin: "Password must be at least 6 characters.",
-                genderMale: "Male Section", genderFemale: "Female Section", noClasses: "No classes.", loadFail: "Failed to load courses. Refresh the page.",
+                genderMale: "Male Section", genderFemale: "Female Section", genderCombined: "Combined Section", noClasses: "No classes.", loadFail: "Failed to load courses. Refresh the page.",
                 displaySemSync: "Syncing...", byAuthor: "By:", profileIncomplete: "Profile incomplete!", loadingCourses: "Loading courses...",
                 btnView: "View", btnEdit: "Edit", btnDelete: "Delete", btnViewFile: "Open file",
                 confirmDeleteResource: "Delete this uploaded resource permanently?", alertResourceDeleted: "Resource deleted.",
@@ -286,7 +286,7 @@
                 alertLoginUpload: "আপলোড করতে প্রথমে লগইন করুন।", alertSemLock: "🔴 লক! শুধু আপনার নিজের রানিং সেমিস্টারে আপলোড করা যাবে।",
                 alertFileSize: "🔴 ফাইল ২ এমবি-র বেশি! ড্রাইভ/ইউটিউবে আপলোড করে পাবলিক লিংক দিন।", alertPickFile: "২ এমবি-র নিচে একটি ফাইল সিলেক্ট করুন।", alertPasteLink: "লিংক পেস্ট করুন।", alertPublished: "রিসোর্স সফলভাবে প্রকাশিত!",
                 alertProfileSaved: "প্রোফাইল সেভ হয়েছে!", alertProfileRequired: "জরুরি তথ্য ও রক্তের গ্রুপ পূরণ বাধ্যতামূলক!", alertPassMin: "পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে।",
-                genderMale: "ভাইদের শাখা", genderFemale: "বোনদের শাখা", noClasses: "ক্লাস নেই।", loadFail: "কোর্স লোড ব্যর্থ। পেজ রিফ্রেশ করুন।",
+                genderMale: "ভাইদের শাখা", genderFemale: "বোনদের শাখা", genderCombined: "সম্মিলিত শাখা", noClasses: "ক্লাস নেই।", loadFail: "কোর্স লোড ব্যর্থ। পেজ রিফ্রেশ করুন।",
                 displaySemSync: "সিঙ্ক হচ্ছে...", byAuthor: "প্রকাশক:", profileIncomplete: "প্রোফাইল অসম্পূর্ণ!", loadingCourses: "কোর্স লোড হচ্ছে...",
                 btnView: "দেখুন", btnEdit: "এডিট", btnDelete: "মুছুন", btnViewFile: "ফাইল খুলুন",
                 confirmDeleteResource: "এই আপলোড করা রিসোর্স স্থায়ীভাবে মুছবেন?", alertResourceDeleted: "রিসোর্স মুছে ফেলা হয়েছে।",
@@ -797,8 +797,12 @@
             dailyContainer.innerHTML = ''; Object.keys(daysWithClasses).forEach(day => { const el = document.getElementById(`day-${day}`); if(el) el.innerHTML = ''; daysWithClasses[day] = false; });
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                let genderLabel = data.gender === 'Male' ? window.portalT('genderMale') : window.portalT('genderFemale');
-                const cardHTML = `<div class="p-2.5 bg-white border border-slate-200 rounded-lg shadow-sm text-xs"><div class="flex justify-between items-center mb-0.5"><h5 class="font-extrabold text-emerald-800 text-sm">${data.subject}</h5><span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${data.gender === 'Male' ? 'bg-blue-100 text-blue-700' : 'bg-pink-100 text-pink-700'}">${genderLabel}</span></div><div class="mb-1 text-[11px] text-amber-700 font-bold">Batch: ${data.batchNumber}</div><div class="grid grid-cols-2 text-[11px] text-gray-600 gap-y-0.5 border-t border-dashed pt-1 mt-1"><p><b>Code:</b> ${data.courseCode}</p><p><b>Room:</b> ${data.room}</p><p class="text-emerald-700 font-bold col-span-2"><b>Teacher:</b> ${data.teacherCode}</p><p class="font-bold text-slate-700 col-span-2 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${data.timeSlot}</p></div></div>`;
+                const genderBadge = data.gender === 'Male'
+                    ? { label: window.portalT('genderMale'), cls: 'bg-blue-100 text-blue-700' }
+                    : data.gender === 'Female'
+                        ? { label: window.portalT('genderFemale'), cls: 'bg-pink-100 text-pink-700' }
+                        : { label: window.portalT('genderCombined'), cls: 'bg-purple-100 text-purple-700' };
+                const cardHTML = `<div class="p-2.5 bg-white border border-slate-200 rounded-lg shadow-sm text-xs"><div class="flex justify-between items-center mb-0.5"><h5 class="font-extrabold text-emerald-800 text-sm">${data.subject}</h5><span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${genderBadge.cls}">${genderBadge.label}</span></div><div class="mb-1 text-[11px] text-amber-700 font-bold">Batch: ${data.batchNumber}</div><div class="grid grid-cols-2 text-[11px] text-gray-600 gap-y-0.5 border-t border-dashed pt-1 mt-1"><p><b>Code:</b> ${data.courseCode}</p><p><b>Room:</b> ${data.room}</p><p class="text-emerald-700 font-bold col-span-2"><b>Teacher:</b> ${data.teacherCode}</p><p class="font-bold text-slate-700 col-span-2 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${data.timeSlot}</p></div></div>`;
                 if (data.boardType === 'daily') { dailyContainer.innerHTML += cardHTML; hasDaily = true; } else if (data.boardType === 'permanent' && data.classDay && data.classDay !== "N/A") { const el = document.getElementById(`day-${data.classDay}`); if (el) { el.innerHTML += cardHTML; daysWithClasses[data.classDay] = true; } }
             });
             Object.keys(daysWithClasses).forEach(day => { if (!daysWithClasses[day]) document.getElementById(`day-${day}`).innerHTML = `<p class="text-xs text-gray-400 text-center py-2 bg-white/40 border border-dashed rounded-lg">${window.portalT('noClasses')}</p>`; });
