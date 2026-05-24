@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans transition-all duration-300">
+<body class="bg-gray-50 text-gray-800 font-sans transition-all duration-300 invisible">
 
     <nav class="bg-emerald-800 text-white shadow-lg sticky top-0 z-50">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -808,9 +808,12 @@
             snapshot.forEach((doc) => { const data = doc.data(); noticeContainer.innerHTML += `<div class="p-2.5 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm text-xs"><p class="font-medium text-gray-800">${data.content}</p></div>`; });
         });
 
-        // প্রোফাইল ভ্যালিডেশন
+        // প্রোফাইল ভ্যালিডেশন — লগইন ছাড়া পেজে প্রবেশ বন্ধ
         onAuthStateChanged(auth, async (user) => {
-            if (!user) return;
+            if (!user) {
+                window.location.replace("./login.html");
+                return;
+            }
             loggedInUserUID = user.uid;
             const userDoc = await getDoc(doc(db, "users", loggedInUserUID));
             if (userDoc.exists()) {
@@ -837,13 +840,17 @@
                         document.getElementById('profileModal').className = "fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm";
                     });
                     if(isProfileIncomplete) setTimeout(() => { document.getElementById('openProfileEditBtn').click(); }, 1500);
-                    document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => window.location.reload()); });
+                    document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => window.location.replace("./login.html")); });
 
                     document.getElementById('filterYear').value = uYear;
                     document.getElementById('filterTermNum').value = uTermNum;
                     document.getElementById('filterSession').value = `${uSess} ${uSessYear}`;
                     await updateFiltersAndListen();
                     renderCourseGrid();
+                    document.body.classList.remove('invisible');
+            } else {
+                await signOut(auth);
+                window.location.replace("./login.html");
             }
         });
 
