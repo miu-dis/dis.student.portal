@@ -40,7 +40,7 @@
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-1">
                         <select id="mapYear" class="p-2 border rounded bg-white font-bold"><option value="1st Year">1st Yr</option><option value="2nd Year">2nd Yr</option><option value="3rd Year">3rd Yr</option><option value="4th Year">4th Yr</option></select>
                         <select id="mapTermNum" class="p-2 border rounded bg-white font-bold"><option value="1st Trimester">1st Tri</option><option value="2nd Trimester">2nd Tri</option><option value="3rd Trimester">3rd Tri</option></select>
-                        <select id="mapTerm" class="p-2 border rounded bg-white font-bold"><option value="Spring">Spring</option><option value="Summer">Summer</option><option value="Fall">Fall</option></select>
+                        <select id="mapTerm" class="p-2 border rounded bg-white font-bold"></select>
                         <select id="mapSessYear" class="p-2 border rounded bg-white font-bold"><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select>
                     </div>
                     <div class="border-t pt-2 space-y-2">
@@ -123,8 +123,11 @@
         import { auth, db } from "./assets/js/app.js";
         import { formatNoticeContent } from "./assets/js/noticeFormat.js";
         import { deletePortalFile, openResourceFile } from "./assets/js/fileStorage.js";
+        import { fillSessionTermSelect, buildTrimesterKey } from "./assets/js/academicTerms.js";
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { doc, getDoc, setDoc, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        fillSessionTermSelect(document.getElementById("mapTerm"));
 
         let activeEditId = null;
         let activeEditCollection = "";
@@ -195,7 +198,7 @@
             const termNum = document.getElementById('mapTermNum').value;
             const term = document.getElementById('mapTerm').value;
             const sessYear = document.getElementById('mapSessYear').value;
-            const key = `${yr} - ${termNum} (${term} ${sessYear})`;
+            const key = buildTrimesterKey(yr, termNum, term, sessYear);
             const payload = {
                 code: document.getElementById('mapCourseCode').value.trim().toUpperCase(),
                 title: document.getElementById('mapCourseTitle').value.trim(),
