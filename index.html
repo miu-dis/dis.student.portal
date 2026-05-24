@@ -20,7 +20,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans" id="studentAppBody">
 
-    <nav class="bg-emerald-800 text-white shadow-lg sticky top-0 z-50 transition-shadow duration-300">
+    <nav class="portal-nav-root bg-emerald-800 text-white shadow-lg sticky top-0 z-50 transition-shadow duration-300">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center gap-3">
             <div class="flex items-center space-x-3 gap-2 min-w-0">
                 <img src="assets/img/logo.png" alt="University Logo" class="h-10 w-auto ml-2 shrink-0"> 
@@ -31,23 +31,24 @@
                 <button type="button" id="navMenuBtn" class="portal-menu-trigger portal-btn hidden h-11 w-11 items-center justify-center rounded-xl bg-emerald-900/90 hover:bg-emerald-950 border border-emerald-600 text-lg ml-0" aria-label="Menu" aria-expanded="false" aria-controls="navMenuDropdown">
                     <i class="fa-solid fa-bars"></i>
                 </button>
-                <div id="navMenuBackdrop" class="portal-menu-backdrop hidden" aria-hidden="true"></div>
-                <div id="navMenuDropdown" class="portal-menu-panel hidden bg-white text-gray-800 rounded-xl shadow-2xl border border-gray-100 overflow-hidden" role="menu" aria-hidden="true">
-                    <div class="portal-menu-stagger">
-                        <div class="px-3 py-3 border-b border-gray-100 bg-gradient-to-b from-gray-50 to-white">
-                            <p id="lblNavMenuTitle" class="text-[10px] font-bold text-emerald-800 uppercase tracking-wide mb-2">Menu</p>
-                            <label id="lblNavLang" class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">Language</label>
-                            <select id="langSelector" class="portal-field w-full mt-1 text-xs font-semibold border border-gray-200 rounded-lg p-2.5 text-emerald-900 bg-white outline-none cursor-pointer">
-                                <option value="en">English</option>
-                                <option value="bn">বাংলা</option>
-                            </select>
-                        </div>
-                        <div id="navAuthButtons" class="py-1"></div>
-                    </div>
-                </div>
             </div>
         </div>
     </nav>
+
+    <div id="navMenuBackdrop" class="portal-menu-backdrop" aria-hidden="true"></div>
+    <div id="navMenuDropdown" class="portal-menu-panel bg-white text-gray-800 rounded-xl border border-gray-100" role="menu" aria-hidden="true">
+        <div class="portal-menu-stagger">
+            <div class="px-3 py-3 border-b border-gray-100 bg-gradient-to-b from-gray-50 to-white">
+                <p id="lblNavMenuTitle" class="text-[10px] font-bold text-emerald-800 uppercase tracking-wide mb-2">Menu</p>
+                <label id="lblNavLang" class="text-[9px] font-bold text-gray-400 uppercase tracking-wide">Language</label>
+                <select id="langSelector" class="portal-field w-full mt-1 text-xs font-semibold border border-gray-200 rounded-lg p-2.5 text-emerald-900 bg-white outline-none cursor-pointer">
+                    <option value="en">English</option>
+                    <option value="bn">বাংলা</option>
+                </select>
+            </div>
+            <div id="navAuthButtons" class="py-1"></div>
+        </div>
+    </div>
 
     <div id="bootErrorBanner" class="hidden bg-red-700 text-white font-bold p-3 text-center text-xs md:text-sm shadow-md z-[60] relative"></div>
     <div id="warningBanner" class="bg-red-600 text-white font-bold p-3 text-center hidden animate-bounce text-xs md:text-sm shadow-md">
