@@ -133,9 +133,44 @@
             else { const userDoc = await getDoc(doc(db, "users", user.uid)); if (userDoc.exists() && userDoc.data().role === 'admin') document.body.classList.remove('invisible'); else window.location.replace("./index.html"); }
         });
 
+        function routineStartMinutes(data) {
+            if (data.rawStartTime) {
+                const parts = String(data.rawStartTime).split(":");
+                return (parseInt(parts[0], 10) || 0) * 60 + (parseInt(parts[1], 10) || 0);
+            }
+            const m = String(data.timeSlot || "").match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+            if (!m) return 9999;
+            let h = parseInt(m[1], 10);
+            const min = parseInt(m[2], 10) || 0;
+            const ap = (m[3] || "").toUpperCase();
+            if (ap === "PM" && h < 12) h += 12;
+            if (ap === "AM" && h === 12) h = 0;
+            return h * 60 + min;
+        }
+
+        function compareRoutineByTime(a, b) {
+            const diff = routineStartMinutes(a) - routineStartMinutes(b);
+            return diff !== 0 ? diff : String(a.subject || "").localeCompare(String(b.subject || ""));
+        }
+
+        const boardTypeEl = document.getElementById('boardType');
+        const classDayEl = document.getElementById('classDay');
+        boardTypeEl.addEventListener('change', () => {
+            if (boardTypeEl.value === 'permanent') {
+                classDayEl.value = classDayEl.value === 'N/A' ? 'Saturday' : classDayEl.value;
+            }
+        });
+
         // নতুন রুটিন আপলোড
         document.getElementById('routineForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); const sTime = document.getElementById('startTime').value; const eTime = document.getElementById('endTime').value;
+            e.preventDefault();
+            const boardType = document.getElementById('boardType').value;
+            const classDay = document.getElementById('classDay').value;
+            if (boardType === 'permanent' && classDay === 'N/A') {
+                alert('Permanent schedule requires a class day (Saturday–Friday). Please select the day.');
+                return;
+            }
+            const sTime = document.getElementById('startTime').value; const eTime = document.getElementById('endTime').value;
             try {
                 await addDoc(collection(db, "routines"), {
                     subject: document.getElementById('subject').value.trim(), courseCode: document.getElementById('courseCode').value.trim(), room: document.getElementById('room').value.trim(), batchNumber: document.getElementById('batchNumber').value.trim(), teacherCode: document.getElementById('teacherCode').value.trim(), classDay: document.getElementById('classDay').value, rawStartTime: sTime, rawEndTime: eTime, timeSlot: `${formatTimeTo12Hour(sTime)} - ${formatTimeTo12Hour(eTime)}`, gender: document.getElementById('gender').value, boardType: document.getElementById('boardType').value, createdAt: new Date().toISOString()
@@ -183,18 +218,26 @@
         onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
             const adminRoutineList = document.getElementById('adminRoutineList');
             document.getElementById('routineCount').innerText = snapshot.size;
-            adminRoutineList.innerHTML = snapshot.docs.map(res => {
+            const sortedDocs = [...snapshot.docs].sort((a, b) => {
+                const da = a.data(); const db = b.data();
+                if (da.boardType !== db.boardType) return da.boardType === 'permanent' ? -1 : 1;
+                if (da.classDay !== db.classDay) return String(da.classDay || "").localeCompare(String(db.classDay || ""));
+                return compareRoutineByTime(da, db);
+            });
+            adminRoutineList.innerHTML = sortedDocs.map(res => {
                 const data = res.data(); const id = res.id;
                 const isDaily = data.boardType === 'daily';
                 const tagColor = isDaily ? "bg-amber-100 text-amber-800 border-amber-300" : "bg-emerald-100 text-emerald-800 border-emerald-300";
                 const tagLabel = isDaily ? "Daily" : "Permanent";
+                const dayInfo = isDaily ? "" : ` | ${data.classDay || "—"}`;
+                const timeInfo = data.timeSlot ? ` | ${data.timeSlot}` : "";
                 const dataJson = JSON.stringify(data).replace(/"/g, '&quot;');
                 return `
                     <div class="p-2.5 bg-slate-50 border rounded-lg flex flex-col gap-1.5 shadow-sm">
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="font-bold text-gray-800">${data.subject} (${data.courseCode})</p>
-                                <p class="text-[10px] text-gray-400">Room: ${data.room} | Batch: ${data.batchNumber}</p>
+                                <p class="text-[10px] text-gray-400">Room: ${data.room} | Batch: ${data.batchNumber}${dayInfo}${timeInfo}</p>
                             </div>
                             <span class="text-[9px] font-bold px-1.5 py-0.5 border rounded ${tagColor}">${tagLabel}</span>
                         </div>
@@ -345,6 +388,18 @@
                             <option value="permanent" ${data.boardType === 'permanent' ? 'selected' : ''}>Permanent Board</option>
                         </select>
                     </div>
+                    <div>
+                        <label class="font-bold text-gray-600">Class Day</label>
+                        <select id="m_routine_day" class="w-full p-2 border rounded bg-white">
+                            <option value="N/A" ${data.classDay === 'N/A' ? 'selected' : ''}>Not Applicable</option>
+                            <option value="Saturday" ${data.classDay === 'Saturday' ? 'selected' : ''}>Saturday</option>
+                            <option value="Sunday" ${data.classDay === 'Sunday' ? 'selected' : ''}>Sunday</option>
+                            <option value="Monday" ${data.classDay === 'Monday' ? 'selected' : ''}>Monday</option>
+                            <option value="Tuesday" ${data.classDay === 'Tuesday' ? 'selected' : ''}>Tuesday</option>
+                            <option value="Wednesday" ${data.classDay === 'Wednesday' ? 'selected' : ''}>Wednesday</option>
+                            <option value="Friday" ${data.classDay === 'Friday' ? 'selected' : ''}>Friday</option>
+                        </select>
+                    </div>
                     <div><label class="font-bold text-gray-600">Starts</label><input type="time" id="m_routine_start" value="${data.rawStartTime || ''}" class="w-full p-2 border rounded"></div>
                     <div><label class="font-bold text-gray-600">Ends</label><input type="time" id="m_routine_end" value="${data.rawEndTime || ''}" class="w-full p-2 border rounded"></div>
                 </div>`;
@@ -415,6 +470,12 @@
                 if (activeEditCollection === "routines") {
                     const sTime = document.getElementById('m_routine_start').value;
                     const eTime = document.getElementById('m_routine_end').value;
+                    const boardType = document.getElementById('m_routine_board').value;
+                    const classDay = document.getElementById('m_routine_day').value;
+                    if (boardType === 'permanent' && classDay === 'N/A') {
+                        alert('Permanent schedule requires a class day (Saturday–Friday).');
+                        return;
+                    }
                     await updateDoc(doc(db, "routines", activeEditId), {
                         subject: document.getElementById('m_routine_sub').value.trim(),
                         courseCode: document.getElementById('m_routine_code').value.trim(),
@@ -422,7 +483,8 @@
                         batchNumber: document.getElementById('m_routine_batch').value.trim(),
                         teacherCode: document.getElementById('m_routine_teacher').value.trim(),
                         gender: document.getElementById('m_routine_gender').value,
-                        boardType: document.getElementById('m_routine_board').value,
+                        boardType,
+                        classDay,
                         rawStartTime: sTime,
                         rawEndTime: eTime,
                         timeSlot: `${formatTimeTo12Hour(sTime)} - ${formatTimeTo12Hour(eTime)}`
