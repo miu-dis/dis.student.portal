@@ -82,12 +82,12 @@
         <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-teal-600">
             <div class="border-b pb-3 mb-6"><h3 id="lblPermanentRoutine" class="text-xl font-bold text-emerald-800">📅 Permanent Weekly Schedule Board</h3></div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="weeklyRoutineGrid">
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Saturday">Saturday</h4><div id="day-Saturday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Sunday">Sunday</h4><div id="day-Sunday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Monday">Monday</h4><div id="day-Monday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Tuesday">Tuesday</h4><div id="day-Tuesday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Wednesday">Wednesday</h4><div id="day-Wednesday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200"><h4 class="font-bold text-sm bg-rose-700 text-white px-3 py-1.5 rounded-lg mb-3" id="dayLabel-Friday">Friday</h4><div id="day-Friday" class="space-y-2 text-xs text-gray-500">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col min-h-0"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 shrink-0" id="dayLabel-Saturday">Saturday</h4><div id="day-Saturday" class="space-y-2 text-xs text-gray-500 flex-1 min-h-0 max-h-[28rem] overflow-y-auto pr-1">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col min-h-0"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 shrink-0" id="dayLabel-Sunday">Sunday</h4><div id="day-Sunday" class="space-y-2 text-xs text-gray-500 flex-1 min-h-0 max-h-[28rem] overflow-y-auto pr-1">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col min-h-0"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 shrink-0" id="dayLabel-Monday">Monday</h4><div id="day-Monday" class="space-y-2 text-xs text-gray-500 flex-1 min-h-0 max-h-[28rem] overflow-y-auto pr-1">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col min-h-0"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 shrink-0" id="dayLabel-Tuesday">Tuesday</h4><div id="day-Tuesday" class="space-y-2 text-xs text-gray-500 flex-1 min-h-0 max-h-[28rem] overflow-y-auto pr-1">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col min-h-0"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 shrink-0" id="dayLabel-Wednesday">Wednesday</h4><div id="day-Wednesday" class="space-y-2 text-xs text-gray-500 flex-1 min-h-0 max-h-[28rem] overflow-y-auto pr-1">No classes.</div></div>
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col min-h-0"><h4 class="font-bold text-sm bg-rose-700 text-white px-3 py-1.5 rounded-lg mb-3 shrink-0" id="dayLabel-Friday">Friday</h4><div id="day-Friday" class="space-y-2 text-xs text-gray-500 flex-1 min-h-0 max-h-[28rem] overflow-y-auto pr-1">No classes.</div></div>
             </div>
         </div>
     </section>
@@ -791,21 +791,67 @@
             }
         });
 
+        function routineStartMinutes(data) {
+            if (data.rawStartTime) {
+                const parts = String(data.rawStartTime).split(":");
+                return (parseInt(parts[0], 10) || 0) * 60 + (parseInt(parts[1], 10) || 0);
+            }
+            const m = String(data.timeSlot || "").match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+            if (!m) return 9999;
+            let h = parseInt(m[1], 10);
+            const min = parseInt(m[2], 10) || 0;
+            const ap = (m[3] || "").toUpperCase();
+            if (ap === "PM" && h < 12) h += 12;
+            if (ap === "AM" && h === 12) h = 0;
+            return h * 60 + min;
+        }
+
+        function compareRoutineByTime(a, b) {
+            const diff = routineStartMinutes(a) - routineStartMinutes(b);
+            return diff !== 0 ? diff : String(a.subject || "").localeCompare(String(b.subject || ""));
+        }
+
+        function buildRoutineCardHTML(data) {
+            const genderBadge = data.gender === 'Male'
+                ? { label: window.portalT('genderMale'), cls: 'bg-blue-100 text-blue-700' }
+                : data.gender === 'Female'
+                    ? { label: window.portalT('genderFemale'), cls: 'bg-pink-100 text-pink-700' }
+                    : { label: window.portalT('genderCombined'), cls: 'bg-purple-100 text-purple-700' };
+            return `<div class="p-2.5 bg-white border border-slate-200 rounded-lg shadow-sm text-xs"><div class="flex justify-between items-center mb-0.5"><h5 class="font-extrabold text-emerald-800 text-sm">${escapeHtml(data.subject)}</h5><span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${genderBadge.cls}">${genderBadge.label}</span></div><div class="mb-1 text-[11px] text-amber-700 font-bold">Batch: ${escapeHtml(data.batchNumber)}</div><div class="grid grid-cols-2 text-[11px] text-gray-600 gap-y-0.5 border-t border-dashed pt-1 mt-1"><p><b>Code:</b> ${escapeHtml(data.courseCode)}</p><p><b>Room:</b> ${escapeHtml(data.room)}</p><p class="text-emerald-700 font-bold col-span-2"><b>Teacher:</b> ${escapeHtml(data.teacherCode)}</p><p class="font-bold text-slate-700 col-span-2 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${escapeHtml(data.timeSlot)}</p></div></div>`;
+        }
+
         // রুটিন ও নোটিশ লিসেনার
         onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
-            let hasDaily = false;
-            dailyContainer.innerHTML = ''; Object.keys(daysWithClasses).forEach(day => { const el = document.getElementById(`day-${day}`); if(el) el.innerHTML = ''; daysWithClasses[day] = false; });
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                const genderBadge = data.gender === 'Male'
-                    ? { label: window.portalT('genderMale'), cls: 'bg-blue-100 text-blue-700' }
-                    : data.gender === 'Female'
-                        ? { label: window.portalT('genderFemale'), cls: 'bg-pink-100 text-pink-700' }
-                        : { label: window.portalT('genderCombined'), cls: 'bg-purple-100 text-purple-700' };
-                const cardHTML = `<div class="p-2.5 bg-white border border-slate-200 rounded-lg shadow-sm text-xs"><div class="flex justify-between items-center mb-0.5"><h5 class="font-extrabold text-emerald-800 text-sm">${data.subject}</h5><span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${genderBadge.cls}">${genderBadge.label}</span></div><div class="mb-1 text-[11px] text-amber-700 font-bold">Batch: ${data.batchNumber}</div><div class="grid grid-cols-2 text-[11px] text-gray-600 gap-y-0.5 border-t border-dashed pt-1 mt-1"><p><b>Code:</b> ${data.courseCode}</p><p><b>Room:</b> ${data.room}</p><p class="text-emerald-700 font-bold col-span-2"><b>Teacher:</b> ${data.teacherCode}</p><p class="font-bold text-slate-700 col-span-2 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${data.timeSlot}</p></div></div>`;
-                if (data.boardType === 'daily') { dailyContainer.innerHTML += cardHTML; hasDaily = true; } else if (data.boardType === 'permanent' && data.classDay && data.classDay !== "N/A") { const el = document.getElementById(`day-${data.classDay}`); if (el) { el.innerHTML += cardHTML; daysWithClasses[data.classDay] = true; } }
+            const dailyRoutines = [];
+            const permanentByDay = {};
+            Object.keys(daysWithClasses).forEach(day => { permanentByDay[day] = []; });
+
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                if (data.boardType === 'daily') {
+                    dailyRoutines.push(data);
+                } else if (data.boardType === 'permanent' && data.classDay && data.classDay !== "N/A" && permanentByDay[data.classDay]) {
+                    permanentByDay[data.classDay].push(data);
+                }
             });
-            Object.keys(daysWithClasses).forEach(day => { if (!daysWithClasses[day]) document.getElementById(`day-${day}`).innerHTML = `<p class="text-xs text-gray-400 text-center py-2 bg-white/40 border border-dashed rounded-lg">${window.portalT('noClasses')}</p>`; });
+
+            dailyRoutines.sort(compareRoutineByTime);
+            dailyContainer.innerHTML = dailyRoutines.length
+                ? dailyRoutines.map(buildRoutineCardHTML).join("")
+                : `<p class="text-xs text-gray-400 col-span-2 p-2">${window.portalT('noClasses')}</p>`;
+
+            Object.keys(daysWithClasses).forEach(day => {
+                const el = document.getElementById(`day-${day}`);
+                if (!el) return;
+                const items = permanentByDay[day].sort(compareRoutineByTime);
+                if (items.length) {
+                    el.innerHTML = items.map(buildRoutineCardHTML).join("");
+                    daysWithClasses[day] = true;
+                } else {
+                    el.innerHTML = `<p class="text-xs text-gray-400 text-center py-2 bg-white/40 border border-dashed rounded-lg">${window.portalT('noClasses')}</p>`;
+                    daysWithClasses[day] = false;
+                }
+            });
         });
         onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
             const noticeContainer = document.getElementById('noticeList'); noticeContainer.innerHTML = '';
