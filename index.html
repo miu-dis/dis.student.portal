@@ -1,941 +1,129 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Islamic Studies Study Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-</head>
-<body class="bg-gray-50 text-gray-800 font-sans transition-all duration-300 invisible">
+/** Academic session: season + program type (stored in profileTerm / mapping keys) */
+export const SESSION_SEASONS = ["Spring", "Summer", "Fall"];
 
-    <nav class="bg-emerald-800 text-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-3 gap-2">
-                <img src="assets/img/logo.png" alt="University Logo" class="h-10 w-auto ml-2"> 
-                <h1 id="navTitle" class="text-xl font-bold tracking-wide">DIS Study Portal</h1>
-            </div>
-            <div class="flex items-center space-x-4">
-                <select id="langSelector" class="bg-emerald-900 text-white text-sm font-semibold rounded p-1 border border-emerald-700 outline-none cursor-pointer">
-                    <option value="en">English</option>
-                    <option value="bn">বাংলা</option>
-                </select>
-                <div id="navAuthButtons">
-                    <a href="login.html" id="btnNavLogin" class="bg-white text-emerald-800 px-4 py-1.5 rounded-lg font-semibold hover:bg-emerald-50 transition shadow text-sm">Login / Register</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+export const SESSION_PROGRAMS = [
+    { value: "regular", label: "Regular" },
+    { value: "weekend", label: "Weekend" },
+];
 
-    <div id="warningBanner" class="bg-red-600 text-white font-bold p-3 text-center hidden animate-bounce text-xs md:text-sm shadow-md">
-        ⚠️ আপনার প্রোফাইলটি অসম্পূর্ণ! অনুগ্রহ করে 'My Profile' বাটনে ক্লিক করে তথ্য সম্পূর্ণ করুন।
-    </div>
+export const SESSION_TERMS = SESSION_SEASONS.flatMap((season) =>
+    SESSION_PROGRAMS.map((p) => `${season} (${p.value})`)
+);
 
-    <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white py-8 text-center shadow-inner">
-        <div class="container mx-auto px-4">
-            <h2 id="heroTitle" class="text-2xl md:text-3xl font-extrabold mb-2">Islamic Studies Study Portal</h2>
-            <p id="heroSubtitle" class="text-emerald-100 text-sm max-w-xl mx-auto">Academic Hub</p>
-        </div>
-    </header>
+export const CALENDAR_SESSION_START = 2026;
+export const CALENDAR_SESSION_END = 2030;
 
-    <main class="container mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="bg-white rounded-xl shadow-md p-5 border-t-4 border-emerald-600">
-            <h3 id="lblNoticeBoard" class="text-lg font-bold text-gray-900 mb-3 flex items-center">📢 Notice Board</h3>
-            <div id="noticeList" class="space-y-3 overflow-y-auto max-h-48 p-1"><p class="text-xs text-gray-400">Loading notices...</p></div>
-        </div>
-        <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-5 border-t-4 border-amber-500">
-            <h3 id="lblDailyRoutine" class="text-lg font-bold text-gray-900 mb-3 flex items-center">⏳ Daily Routine Update</h3>
-            <div id="dailyRoutineList" class="grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto max-h-48 p-1"><p class="text-xs text-gray-400">Loading today's updates...</p></div>
-        </div>
-    </main>
+/** Profile modal + archive calendar year dropdown (2026–2030) */
+export const PROFILE_SESSION_YEARS = ["2026", "2027", "2028", "2029", "2030"];
 
-    <section class="container mx-auto px-4 pb-12">
-        <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-indigo-600">
-            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 pb-4 border-b border-gray-200 gap-4">
-                <div>
-                    <h3 id="lblCourses" class="text-2xl font-bold text-emerald-800 mb-0.5">Academic Resources Directory</h3>
-                    <p class="text-xs text-gray-500 font-medium" id="lblSubTitleCourses">সব সেমিস্টারের ফাইল দেখার উম্মুক্ত আর্কাইভ (আপলোড শুধুমাত্র নিজের সেমিস্টারে লকিং)।</p>
-                </div>
-                
-                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto text-xs font-semibold">
-                    <select id="filterYear" class="bg-gray-50 border border-gray-300 text-emerald-800 p-2 rounded-lg outline-none">
-                        <option value="1st Year">1st Year</option><option value="2nd Year">2nd Year</option><option value="3rd Year">3rd Year</option><option value="4th Year">4th Year</option>
-                    </select>
-                    <select id="filterTermNum" class="bg-gray-50 border border-gray-300 text-emerald-800 p-2 rounded-lg outline-none">
-                        <option value="1st Trimester">1st Trimester</option><option value="2nd Trimester">2nd Trimester</option><option value="3rd Trimester">3rd Trimester</option>
-                    </select>
-                    <select id="filterSession" class="bg-gray-50 border border-gray-300 text-emerald-800 p-2 rounded-lg outline-none"></select>
-                    <span id="displayStudentCurrentSem" class="bg-indigo-50 text-indigo-800 font-bold px-3 py-2 rounded-lg border border-indigo-200 shrink-0">Syncing...</span>
-                </div>
-            </div>
-            
-            <div id="courseGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <p class="text-xs text-gray-400 p-2">Loading academic course archive...</p>
-            </div>
-        </div>
-    </section>
+export function getCalendarSessionYears() {
+    const years = [];
+    for (let y = CALENDAR_SESSION_START; y <= CALENDAR_SESSION_END; y++) {
+        years.push(String(y));
+    }
+    return years;
+}
 
-    <section class="container mx-auto px-4 pb-12">
-        <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-teal-600">
-            <div class="border-b pb-3 mb-6"><h3 id="lblPermanentRoutine" class="text-xl font-bold text-emerald-800">📅 Permanent Weekly Schedule Board</h3></div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="weeklyRoutineGrid">
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col min-h-0"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 shrink-0" id="dayLabel-Saturday">Saturday</h4><div id="day-Saturday" class="space-y-2 text-xs text-gray-500 flex-1 min-h-0 max-h-[28rem] overflow-y-auto pr-1">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col min-h-0"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 shrink-0" id="dayLabel-Sunday">Sunday</h4><div id="day-Sunday" class="space-y-2 text-xs text-gray-500 flex-1 min-h-0 max-h-[28rem] overflow-y-auto pr-1">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col min-h-0"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 shrink-0" id="dayLabel-Monday">Monday</h4><div id="day-Monday" class="space-y-2 text-xs text-gray-500 flex-1 min-h-0 max-h-[28rem] overflow-y-auto pr-1">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col min-h-0"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 shrink-0" id="dayLabel-Tuesday">Tuesday</h4><div id="day-Tuesday" class="space-y-2 text-xs text-gray-500 flex-1 min-h-0 max-h-[28rem] overflow-y-auto pr-1">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col min-h-0"><h4 class="font-bold text-sm bg-emerald-700 text-white px-3 py-1.5 rounded-lg mb-3 shrink-0" id="dayLabel-Wednesday">Wednesday</h4><div id="day-Wednesday" class="space-y-2 text-xs text-gray-500 flex-1 min-h-0 max-h-[28rem] overflow-y-auto pr-1">No classes.</div></div>
-                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 flex flex-col min-h-0"><h4 class="font-bold text-sm bg-rose-700 text-white px-3 py-1.5 rounded-lg mb-3 shrink-0" id="dayLabel-Friday">Friday</h4><div id="day-Friday" class="space-y-2 text-xs text-gray-500 flex-1 min-h-0 max-h-[28rem] overflow-y-auto pr-1">No classes.</div></div>
-            </div>
-        </div>
-    </section>
+export function combineSessionTerm(season, program) {
+    const s = SESSION_SEASONS.includes(season) ? season : "Spring";
+    const p = program === "weekend" ? "weekend" : "regular";
+    return `${s} (${p})`;
+}
 
-    <div id="shareModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
-            <h3 id="sm_title" class="text-lg font-bold text-indigo-900 mb-4 border-b pb-2 flex items-center"><i class="fa-solid fa-cloud-arrow-up mr-2"></i> Share / Upload Study Material</h3>
-            
-            <form id="resourceShareForm" class="space-y-3 text-xs" data-edit-id="">
-                <div>
-                    <label id="sm_name" class="block font-semibold text-gray-600 mb-1">Contributor Name</label>
-                    <input type="text" id="shareAuthor" required readonly class="w-full p-2 border rounded bg-gray-100 text-gray-700 cursor-not-allowed">
-                </div>
-                <div>
-                    <label id="sm_locked_course" class="block font-semibold text-gray-600 mb-1">Locked Course</label>
-                    <input type="text" id="lockedCourseDisplay" readonly class="w-full p-2 border rounded bg-indigo-50 text-indigo-900 font-bold cursor-not-allowed">
-                </div>
-                <div>
-                    <label id="sm_topic" class="block font-semibold text-gray-600 mb-1">Note / Lecture Title</label>
-                    <input type="text" id="shareTitle" required class="w-full p-2 border rounded" placeholder="e.g. Chapter 1 notes">
-                </div>
-                <div>
-                    <label id="sm_type" class="block font-semibold text-gray-600 mb-1">Resource Type</label>
-                    <select id="shareType" required class="w-full p-2 border rounded bg-white">
-                        <option value="PDF/Handnote">PDF / Handnote</option>
-                        <option value="Video Lecture">Video / YouTube Link</option>
-                        <option value="Audio/Voice">Audio / Voice Clip</option>
-                        <option value="Image/Document">Image / Document</option>
-                    </select>
-                </div>
+export function splitSessionTerm(term) {
+    const norm = normalizeSessionTerm(term);
+    const m = norm.match(/^(Spring|Summer|Fall)\s+\((regular|weekend)\)$/i);
+    if (m) return { season: m[1], program: m[2].toLowerCase() };
+    if (SESSION_SEASONS.includes(norm)) return { season: norm, program: "regular" };
+    return { season: "Spring", program: "regular" };
+}
 
-                <div id="uploadSizeNotice" class="bg-amber-50 border border-amber-300 text-amber-900 text-[10px] p-2.5 rounded-lg leading-relaxed font-medium">⚠️ Direct upload limit: 2MB. If your file is larger, upload it to Google Drive or YouTube first, set sharing to Public, then paste the link here.</div>
+/** Map legacy profileTerm / filter values to the new labeled format */
+export function normalizeSessionTerm(term) {
+    if (!term) return "Spring (regular)";
+    const t = String(term).trim();
+    if (t === "Spring" || t === "Summer" || t === "Fall") return `${t} (regular)`;
+    return t;
+}
 
-                <div class="bg-slate-50 p-3 rounded-xl border border-dashed border-slate-300 space-y-2">
-                    <label id="lblUploadMethod" class="block font-bold text-gray-700 mb-1">Choose upload method:</label>
-                    <div class="grid grid-cols-2 gap-2 mb-2">
-                        <button type="button" onclick="switchUploadMethod('file')" id="methodFileBtn" class="py-2 text-center text-[11px] font-bold rounded-lg bg-indigo-100 text-indigo-800 border border-indigo-300 w-full">📁 Direct File</button>
-                        <button type="button" onclick="switchUploadMethod('link')" id="methodLinkBtn" class="py-2 text-center text-[11px] font-bold rounded-lg bg-gray-100 text-gray-600 border border-gray-300 w-full">🔗 Cloud Link</button>
-                    </div>
+export function buildTrimesterKey(year, termNum, term, sessionYear) {
+    const sessionTerm = normalizeSessionTerm(term);
+    return `${year} - ${termNum} (${sessionTerm} ${sessionYear})`;
+}
 
-                    <div id="uploadFileSection">
-                        <label id="lblSelectFileText" class="block text-[10px] text-gray-500 font-semibold mb-1">Select file (max 2MB)</label>
-                        <input type="file" id="shareFileField" accept="image/*,application/pdf,audio/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-indigo-100 file:text-indigo-800 hover:file:bg-indigo-200 cursor-pointer">
-                    </div>
+/** Normalize full semester keys, including legacy "(Spring 2026)" without program type */
+export function normalizeTrimesterKey(key) {
+    if (!key || !key.includes("(")) return key;
+    const closeIdx = key.lastIndexOf(")");
+    const openIdx = key.indexOf("(");
+    if (openIdx < 0 || closeIdx < 0) return key;
+    const prefix = key.slice(0, openIdx).trim();
+    const inner = key.slice(openIdx + 1, closeIdx).trim();
+    const yearMatch = inner.match(/\s+(20\d{2})$/);
+    if (!yearMatch) return key;
+    const sessionYear = yearMatch[1];
+    const termPart = inner.slice(0, inner.length - yearMatch[0].length).trim();
+    const dashIdx = prefix.indexOf(" - ");
+    if (dashIdx < 0) return key;
+    const yr = prefix.slice(0, dashIdx).trim();
+    const termNum = prefix.slice(dashIdx + 3).trim();
+    return buildTrimesterKey(yr, termNum, termPart, sessionYear);
+}
 
-                    <div id="uploadLinkSection" class="hidden">
-                        <label id="lblLinkUrlText" class="block text-[10px] text-gray-500 font-semibold mb-1">Paste public link</label>
-                        <input type="url" id="shareUrl" class="w-full p-2 border border-indigo-300 rounded text-blue-600 font-mono" placeholder="https://drive.google.com/...">
-                    </div>
-                </div>
+export function getArchiveSessionFull(season, program, sessionYear) {
+    return `${combineSessionTerm(season, program)} ${sessionYear}`;
+}
 
-                <div id="lockSemNotice" class="bg-indigo-50 p-2.5 rounded-lg text-indigo-900 font-medium text-[11px] border border-indigo-200 leading-relaxed">
-                    <span id="lockSemNoticeBefore">🔒 This file will be saved under your running semester</span> <b id="lockedSemLabel">...</b><span id="lockSemNoticeAfter">. Classmates can view it in this course.</span>
-                </div>
+/** Legacy course_mapping doc ids used Spring/Summer/Fall without (regular)/(weekend) */
+export function toLegacyTrimesterKey(key) {
+    const norm = normalizeTrimesterKey(key);
+    const closeIdx = norm.lastIndexOf(")");
+    const openIdx = norm.indexOf("(");
+    if (openIdx < 0 || closeIdx < 0) return null;
+    const prefix = norm.slice(0, openIdx).trim();
+    const inner = norm.slice(openIdx + 1, closeIdx).trim();
+    const yearMatch = inner.match(/\s+(20\d{2})$/);
+    if (!yearMatch) return null;
+    const sessionYear = yearMatch[1];
+    const termPart = inner.slice(0, inner.length - yearMatch[0].length).trim();
+    if (!termPart.endsWith(" (regular)")) return null;
+    const legacyTerm = termPart.slice(0, -" (regular)".length);
+    return `${prefix} (${legacyTerm} ${sessionYear})`;
+}
 
-                <div class="flex justify-end space-x-2 pt-2 border-t">
-                    <button type="button" onclick="closeShareModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold transition" id="sm_cancel">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition" id="sm_submit">Publish Live</button>
-                </div>
-            </form>
-        </div>
-    </div>
+export function fillSessionTermSelect(selectEl, selectedValue) {
+    if (!selectEl) return;
+    selectEl.innerHTML = SESSION_TERMS.map(
+        (v) => `<option value="${v}">${v}</option>`
+    ).join("");
+    const norm = normalizeSessionTerm(selectedValue || selectEl.value);
+    selectEl.value = SESSION_TERMS.includes(norm) ? norm : "Spring (regular)";
+}
 
-    <div id="profileModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative max-h-[90vh] overflow-y-auto">
-            <h3 id="m_title" class="text-lg font-bold text-emerald-800 mb-4 border-b pb-2 flex items-center"><i class="fa-solid fa-id-card mr-2"></i> My Personal Profile Card</h3>
-            <form id="profileEditForm" class="space-y-3 text-xs">
-                <div class="flex items-center space-x-4 bg-slate-50 p-2.5 rounded-xl border border-dashed">
-                    <img id="avatarPreview" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="h-16 w-16 rounded-full object-cover border-2 border-emerald-700 shadow-sm" alt="Avatar">
-                    <div><label id="m_pic" class="block font-semibold text-gray-700 mb-1">Upload Profile Picture</label><input type="file" id="profilePicFile" accept="image/*" class="w-full text-xs text-gray-500"></div>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div class="col-span-2"><label id="m_name" class="block font-semibold text-gray-600 mb-0.5">Full Name</label><input type="text" id="editProfileName" required class="w-full p-2 border rounded text-gray-700"></div>
-                    <div><label id="m_uid" class="block font-semibold text-gray-600 mb-0.5">University ID (UID)</label><input type="text" id="editProfileUID" required class="w-full p-2 border rounded text-gray-700"></div>
-                    <div><label id="m_batch" class="block font-semibold text-gray-600 mb-0.5">Batch Number</label><input type="text" id="editProfileBatch" required class="w-full p-2 border rounded text-gray-700"></div>
-                </div>
-                <div class="bg-slate-100 p-3 rounded-xl border space-y-2">
-                    <p id="m_academic_title" class="font-bold text-slate-700 text-[11px]"><i class="fa-solid fa-graduation-cap mr-1"></i> Academic Session Status</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <select id="editProfileYear" required class="w-full p-1.5 border rounded bg-white text-gray-700"><option value="1st Year">1st Year</option><option value="2nd Year">2nd Year</option><option value="3rd Year">3rd Year</option><option value="4th Year">4th Year</option></select>
-                        </div>
-                        <div>
-                            <select id="editProfileTermNum" required class="w-full p-1.5 border rounded bg-white text-gray-700"><option value="1st Trimester">1st Trimester</option><option value="2nd Trimester">2nd Trimester</option><option value="3rd Trimester">3rd Trimester</option></select>
-                        </div>
-                        <div>
-                            <select id="editProfileTerm" required class="w-full p-1.5 border rounded bg-white text-gray-700"></select>
-                        </div>
-                        <div>
-                            <select id="editProfileSessionYear" required class="w-full p-1.5 border rounded bg-white text-gray-700"><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-200 space-y-2.5">
-                    <p id="m_emg_title" class="font-bold text-amber-800 text-[11px]">⚠️ Emergency Data</p>
-                    <div><label id="m_phone" class="block font-semibold text-gray-700 mb-0.5">My Mobile Number</label><input type="tel" id="editProfilePhone" required class="w-full p-2 border border-gray-300 rounded"></div>
-                    <div>
-                        <label id="lblBloodGroup" class="block font-semibold text-gray-700 mb-0.5">Blood Group</label>
-                        <select id="editProfileBlood" required class="w-full p-2 border border-gray-300 rounded bg-white"><option value="">Select Blood Group</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="O+">O+</option><option value="O-">O-</option><option value="AB+">AB+</option><option value="AB-">AB-</option></select>
-                    </div>
-                    <div><label id="lblEmgName" class="block font-semibold text-gray-700 mb-0.5">Emergency Contact Name</label><input type="text" id="editProfileEmergencyName" required class="w-full p-2 border border-gray-300 rounded"></div>
-                    <div><label id="lblEmgPhone" class="block font-semibold text-gray-700 mb-0.5">Emergency Contact Mobile No</label><input type="tel" id="editProfileEmergencyPhone" required class="w-full p-2 border border-gray-300 rounded"></div>
-                </div>
-                <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-200 space-y-2">
-                    <p id="m_pass_title" class="font-bold text-blue-800 text-[11px]">🔒 Change Password</p>
-                    <div class="relative"><input type="password" id="newProfilePassword" class="w-full p-2 border border-gray-300 rounded pr-10"><button type="button" onclick="toggleProfilePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"><i id="eyeIconProfile" class="fa-solid fa-eye-slash"></i></button></div>
-                </div>
-                <div class="flex justify-end space-x-2 pt-2 border-t">
-                    <button type="button" id="btnCancelProfile" onclick="closeProfileModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold transition">Cancel</button>
-                    <button type="submit" id="btnSaveProfileText" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg font-semibold transition">Save Profile Info</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        window.currentActiveMethod = "file";
-
-        function switchUploadMethod(method) {
-            window.currentActiveMethod = method;
-            const fBtn = document.getElementById('methodFileBtn');
-            const lBtn = document.getElementById('methodLinkBtn');
-            const fSec = document.getElementById('uploadFileSection');
-            const lSec = document.getElementById('uploadLinkSection');
-
-            if(method === 'file') {
-                fBtn.className = "py-1.5 text-center font-bold rounded-lg bg-indigo-100 text-indigo-800 border border-indigo-300 w-full";
-                lBtn.className = "py-1.5 text-center font-bold rounded-lg bg-gray-100 text-gray-600 border w-full";
-                fSec.classList.remove('hidden'); lSec.classList.add('hidden');
-            } else {
-                lBtn.className = "py-1.5 text-center font-bold rounded-lg bg-indigo-100 text-indigo-800 border border-indigo-300 w-full";
-                fBtn.className = "py-1.5 text-center font-bold rounded-lg bg-gray-100 text-gray-600 border w-full";
-                lSec.classList.remove('hidden'); fSec.classList.add('hidden');
-            }
+/** Class Shared Resources Archive: season, program, calendar year as separate dropdowns */
+export function fillArchiveSessionFilters({ seasonEl, programEl, yearEl, profileTerm, sessionYear }) {
+    if (seasonEl) {
+        seasonEl.innerHTML = SESSION_SEASONS.map(
+            (s) => `<option value="${s}">${s}</option>`
+        ).join("");
+    }
+    if (programEl) {
+        programEl.innerHTML = SESSION_PROGRAMS.map(
+            (p) => `<option value="${p.value}">${p.label}</option>`
+        ).join("");
+    }
+    if (yearEl) {
+        yearEl.innerHTML = getCalendarSessionYears()
+            .map((y) => `<option value="${y}">${y}</option>`)
+            .join("");
+    }
+    if (profileTerm !== undefined || sessionYear !== undefined) {
+        const { season, program } = splitSessionTerm(profileTerm);
+        if (seasonEl && SESSION_SEASONS.includes(season)) seasonEl.value = season;
+        if (programEl) programEl.value = program === "weekend" ? "weekend" : "regular";
+        if (yearEl) {
+            const y = String(sessionYear || CALENDAR_SESSION_START);
+            if ([...yearEl.options].some((o) => o.value === y)) yearEl.value = y;
         }
-        window.switchUploadMethod = switchUploadMethod;
-
-        const translations = {
-            en: {
-                navTitle: "DIS Study Portal", btnNavLogin: "Login / Register", btnMyProfile: "My Profile", btnLogout: "Logout",
-                warningBanner: "⚠️ Profile incomplete! Please open My Profile and fill mandatory fields.",
-                heroTitle: "Islamic Studies Study Portal", heroSubtitle: "Open platform to share class notes and lectures.",
-                lblNoticeBoard: "📢 Notice Board", lblDailyRoutine: "⏳ Daily Routine Update", lblPermanentRoutine: "📅 Permanent Weekly Schedule Board",
-                lblCourses: "Class Shared Resources Archive", lblSubTitleCourses: "Select year, trimester and session above to browse any semester.",
-                sat: "Saturday", sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", fri: "Friday",
-                noCourses: "No live courses mapped for this semester yet (admin panel).", noSharedFiles: "No shared files yet.", activeCourse: "Active Course", faculty: "Faculty",
-                btnAddResource: "Add Note / Link", loginToUpload: "Login to upload", uploadOwnSemOnly: "Upload only in your running semester",
-                m_title: "My Personal Profile Card", m_pic: "Upload Profile Picture", m_name: "Full Name", m_uid: "University ID (UID)", m_batch: "Batch Number",
-                m_academic_title: "Academic Trimester Status", m_emg_title: "⚠️ Emergency Data", m_phone: "My Mobile Number", m_emg_name: "Emergency Contact Name",
-                m_emg_phone: "Emergency Contact Mobile", m_pass_title: "🔒 Change Password (optional)", m_pass_ph: "Min. 6 characters",
-                m_blood: "Blood Group", m_blood_select: "Select Blood Group",
-                btnCancelProfile: "Cancel", btnSaveProfileText: "Save Profile",
-                sm_title: "Share Study Material", sm_name: "Contributor Name", sm_locked_course: "Locked Course", sm_topic: "Note / Lecture Title", sm_type: "Resource Type",
-                sm_topic_ph: "e.g. Chapter 1 — Introduction notes", sm_cancel: "Cancel", sm_submit: "Publish Live",
-                lblUploadMethod: "Choose upload method:", methodFile: "📁 Direct File", methodLink: "🔗 Cloud Link",
-                lblSelectFile: "Select file (max 2MB)", lblLinkUrl: "Paste public link (must be Public)", shareUrl_ph: "https://drive.google.com/... (Public)",
-                uploadSizeWarn: "⚠️ Direct upload limit: 2MB. If your file is larger, upload it to Google Drive or YouTube first, set sharing to Public, then paste the link here.",
-                alertFileSizeAuto: "🔴 This file is over 2MB! Switched to Cloud Link mode. Upload to Drive/YouTube, set the link to Public, then paste it below.",
-                lockSemBefore: "🔒 This file will be saved under your running semester", lockSemAfter: ". Classmates can view it in this course. You cannot upload to other semesters.",
-                typePdf: "PDF / Handnote", typeVideo: "Video / YouTube Link", typeAudio: "Audio / Voice", typeImage: "Image / Document",
-                alertLoginUpload: "Please login first to upload.", alertSemLock: "🔒 Locked! You can only upload in your own running semester.",
-                alertFileSize: "🔴 File exceeds 2MB! Upload to Drive/YouTube and paste a public link.", alertPickFile: "Select a file under 2MB.", alertPasteLink: "Paste a link.", alertPublished: "Resource published successfully!",
-                alertProfileSaved: "Profile saved!", alertProfileRequired: "Emergency info and blood group are required!", alertPassMin: "Password must be at least 6 characters.",
-                genderMale: "Male Section", genderFemale: "Female Section", genderCombined: "Combined Section", noClasses: "No classes.", loadFail: "Failed to load courses. Refresh the page.",
-                displaySemSync: "Syncing...", byAuthor: "By:", profileIncomplete: "Profile incomplete!", loadingCourses: "Loading courses...",
-                btnView: "View", btnEdit: "Edit", btnDelete: "Delete", btnViewFile: "Open file",
-                confirmDeleteResource: "Delete this uploaded resource permanently?", alertResourceDeleted: "Resource deleted.",
-                sm_edit_title: "Edit Study Material", sm_save: "Save changes", alertResourceUpdated: "Resource updated successfully!", alertUploading: "Uploading file, please wait...",
-                alertNotOwner: "You can only edit or delete resources you uploaded.",
-                fileLinkMissing: "File link missing — please upload again.",
-                alertInvalidFileUrl: "Upload failed: no valid file URL. Check Supabase config (anon key) and public bucket.",
-                alertOpenFileFailed: "Could not open file. Delete and upload again, or check Supabase Storage bucket."
-            },
-            bn: {
-                navTitle: "ডিআইএস স্টাডি পোর্টাল", btnNavLogin: "লগইন / রেজিস্টার", btnMyProfile: "আমার প্রোফাইল", btnLogout: "লগআউট",
-                warningBanner: "⚠️ আপনার প্রোফাইল অসম্পূর্ণ! অনুগ্রহ করে 'আমার প্রোফাইল' বাটনে ক্লিক করে তথ্য পূরণ করুন।",
-                heroTitle: "ইসলামিক স্টাডিজ বিভাগ পোর্টাল", heroSubtitle: "সহপাঠীদের মাঝে ক্লাস নোট ও লেকচার শেয়ার করার উন্মুক্ত প্ল্যাটফর্ম।",
-                lblNoticeBoard: "📢 নোটিশ বোর্ড", lblDailyRoutine: "⏳ আজকের সাময়িক রুটিন", lblPermanentRoutine: "📅 স্থায়ী সাপ্তাহিক রুটিন বোর্ড",
-                lblCourses: "ক্লাস শেয়ারড রিসোর্স আর্কাইভ", lblSubTitleCourses: "উপরের বছর, ট্রাইমেস্টার ও সেশন সিলেক্ট করে যেকোনো সেমিস্টারের ফাইল দেখুন।",
-                sat: "শনিবার", sun: "রবিবার", mon: "সোমবার", tue: "মঙ্গলবার", wed: "বুধবার", fri: "শুক্রবার",
-                noCourses: "এই সেমিস্টারে এখনো কোনো কোর্স ম্যাপ করা হয়নি (অ্যাডমিন প্যানেল)।", noSharedFiles: "এখনো কোনো শেয়ার নেই।", activeCourse: "সক্রিয় কোর্স", faculty: "শিক্ষক",
-                btnAddResource: "নোট / লিংক যোগ করুন", loginToUpload: "আপলোডের জন্য লগইন করুন", uploadOwnSemOnly: "শুধু আপনার রানিং সেমিস্টারে আপলোড",
-                m_title: "আমার প্রোফাইল", m_pic: "প্রোফাইল ছবি (ঐচ্ছিক)", m_name: "পূর্ণ নাম", m_uid: "ইউনিভার্সিটি আইডি", m_batch: "ব্যাচ নম্বর",
-                m_academic_title: "একাডেমিক সেশন (বর্ষ / ট্রাইমেস্টার / সেশন / সাল)", m_emg_title: "⚠️ জরুরি তথ্য", m_phone: "আমার মোবাইল",
-                m_emg_name: "জরুরি যোগাযোগের নাম", m_emg_phone: "জরুরি মোবাইল নম্বর", m_pass_title: "🔒 পাসওয়ার্ড (ঐচ্ছিক)", m_pass_ph: "কমপক্ষে ৬ অক্ষর",
-                m_blood: "রক্তের গ্রুপ", m_blood_select: "রক্তের গ্রুপ সিলেক্ট করুন",
-                btnCancelProfile: "বাতিল", btnSaveProfileText: "প্রোফাইল সেভ",
-                sm_title: "স্টাডি মেটেরিয়াল আপলোড", sm_name: "আপনার নাম", sm_locked_course: "লক করা কোর্স", sm_topic: "নোট / লেকচারের শিরোনাম", sm_type: "রিসোর্সের ধরণ",
-                sm_topic_ph: "যেমন: ১ম পরিচ্ছেদ — ভূমিকা", sm_cancel: "বাতিল", sm_submit: "প্রকাশ করুন",
-                lblUploadMethod: "আপলোড পদ্ধতি সিলেক্ট করুন:", methodFile: "📁 সরাসরি ফাইল", methodLink: "🔗 ক্লাউড লিংক",
-                lblSelectFile: "ফাইল সিলেক্ট (সর্বোচ্চ ২ এমবি)", lblLinkUrl: "পাবলিক লিংক পেস্ট করুন (অবশ্যই Public)", shareUrl_ph: "https://drive.google.com/... (Public)",
-                uploadSizeWarn: "⚠️ সরাসরি আপলোড সীমা: ২ এমবি। ফাইল বড় হলে আগে Google Drive বা YouTube-এ আপলোড করুন, শেয়ারিং Public করুন, তারপর লিংক এখানে দিন।",
-                alertFileSizeAuto: "🔴 ফাইল ২ এমবি-র বেশি! স্বয়ংক্রিয়ভাবে লিংক মোডে নেওয়া হয়েছে। Drive/YouTube-এ আপলোড করে Public লিংক পেস্ট করুন।",
-                lockSemBefore: "🔒 এই ফাইলটি আপনার রানিং সেমিস্টার", lockSemAfter: " এ সংরক্ষিত হবে। সহপাঠীরা এই কোর্সে দেখতে পারবে। অন্য সেমিস্টারে আপলোড করা যাবে না।",
-                typePdf: "পিডিএফ / হ্যান্ডনোট", typeVideo: "ভিডিও / ইউটিউব", typeAudio: "অডিও / ভয়েস", typeImage: "ছবি / ডকুমেন্ট",
-                alertLoginUpload: "আপলোড করতে প্রথমে লগইন করুন।", alertSemLock: "🔴 লক! শুধু আপনার নিজের রানিং সেমিস্টারে আপলোড করা যাবে।",
-                alertFileSize: "🔴 ফাইল ২ এমবি-র বেশি! ড্রাইভ/ইউটিউবে আপলোড করে পাবলিক লিংক দিন।", alertPickFile: "২ এমবি-র নিচে একটি ফাইল সিলেক্ট করুন।", alertPasteLink: "লিংক পেস্ট করুন।", alertPublished: "রিসোর্স সফলভাবে প্রকাশিত!",
-                alertProfileSaved: "প্রোফাইল সেভ হয়েছে!", alertProfileRequired: "জরুরি তথ্য ও রক্তের গ্রুপ পূরণ বাধ্যতামূলক!", alertPassMin: "পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে।",
-                genderMale: "ভাইদের শাখা", genderFemale: "বোনদের শাখা", genderCombined: "সম্মিলিত শাখা", noClasses: "ক্লাস নেই।", loadFail: "কোর্স লোড ব্যর্থ। পেজ রিফ্রেশ করুন।",
-                displaySemSync: "সিঙ্ক হচ্ছে...", byAuthor: "প্রকাশক:", profileIncomplete: "প্রোফাইল অসম্পূর্ণ!", loadingCourses: "কোর্স লোড হচ্ছে...",
-                btnView: "দেখুন", btnEdit: "এডিট", btnDelete: "মুছুন", btnViewFile: "ফাইল খুলুন",
-                confirmDeleteResource: "এই আপলোড করা রিসোর্স স্থায়ীভাবে মুছবেন?", alertResourceDeleted: "রিসোর্স মুছে ফেলা হয়েছে।",
-                sm_edit_title: "স্টাডি মেটেরিয়াল এডিট", sm_save: "সংরক্ষণ করুন", alertResourceUpdated: "রিসোর্স আপডেট হয়েছে!", alertUploading: "ফাইল আপলোড হচ্ছে, অপেক্ষা করুন...",
-                alertNotOwner: "শুধু নিজের আপলোড করা রিসোর্স এডিট বা ডিলিট করতে পারবেন।",
-                fileLinkMissing: "ফাইল লিংক নেই — আবার আপলোড করুন।",
-                alertInvalidFileUrl: "আপলোড সফ্য হয়নি: সঠিক URL তৈরি হয়নি। Supabase-এ anon key ও Public বাকেট চেক করুন।",
-                alertOpenFileFailed: "ফাইল খোলা যায়নি। মুছে আবার আপলোড করুন অথবা Supabase Storage চেক করুন।"
-            }
-        };
-        window.portalTranslations = translations;
-        window.getPortalLang = () => localStorage.getItem('preferredLang') || 'en';
-        window.portalT = (key) => { const lang = window.getPortalLang(); return (translations[lang] && translations[lang][key]) || translations.en[key] || key; };
-
-        function applyLanguage(lang) {
-            const t = translations[lang] || translations['en'];
-            document.getElementById('navTitle').innerText = t.navTitle;
-            if(document.getElementById('btnNavLogin')) document.getElementById('btnNavLogin').innerText = t.btnNavLogin;
-            document.getElementById('warningBanner').innerText = t.warningBanner;
-            document.getElementById('heroTitle').innerText = t.heroTitle;
-            document.getElementById('heroSubtitle').innerText = t.heroSubtitle;
-            document.getElementById('lblNoticeBoard').innerText = t.lblNoticeBoard;
-            document.getElementById('lblDailyRoutine').innerText = t.lblDailyRoutine;
-            document.getElementById('lblPermanentRoutine').innerText = t.lblPermanentRoutine;
-            document.getElementById('lblCourses').innerText = t.lblCourses;
-            document.getElementById('lblSubTitleCourses').innerText = t.lblSubTitleCourses;
-
-            document.getElementById('dayLabel-Saturday').innerText = t.sat; document.getElementById('dayLabel-Sunday').innerText = t.sun;
-            document.getElementById('dayLabel-Monday').innerText = t.mon; document.getElementById('dayLabel-Tuesday').innerText = t.tue;
-            document.getElementById('dayLabel-Wednesday').innerText = t.wed; document.getElementById('dayLabel-Friday').innerText = t.fri;
-
-            document.getElementById('m_title').innerHTML = `<i class="fa-solid fa-id-card mr-2"></i> ` + t.m_title;
-            document.getElementById('m_pic').innerText = t.m_pic; document.getElementById('m_name').innerText = t.m_name;
-            document.getElementById('m_uid').innerText = t.m_uid; document.getElementById('m_batch').innerText = t.m_batch;
-            document.getElementById('m_academic_title').innerHTML = `<i class="fa-solid fa-graduation-cap mr-1"></i> ` + t.m_academic_title;
-            document.getElementById('m_emg_title').innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> ` + t.m_emg_title;
-            document.getElementById('m_phone').innerText = t.m_phone; document.getElementById('m_emg_name').innerText = t.m_emg_name;
-            document.getElementById('m_emg_phone').innerText = t.m_emg_phone; document.getElementById('m_pass_title').innerHTML = `<i class="fa-solid fa-lock mr-1"></i> ` + t.m_pass_title;
-            document.getElementById('btnCancelProfile').innerText = t.btnCancelProfile; document.getElementById('btnSaveProfileText').innerText = t.btnSaveProfileText;
-
-            document.getElementById('sm_title').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> ` + t.sm_title;
-            document.getElementById('sm_name').innerText = t.sm_name;
-            document.getElementById('sm_locked_course').innerText = t.sm_locked_course;
-            document.getElementById('sm_topic').innerText = t.sm_topic;
-            document.getElementById('sm_type').innerText = t.sm_type;
-            document.getElementById('sm_cancel').innerText = t.sm_cancel;
-            document.getElementById('sm_submit').innerText = t.sm_submit;
-            document.getElementById('shareTitle').placeholder = t.sm_topic_ph;
-            document.getElementById('shareUrl').placeholder = t.shareUrl_ph;
-            document.getElementById('lblUploadMethod').innerText = t.lblUploadMethod;
-            document.getElementById('methodFileBtn').innerText = t.methodFile;
-            document.getElementById('methodLinkBtn').innerText = t.methodLink;
-            document.getElementById('lblSelectFileText').innerText = t.lblSelectFile;
-            document.getElementById('lblLinkUrlText').innerText = t.lblLinkUrl;
-            document.getElementById('uploadSizeNotice').innerText = t.uploadSizeWarn;
-            if (typeof switchUploadMethod === 'function') switchUploadMethod(window.currentActiveMethod || 'file');
-            document.getElementById('lockSemNoticeBefore').innerText = t.lockSemBefore;
-            document.getElementById('lockSemNoticeAfter').innerText = t.lockSemAfter;
-            document.getElementById('newProfilePassword').placeholder = t.m_pass_ph;
-            const shareType = document.getElementById('shareType');
-            if (shareType && shareType.options.length >= 4) {
-                shareType.options[0].text = t.typePdf; shareType.options[1].text = t.typeVideo;
-                shareType.options[2].text = t.typeAudio; shareType.options[3].text = t.typeImage;
-            }
-            const lblBlood = document.getElementById('lblBloodGroup');
-            if (lblBlood) lblBlood.innerText = t.m_blood;
-            if (document.getElementById('editProfileBlood')?.options[0]) document.getElementById('editProfileBlood').options[0].text = t.m_blood_select;
-            const lblEmgName = document.getElementById('lblEmgName');
-            const lblEmgPhone = document.getElementById('lblEmgPhone');
-            if (lblEmgName) lblEmgName.innerText = t.m_emg_name;
-            if (lblEmgPhone) lblEmgPhone.innerText = t.m_emg_phone;
-            const semBadge = document.getElementById('displayStudentCurrentSem');
-            if (semBadge && semBadge.innerText === 'Syncing...') semBadge.innerText = t.displaySemSync;
-            document.documentElement.lang = lang === 'bn' ? 'bn' : 'en';
-            if (typeof window.refreshCourseGridLang === 'function') window.refreshCourseGridLang();
-        }
-
-        const langSelector = document.getElementById('langSelector');
-        langSelector.addEventListener('change', (e) => { localStorage.setItem('preferredLang', e.target.value); applyLanguage(e.target.value); window.location.reload(); });
-        const savedLang = localStorage.getItem('preferredLang') || 'en';
-        langSelector.value = savedLang;
-        applyLanguage(savedLang);
-
-        function openShareModal() {
-            const modal = document.getElementById('shareModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-        function closeShareModal() {
-            const modal = document.getElementById('shareModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-        window.openShareModal = openShareModal;
-        window.closeShareModal = closeShareModal;
-        function toggleProfilePassword() { const input = document.getElementById('newProfilePassword'); const icon = document.getElementById('eyeIconProfile'); if (input.type === "password") { input.type = "text"; icon.className = "fa-solid fa-eye"; } else { input.type = "password"; icon.className = "fa-solid fa-eye-slash"; } }
-        window.toggleProfilePassword = toggleProfilePassword;
-    </script>
-
-    <script type="module">
-        import { auth, db } from "./assets/js/app.js";
-        import { formatNoticeContent } from "./assets/js/noticeFormat.js";
-        import { uploadPortalFile, deletePortalFile, openResourceFile } from "./assets/js/fileStorage.js";
-        import { fillSessionTermSelect, fillSessionFilterSelect, buildTrimesterKey, normalizeSessionTerm, normalizeTrimesterKey, sessionFilterValue, toLegacyTrimesterKey } from "./assets/js/academicTerms.js";
-        import { onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { collection, onSnapshot, query, orderBy, doc, getDoc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        fillSessionTermSelect(document.getElementById("editProfileTerm"));
-        fillSessionFilterSelect(document.getElementById("filterSession"));
-
-        let loggedInUserUID = null; let loggedInUserName = ""; let isProfileIncomplete = false; let base64PicString = "";
-        let studentCurrentTrimesterKey = ""; 
-        let base64UploadedFileString = ""; 
-        const dailyContainer = document.getElementById('dailyRoutineList');
-        const courseGrid = document.getElementById('courseGrid');
-        const daysWithClasses = { Saturday: false, Sunday: false, Monday: false, Tuesday: false, Wednesday: false, Friday: false };
-
-        let latestMappedCourses = [];
-        let resourcesSnapshot = null;
-        let renderCourseGridTimer = null;
-        let pendingUploadFile = null;
-
-        function escapeHtml(text) {
-            return String(text || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
-        }
-
-        function hasViewableResource(rData) {
-            if (rData.urlType === "external") {
-                const u = (rData.url || "").trim();
-                return u.startsWith("http") || u.startsWith("data:");
-            }
-            if (rData.storagePath) return true;
-            const u = (rData.url || "").trim();
-            return u.startsWith("http") || u.startsWith("data:");
-        }
-
-        function normalizePersonName(name) {
-            return String(name || "").trim().toLowerCase();
-        }
-
-        function canManageResource(rData) {
-            if (!loggedInUserUID) return false;
-            if (rData.uploadedBy && rData.uploadedBy === loggedInUserUID) return true;
-            // পুরনো আপলোডে uploadedBy না থাকলে প্রোফাইলের নাম == author হলে নিজেরটা ধরা
-            if (!rData.uploadedBy && loggedInUserName && normalizePersonName(rData.author) === normalizePersonName(loggedInUserName)) {
-                return true;
-            }
-            return false;
-        }
-
-        async function uploadFileToStorage(file) {
-            return uploadPortalFile(file, loggedInUserUID);
-        }
-
-        function renderResourceItemHTML(rData, t) {
-            const canView = hasViewableResource(rData);
-            let icon = "fa-file-pdf text-red-500";
-            if (rData.type && rData.type.includes("Video")) icon = "fa-video text-blue-500";
-            if (rData.type && rData.type.includes("Audio")) icon = "fa-microphone text-purple-500";
-            if (rData.type && rData.type.includes("Image")) icon = "fa-image text-amber-500";
-
-            const manageBtns = canManageResource(rData) ? `
-                <div class="flex gap-1 shrink-0 ml-1">
-                    <button type="button" data-edit-resource="${rData.id}" class="text-[9px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-600 hover:text-white font-bold">${t('btnEdit')}</button>
-                    <button type="button" data-delete-resource="${rData.id}" class="text-[9px] px-1.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 hover:bg-red-600 hover:text-white font-bold">${t('btnDelete')}</button>
-                </div>` : "";
-
-            const viewBtn = canView
-                ? `<button type="button" data-view-resource="${rData.id}" class="inline-block mt-1 text-[9px] text-indigo-600 font-bold underline hover:text-indigo-900">${t('btnViewFile')}</button>`
-                : `<span class="inline-block mt-1 text-[9px] text-red-500">${t('fileLinkMissing')}</span>`;
-
-            return `
-                <div class="p-2 bg-indigo-50/50 border border-indigo-100 rounded-md text-[11px]">
-                    <div class="flex justify-between items-start gap-1">
-                        <div class="flex-1 min-w-0 font-medium text-gray-800">
-                            <i class="fa-solid ${icon} mr-1"></i>
-                            <span class="break-words">${escapeHtml(rData.title)}</span>
-                            <span class="text-[9px] text-gray-400 block">(${t('byAuthor')} ${escapeHtml(rData.author)})</span>
-                        </div>
-                        ${manageBtns}
-                    </div>
-                    ${viewBtn}
-                </div>`;
-        }
-
-        function getCombinedTrimesterKey() {
-            const yr = document.getElementById('filterYear').value;
-            const termNum = document.getElementById('filterTermNum').value;
-            const sessionFull = document.getElementById('filterSession').value;
-            return normalizeTrimesterKey(`${yr} - ${termNum} (${sessionFull})`);
-        }
-
-        function buildResourcesByCourse(combinedTrimesterKey) {
-            const byCourse = {};
-            if (!resourcesSnapshot) return byCourse;
-            resourcesSnapshot.forEach(resDoc => {
-                const rData = { id: resDoc.id, ...resDoc.data() };
-                if (normalizeTrimesterKey(rData.semester) !== normalizeTrimesterKey(combinedTrimesterKey)) return;
-                const code = rData.courseCode;
-                if (!byCourse[code]) byCourse[code] = [];
-                byCourse[code].push(rData);
-            });
-            return byCourse;
-        }
-
-        function scheduleRenderCourseGrid() {
-            clearTimeout(renderCourseGridTimer);
-            renderCourseGridTimer = setTimeout(renderCourseGrid, 120);
-        }
-
-        function renderCourseGrid() {
-            const t = window.portalT;
-            const combinedTrimesterKey = getCombinedTrimesterKey();
-            const resourcesByCourse = buildResourcesByCourse(combinedTrimesterKey);
-            const isMyOwnSemester = Boolean(studentCurrentTrimesterKey) && combinedTrimesterKey === studentCurrentTrimesterKey;
-            const canUpload = Boolean(loggedInUserUID) && isMyOwnSemester;
-            const cards = [];
-
-            if (latestMappedCourses.length === 0) {
-                courseGrid.innerHTML = `<p class="text-xs text-gray-400 col-span-3 p-6 text-center border border-dashed rounded-xl w-full">${t('noCourses')}</p>`;
-                return;
-            }
-
-            latestMappedCourses.forEach((course, courseIndex) => {
-                const files = resourcesByCourse[course.code] || [];
-                let sharedItemsHTML = files.map(rData => renderResourceItemHTML(rData, t)).join("");
-                if (!sharedItemsHTML) sharedItemsHTML = `<p class="text-[10px] text-gray-400 italic p-1">${t('noSharedFiles')}</p>`;
-
-                const btnColorClass = canUpload
-                    ? "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-600 hover:text-white shadow-sm font-bold"
-                    : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-80";
-                const lockHint = !loggedInUserUID ? t('loginToUpload') : t('uploadOwnSemOnly');
-
-                cards.push(`
-                    <div class="border border-gray-200 rounded-xl p-4 bg-gray-50 flex flex-col justify-between hover:shadow-md hover:border-indigo-600 transition duration-200">
-                        <div>
-                            <div class="flex justify-between items-start">
-                                <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-0.5 rounded">${course.code}</span>
-                                <span class="text-[9px] bg-slate-200 font-bold px-1.5 py-0.5 rounded text-slate-700">${t('activeCourse')}</span>
-                            </div>
-                            <h4 class="text-base font-extrabold text-gray-800 mt-2">${course.title}</h4>
-                            <p class="text-xs text-gray-500 mt-1 mb-3"><i class="fa-solid fa-user-tie mr-1 text-slate-400"></i>${t('faculty')}: ${course.teacher}</p>
-                            <div class="space-y-1.5 border-t border-dashed pt-2.5">${sharedItemsHTML}</div>
-                        </div>
-                        <div class="mt-4 pt-2.5 flex">
-                            <button type="button" data-upload-course="${courseIndex}" ${canUpload ? "" : `disabled title="${lockHint}"`}
-                                class="w-full ${btnColorClass} border text-center text-xs py-2 rounded-lg transition flex items-center justify-center gap-1">
-                                <i class="fa-solid fa-plus-circle"></i> ${t('btnAddResource')}
-                            </button>
-                        </div>
-                    </div>`);
-            });
-            courseGrid.innerHTML = cards.join("");
-        }
-        window.refreshCourseGridLang = () => { if (latestMappedCourses.length >= 0) renderCourseGrid(); };
-
-        function openShareModalFromModule() {
-            const modal = document.getElementById('shareModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeShareModalFromModule() {
-            const modal = document.getElementById('shareModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        function triggerLockedUploadFlow(courseIndex) {
-            if (!auth.currentUser) {
-                alert(window.portalT('alertLoginUpload'));
-                window.location.href = './login.html';
-                return;
-            }
-            const combinedTrimesterKey = getCombinedTrimesterKey();
-            if (combinedTrimesterKey !== studentCurrentTrimesterKey) {
-                alert(window.portalT('alertSemLock'));
-                return;
-            }
-            const course = latestMappedCourses[courseIndex];
-            if (!course) return;
-
-            document.getElementById('shareAuthor').value = loggedInUserName || auth.currentUser.displayName || "";
-            document.getElementById('lockedCourseDisplay').value = `${course.code}: ${course.title}`;
-            document.getElementById('shareTitle').value = "";
-            document.getElementById('lockedSemLabel').innerText = studentCurrentTrimesterKey;
-            document.getElementById('resourceShareForm').dataset.lockedCode = course.code;
-            document.getElementById('resourceShareForm').dataset.lockedCourseTitle = course.title;
-            document.getElementById('resourceShareForm').dataset.editId = "";
-            pendingUploadFile = null;
-            base64UploadedFileString = "";
-            document.getElementById('shareFileField').value = "";
-            document.getElementById('shareUrl').value = "";
-            document.getElementById('sm_submit').innerText = window.portalT('sm_submit');
-            document.getElementById('sm_title').innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i> ${window.portalT('sm_title')}`;
-            window.switchUploadMethod('file');
-            refreshShareModalLabels();
-            openShareModalFromModule();
-        }
-
-        async function openEditResourceModal(resourceId) {
-            const snap = await getDoc(doc(db, "resources", resourceId));
-            if (!snap.exists()) return;
-            const rData = snap.data();
-            if (!canManageResource({ ...rData, id: resourceId })) {
-                alert(window.portalT('alertNotOwner'));
-                return;
-            }
-            const course = latestMappedCourses.find(c => c.code === rData.courseCode);
-            document.getElementById('shareAuthor').value = rData.author || loggedInUserName;
-            document.getElementById('lockedCourseDisplay').value = course ? `${course.code}: ${course.title}` : rData.courseCode;
-            const titleParts = (rData.title || "").split(" — ");
-            document.getElementById('shareTitle').value = titleParts.length > 1 ? titleParts.slice(1).join(" — ") : rData.title;
-            document.getElementById('shareType').value = rData.type || "PDF/Handnote";
-            document.getElementById('shareUrl').value = (rData.urlType === "external") ? (rData.url || "") : "";
-            document.getElementById('resourceShareForm').dataset.lockedCode = rData.courseCode;
-            document.getElementById('resourceShareForm').dataset.lockedCourseTitle = course?.title || rData.courseCode;
-            document.getElementById('resourceShareForm').dataset.editId = resourceId;
-            document.getElementById('lockedSemLabel').innerText = rData.semester || studentCurrentTrimesterKey;
-            pendingUploadFile = null;
-            base64UploadedFileString = "";
-            document.getElementById('shareFileField').value = "";
-            window.switchUploadMethod(rData.urlType === "external" ? "link" : "file");
-            document.getElementById('sm_submit').innerText = window.portalT('sm_save');
-            document.getElementById('sm_title').innerHTML = `<i class="fa-solid fa-pen-to-square mr-2"></i> ${window.portalT('sm_edit_title')}`;
-            refreshShareModalLabels();
-            openShareModalFromModule();
-        }
-
-        async function deleteResourceById(resourceId) {
-            const snap = await getDoc(doc(db, "resources", resourceId));
-            if (!snap.exists()) return;
-            const rData = snap.data();
-            if (!canManageResource({ ...rData, id: resourceId })) {
-                alert(window.portalT('alertNotOwner'));
-                return;
-            }
-            if (!confirm(window.portalT('confirmDeleteResource'))) return;
-            try {
-                if (rData.storagePath && rData.urlType !== "external") {
-                    await deletePortalFile(rData.storagePath);
-                }
-                await deleteDoc(doc(db, "resources", resourceId));
-                alert(window.portalT('alertResourceDeleted'));
-            } catch (err) { alert(err.message); }
-        }
-
-        function refreshShareModalLabels() {
-            document.getElementById('uploadSizeNotice').innerText = window.portalT('uploadSizeWarn');
-            document.getElementById('lockSemNoticeBefore').innerText = window.portalT('lockSemBefore');
-            document.getElementById('lockSemNoticeAfter').innerText = window.portalT('lockSemAfter');
-        }
-        window.refreshShareModalLabels = refreshShareModalLabels;
-        window.triggerLockedUploadFlow = triggerLockedUploadFlow;
-
-        courseGrid.addEventListener('click', async (e) => {
-            const uploadBtn = e.target.closest('[data-upload-course]');
-            if (uploadBtn && !uploadBtn.disabled) {
-                triggerLockedUploadFlow(parseInt(uploadBtn.dataset.uploadCourse, 10));
-                return;
-            }
-            const viewBtn = e.target.closest('[data-view-resource]');
-            if (viewBtn) {
-                e.preventDefault();
-                try {
-                    const snap = await getDoc(doc(db, "resources", viewBtn.dataset.viewResource));
-                    if (!snap.exists()) return;
-                    const ok = await openResourceFile({ id: snap.id, ...snap.data() });
-                    if (!ok) alert(window.portalT('alertOpenFileFailed'));
-                } catch (err) { alert(err.message); }
-                return;
-            }
-            const editBtn = e.target.closest('[data-edit-resource]');
-            if (editBtn) { openEditResourceModal(editBtn.dataset.editResource); return; }
-            const delBtn = e.target.closest('[data-delete-resource]');
-            if (delBtn) { deleteResourceById(delBtn.dataset.deleteResource); }
-        });
-
-        async function fetchCourseMappingForKey(key) {
-            let mapDoc = await getDoc(doc(db, "course_mappings", key));
-            if (mapDoc.exists()) return mapDoc;
-            const legacyKey = toLegacyTrimesterKey(key);
-            if (legacyKey && legacyKey !== key) {
-                mapDoc = await getDoc(doc(db, "course_mappings", legacyKey));
-            }
-            return mapDoc;
-        }
-
-        async function updateFiltersAndListen() {
-            const key = getCombinedTrimesterKey();
-            try {
-                const mapDoc = await fetchCourseMappingForKey(key);
-                latestMappedCourses = mapDoc.exists() ? (mapDoc.data().courses || []) : [];
-                renderCourseGrid();
-            } catch (err) {
-                console.error(err);
-                courseGrid.innerHTML = `<p class="text-xs text-red-500 p-4 text-center">${window.portalT('loadFail')}</p>`;
-            }
-        }
-
-        onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snapshot) => {
-            resourcesSnapshot = snapshot;
-            scheduleRenderCourseGrid();
-        });
-
-        document.getElementById('filterYear').addEventListener('change', updateFiltersAndListen);
-        document.getElementById('filterTermNum').addEventListener('change', updateFiltersAndListen);
-        document.getElementById('filterSession').addEventListener('change', updateFiltersAndListen);
-        updateFiltersAndListen();
-
-        // ২ এমবি ফিল্টার ইঞ্জিন
-        document.getElementById('shareFileField').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const fileSizeInMB = file.size / (1024 * 1024);
-            if (fileSizeInMB > 2) {
-                alert(window.portalT('alertFileSizeAuto'));
-                e.target.value = "";
-                pendingUploadFile = null;
-                base64UploadedFileString = "";
-                window.switchUploadMethod('link');
-                document.getElementById('shareUrl').focus();
-                return;
-            }
-            pendingUploadFile = file;
-            base64UploadedFileString = "";
-        });
-
-        // ফর্ম সাবমিশন লজিক
-        document.getElementById('resourceShareForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formEl = document.getElementById('resourceShareForm');
-            const editId = formEl.dataset.editId || "";
-            const noteTitle = document.getElementById('shareTitle').value.trim();
-            const courseLabel = formEl.dataset.lockedCourseTitle || formEl.dataset.lockedCode;
-            const fullTitle = noteTitle ? `${courseLabel} — ${noteTitle}` : courseLabel;
-            let urlPayload = "";
-            let urlType = "external";
-            let storagePath = "";
-
-            try {
-                if (window.currentActiveMethod === 'file') {
-                    if (pendingUploadFile) {
-                        const submitBtn = document.getElementById('sm_submit');
-                        submitBtn.disabled = true;
-                        submitBtn.innerText = window.portalT('alertUploading');
-                        const uploaded = await uploadFileToStorage(pendingUploadFile);
-                        if (editId) {
-                            const prevSnap = await getDoc(doc(db, "resources", editId));
-                            const oldPath = prevSnap.exists() ? prevSnap.data().storagePath : null;
-                            if (oldPath && oldPath !== uploaded.storagePath) {
-                                await deletePortalFile(oldPath);
-                            }
-                        }
-                        urlPayload = uploaded.downloadUrl;
-                        storagePath = uploaded.storagePath;
-                        urlType = uploaded.urlType;
-                        submitBtn.disabled = false;
-                        submitBtn.innerText = editId ? window.portalT('sm_save') : window.portalT('sm_submit');
-                    } else if (editId) {
-                        const existing = await getDoc(doc(db, "resources", editId));
-                        if (existing.exists()) {
-                            urlPayload = existing.data().url;
-                            urlType = existing.data().urlType || "supabase";
-                            storagePath = existing.data().storagePath || "";
-                        }
-                    } else {
-                        alert(window.portalT('alertPickFile'));
-                        return;
-                    }
-                } else {
-                    urlPayload = document.getElementById('shareUrl').value.trim();
-                    if (!urlPayload) { alert(window.portalT('alertPasteLink')); return; }
-                    urlType = "external";
-                    storagePath = "";
-                }
-
-                const semesterKey = editId
-                    ? (document.getElementById('lockedSemLabel').innerText.trim() || studentCurrentTrimesterKey)
-                    : studentCurrentTrimesterKey;
-
-                if (!urlPayload || (!urlPayload.startsWith("http") && !urlPayload.startsWith("data:"))) {
-                    alert(window.portalT('alertInvalidFileUrl'));
-                    return;
-                }
-
-                const payload = {
-                    author: document.getElementById('shareAuthor').value.trim(),
-                    title: fullTitle,
-                    type: document.getElementById('shareType').value,
-                    courseCode: formEl.dataset.lockedCode,
-                    semester: semesterKey,
-                    url: urlPayload,
-                    urlType,
-                    storagePath,
-                    uploadedBy: loggedInUserUID,
-                    updatedAt: new Date().toISOString()
-                };
-
-                if (editId) {
-                    await updateDoc(doc(db, "resources", editId), payload);
-                    alert(window.portalT('alertResourceUpdated'));
-                } else {
-                    await addDoc(collection(db, "resources"), { ...payload, createdAt: new Date().toISOString() });
-                    alert(window.portalT('alertPublished'));
-                }
-                formEl.reset();
-                formEl.dataset.editId = "";
-                pendingUploadFile = null;
-                closeShareModalFromModule();
-                updateFiltersAndListen();
-            } catch (err) {
-                const submitBtn = document.getElementById('sm_submit');
-                submitBtn.disabled = false;
-                submitBtn.innerText = formEl.dataset.editId ? window.portalT('sm_save') : window.portalT('sm_submit');
-                alert(err.message);
-            }
-        });
-
-        function routineStartMinutes(data) {
-            if (data.rawStartTime) {
-                const parts = String(data.rawStartTime).split(":");
-                return (parseInt(parts[0], 10) || 0) * 60 + (parseInt(parts[1], 10) || 0);
-            }
-            const m = String(data.timeSlot || "").match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
-            if (!m) return 9999;
-            let h = parseInt(m[1], 10);
-            const min = parseInt(m[2], 10) || 0;
-            const ap = (m[3] || "").toUpperCase();
-            if (ap === "PM" && h < 12) h += 12;
-            if (ap === "AM" && h === 12) h = 0;
-            return h * 60 + min;
-        }
-
-        function compareRoutineByTime(a, b) {
-            const diff = routineStartMinutes(a) - routineStartMinutes(b);
-            return diff !== 0 ? diff : String(a.subject || "").localeCompare(String(b.subject || ""));
-        }
-
-        function buildRoutineCardHTML(data) {
-            const genderBadge = data.gender === 'Male'
-                ? { label: window.portalT('genderMale'), cls: 'bg-blue-100 text-blue-700' }
-                : data.gender === 'Female'
-                    ? { label: window.portalT('genderFemale'), cls: 'bg-pink-100 text-pink-700' }
-                    : { label: window.portalT('genderCombined'), cls: 'bg-purple-100 text-purple-700' };
-            return `<div class="p-2.5 bg-white border border-slate-200 rounded-lg shadow-sm text-xs"><div class="flex justify-between items-center mb-0.5"><h5 class="font-extrabold text-emerald-800 text-sm">${escapeHtml(data.subject)}</h5><span class="text-[9px] font-bold px-1.5 py-0.5 rounded ${genderBadge.cls}">${genderBadge.label}</span></div><div class="mb-1 text-[11px] text-amber-700 font-bold">Batch: ${escapeHtml(data.batchNumber)}</div><div class="grid grid-cols-2 text-[11px] text-gray-600 gap-y-0.5 border-t border-dashed pt-1 mt-1"><p><b>Code:</b> ${escapeHtml(data.courseCode)}</p><p><b>Room:</b> ${escapeHtml(data.room)}</p><p class="text-emerald-700 font-bold col-span-2"><b>Teacher:</b> ${escapeHtml(data.teacherCode)}</p><p class="font-bold text-slate-700 col-span-2 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${escapeHtml(data.timeSlot)}</p></div></div>`;
-        }
-
-        // রুটিন ও নোটিশ লিসেনার
-        onSnapshot(query(collection(db, "routines"), orderBy("createdAt", "desc")), (snapshot) => {
-            const dailyRoutines = [];
-            const permanentByDay = {};
-            Object.keys(daysWithClasses).forEach(day => { permanentByDay[day] = []; });
-
-            snapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                if (data.boardType === 'daily') {
-                    dailyRoutines.push(data);
-                } else if (data.boardType === 'permanent' && data.classDay && data.classDay !== "N/A" && permanentByDay[data.classDay]) {
-                    permanentByDay[data.classDay].push(data);
-                }
-            });
-
-            dailyRoutines.sort(compareRoutineByTime);
-            dailyContainer.innerHTML = dailyRoutines.length
-                ? dailyRoutines.map(buildRoutineCardHTML).join("")
-                : `<p class="text-xs text-gray-400 col-span-2 p-2">${window.portalT('noClasses')}</p>`;
-
-            Object.keys(daysWithClasses).forEach(day => {
-                const el = document.getElementById(`day-${day}`);
-                if (!el) return;
-                const items = permanentByDay[day].sort(compareRoutineByTime);
-                if (items.length) {
-                    el.innerHTML = items.map(buildRoutineCardHTML).join("");
-                    daysWithClasses[day] = true;
-                } else {
-                    el.innerHTML = `<p class="text-xs text-gray-400 text-center py-2 bg-white/40 border border-dashed rounded-lg">${window.portalT('noClasses')}</p>`;
-                    daysWithClasses[day] = false;
-                }
-            });
-        });
-        onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
-            const noticeContainer = document.getElementById('noticeList'); noticeContainer.innerHTML = '';
-            snapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                noticeContainer.innerHTML += `<div class="p-2.5 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg shadow-sm text-xs"><p class="font-medium text-gray-800 leading-relaxed break-words">${formatNoticeContent(data.content)}</p></div>`;
-            });
-        });
-
-        // প্রোফাইল ভ্যালিডেশন — লগইন ছাড়া পেজে প্রবেশ বন্ধ
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                window.location.replace("./login.html");
-                return;
-            }
-            loggedInUserUID = user.uid;
-            const userDoc = await getDoc(doc(db, "users", loggedInUserUID));
-            if (userDoc.exists()) {
-                    const uData = userDoc.data(); if (uData.role === 'admin') { window.location.replace("./admin-dashboard.html"); return; }
-                    loggedInUserName = (uData.name || "").trim();
-                    const uYear = uData.profileYear || "1st Year"; const uTermNum = uData.profileTermNum || "1st Trimester"; const uSess = normalizeSessionTerm(uData.profileTerm || "Spring"); const uSessYear = uData.profileSessionYear || "2026";
-                    studentCurrentTrimesterKey = uData.trimester && uData.trimester.includes("(")
-                        ? normalizeTrimesterKey(uData.trimester)
-                        : buildTrimesterKey(uYear, uTermNum, uSess, uSessYear);
-                    document.getElementById('displayStudentCurrentSem').innerText = uData.profileYear ? `${uYear} - ${uTermNum}` : window.portalT('profileIncomplete');
-
-                    if(!uData.phone || !uData.bloodGroup || !uData.emergencyPhone || !uData.profileYear || !uData.profileTermNum) {
-                        isProfileIncomplete = true; document.getElementById('warningBanner').classList.remove('hidden');
-                    }
-                    const pulseClass = isProfileIncomplete ? 'bg-red-600 hover:bg-red-700 animate-pulse text-white' : 'bg-emerald-950 hover:bg-emerald-900 text-emerald-200';
-                    document.getElementById('navAuthButtons').innerHTML = `<div class="flex items-center space-x-2 gap-1"><button id="openProfileEditBtn" class="${pulseClass} px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-user mr-1"></i> ${window.portalT('btnMyProfile')}</button><button id="logoutBtn" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg font-semibold transition text-xs">${window.portalT('btnLogout')}</button></div>`;
-
-                    document.getElementById('openProfileEditBtn').addEventListener('click', () => {
-                        document.getElementById('editProfileName').value = uData.name || ""; document.getElementById('editProfileUID').value = uData.universityUID || ""; document.getElementById('editProfileBatch').value = uData.batchNumber || "";
-                        document.getElementById('editProfilePhone').value = uData.phone || ""; document.getElementById('editProfileBlood').value = uData.bloodGroup || ""; document.getElementById('editProfileEmergencyName').value = uData.emergencyName || ""; document.getElementById('editProfileEmergencyPhone').value = uData.emergencyPhone || "";
-                        document.getElementById('editProfileYear').value = uData.profileYear || "1st Year"; document.getElementById('editProfileTermNum').value = uData.profileTermNum || "1st Trimester"; fillSessionTermSelect(document.getElementById('editProfileTerm'), uData.profileTerm); document.getElementById('editProfileSessionYear').value = uData.profileSessionYear || "2026";
-                        if(uData.profilePic) { document.getElementById('avatarPreview').src = uData.profilePic; base64PicString = uData.profilePic; }
-                        if(isProfileIncomplete) document.getElementById('btnCancelProfile').classList.add('hidden'); else document.getElementById('btnCancelProfile').classList.remove('hidden');
-                        document.getElementById('profileModal').className = "fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm";
-                    });
-                    if(isProfileIncomplete) setTimeout(() => { document.getElementById('openProfileEditBtn').click(); }, 1500);
-                    document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => window.location.replace("./login.html")); });
-
-                    document.getElementById('filterYear').value = uYear;
-                    document.getElementById('filterTermNum').value = uTermNum;
-                    fillSessionFilterSelect(document.getElementById('filterSession'), sessionFilterValue(uSess, uSessYear));
-                    await updateFiltersAndListen();
-                    renderCourseGrid();
-                    document.body.classList.remove('invisible');
-            } else {
-                await signOut(auth);
-                window.location.replace("./login.html");
-            }
-        });
-
-        // প্রোফাইল সেভ
-        document.getElementById('profilePicFile').addEventListener('change', (e) => { const file = e.target.files[0]; if(file) { const reader = new FileReader(); reader.onloadend = () => { base64PicString = reader.result; document.getElementById('avatarPreview').src = reader.result; }; reader.readAsDataURL(file); } });
-        document.getElementById('profileEditForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); if(!loggedInUserUID) return;
-            const newPass = document.getElementById('newProfilePassword').value.trim();
-            try {
-                if(newPass !== "") { if(newPass.length < 6) { alert(window.portalT('alertPassMin')); return; } await updatePassword(auth.currentUser, newPass); }
-                await updateDoc(doc(db, "users", loggedInUserUID), {
-                    name: document.getElementById('editProfileName').value.trim(), universityUID: document.getElementById('editProfileUID').value.trim(), batchNumber: document.getElementById('editProfileBatch').value.trim(),
-                    profileYear: document.getElementById('editProfileYear').value, profileTermNum: document.getElementById('editProfileTermNum').value, profileTerm: document.getElementById('editProfileTerm').value, profileSessionYear: document.getElementById('editProfileSessionYear').value,
-                    trimester: buildTrimesterKey(document.getElementById('editProfileYear').value, document.getElementById('editProfileTermNum').value, document.getElementById('editProfileTerm').value, document.getElementById('editProfileSessionYear').value),
-                    phone: document.getElementById('editProfilePhone').value.trim(), bloodGroup: document.getElementById('editProfileBlood').value, emergencyName: document.getElementById('editProfileEmergencyName').value.trim(), emergencyPhone: document.getElementById('editProfileEmergencyPhone').value.trim(), profilePic: base64PicString
-                });
-                alert(window.portalT('alertProfileSaved')); window.location.reload();
-            } catch (err) { alert(err.message); }
-        });
-        window.closeProfileModal = () => { if(isProfileIncomplete) { alert(window.portalT('alertProfileRequired')); return; } document.getElementById('profileModal').className = "fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50"; };
-    </script>
-</body>
-</html>
+    }
+}
