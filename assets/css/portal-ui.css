@@ -15,6 +15,7 @@
         --portal-dur: 0.01ms;
         --portal-dur-slow: 0.01ms;
     }
+
     .portal-page-enter,
     .portal-card,
     .portal-menu-panel,
@@ -30,8 +31,13 @@
 }
 
 @keyframes portalFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .portal-card {
@@ -94,7 +100,10 @@
 }
 
 @keyframes portalRipple {
-    to { transform: scale(2.8); opacity: 0; }
+    to {
+        transform: scale(2.8);
+        opacity: 0;
+    }
 }
 
 .portal-field {
@@ -192,18 +201,36 @@ nav.portal-nav-root {
     }
 }
 
-.portal-menu-panel.is-open .portal-menu-stagger > * {
+.portal-menu-panel.is-open .portal-menu-stagger>* {
     animation: portalMenuItemIn 0.35s var(--portal-ease-out) both;
 }
 
-.portal-menu-panel.is-open .portal-menu-stagger > *:nth-child(1) { animation-delay: 0.03s; }
-.portal-menu-panel.is-open .portal-menu-stagger > *:nth-child(2) { animation-delay: 0.06s; }
-.portal-menu-panel.is-open .portal-menu-stagger > *:nth-child(3) { animation-delay: 0.09s; }
-.portal-menu-panel.is-open .portal-menu-stagger > *:nth-child(4) { animation-delay: 0.12s; }
+.portal-menu-panel.is-open .portal-menu-stagger>*:nth-child(1) {
+    animation-delay: 0.03s;
+}
+
+.portal-menu-panel.is-open .portal-menu-stagger>*:nth-child(2) {
+    animation-delay: 0.06s;
+}
+
+.portal-menu-panel.is-open .portal-menu-stagger>*:nth-child(3) {
+    animation-delay: 0.09s;
+}
+
+.portal-menu-panel.is-open .portal-menu-stagger>*:nth-child(4) {
+    animation-delay: 0.12s;
+}
 
 @keyframes portalMenuItemIn {
-    from { opacity: 0; transform: translateX(8px); }
-    to { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 .portal-modal-backdrop {
@@ -215,34 +242,61 @@ nav.portal-nav-root {
 }
 
 @keyframes portalModalIn {
-    from { opacity: 0; transform: scale(0.94) translateY(10px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
+    from {
+        opacity: 0;
+        transform: scale(0.94) translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
-.portal-stagger-grid > * {
+.portal-stagger-grid>* {
     animation: portalFadeUp var(--portal-dur-slow) var(--portal-ease-out) both;
 }
 
 @keyframes portalFadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.portal-stagger-grid > *:nth-child(1) { animation-delay: 0.04s; }
-.portal-stagger-grid > *:nth-child(2) { animation-delay: 0.08s; }
-.portal-stagger-grid > *:nth-child(3) { animation-delay: 0.12s; }
-.portal-stagger-grid > *:nth-child(4) { animation-delay: 0.16s; }
-.portal-stagger-grid > *:nth-child(5) { animation-delay: 0.2s; }
-.portal-stagger-grid > *:nth-child(6) { animation-delay: 0.24s; }
-.portal-stagger-grid > *:nth-child(n + 7) { animation-delay: 0.28s; }
+.portal-stagger-grid>*:nth-child(1) {
+    animation-delay: 0.04s;
+}
+
+.portal-stagger-grid>*:nth-child(2) {
+    animation-delay: 0.08s;
+}
+
+.portal-stagger-grid>*:nth-child(3) {
+    animation-delay: 0.12s;
+}
+
+.portal-stagger-grid>*:nth-child(4) {
+    animation-delay: 0.16s;
+}
+
+.portal-stagger-grid>*:nth-child(5) {
+    animation-delay: 0.2s;
+}
+
+.portal-stagger-grid>*:nth-child(6) {
+    animation-delay: 0.24s;
+}
+
+.portal-stagger-grid>*:nth-child(n + 7) {
+    animation-delay: 0.28s;
+}
 
 .portal-nav-scrolled {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-}
-
-/* Logo blending on dark backgrounds — removes white PNG background */
-.portal-logo-dark-bg {
-    mix-blend-mode: multiply;
-    /* subtle lift so the logo edges don't blur into background */
-    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.15));
 }
