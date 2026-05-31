@@ -159,6 +159,9 @@
                         Matrix</span><span id="mappingCount"
                         class="text-[10px] bg-indigo-50 px-2 py-0.5 rounded-full text-indigo-700 font-bold"
                         title="Total mapped courses">0 courses</span></h3>
+                <p class="text-[10px] text-gray-400 mb-2">সেমিস্টার ট্যাবে ক্লিক করে নির্দিষ্ট সেমিস্টারের কোর্স দেখুন ও
+                    এডিট/ডিলিট করুন।</p>
+                <div id="mappingSemesterTabs" class="flex flex-wrap gap-1 mb-2 border-b border-slate-200 pb-2"></div>
                 <div id="adminMappingList" class="space-y-2 max-h-96 overflow-y-auto text-xs pr-1">
                     <p class="text-gray-400">Loading master mappings...</p>
                 </div>
@@ -447,41 +450,105 @@
             renderRoutineListForTab(groups);
         });
 
-        // কোর্স ম্যাপিং লিসেনার (এডিট ম্যানেজার প্যানেল)
+        // ─── Course Mapping tab state ───
+        let activeMappingTab = "__all__";
+        let cachedMappingGroups = {};
+
+        function renderMappingTabBar(groups) {
+            const tabsEl = document.getElementById('mappingSemesterTabs');
+            const tabKeys = Object.keys(groups).sort();
+            // "All" tab always first, then each semester key
+            const allCount = tabKeys.reduce((sum, k) => sum + groups[k].length, 0);
+            let tabsHtml = `<button type="button" data-mapping-tab="__all__" class="mapping-tab-btn px-2 py-1 rounded-md text-[10px] font-bold border transition ${activeMappingTab === '__all__' ? 'bg-indigo-700 text-white border-indigo-800' : 'bg-white text-gray-600 border-gray-200 hover:bg-indigo-50'}">All (${allCount})</button>`;
+            tabKeys.forEach(key => {
+                const count = groups[key].length;
+                const active = key === activeMappingTab;
+                tabsHtml += `<button type="button" data-mapping-tab="${key.replace(/"/g, "\x26quot;")}" class="mapping-tab-btn px-2 py-1 rounded-md text-[10px] font-bold border transition ${active ? 'bg-indigo-700 text-white border-indigo-800' : 'bg-white text-gray-600 border-gray-200 hover:bg-indigo-50'}">${key} (${count})</button>`;
+            });
+            tabsEl.innerHTML = tabsHtml;
+            tabsEl.querySelectorAll('.mapping-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    activeMappingTab = btn.dataset.mappingTab;
+                    // update active styles
+                    tabsEl.querySelectorAll('.mapping-tab-btn').forEach(b => {
+                        b.classList.remove('bg-indigo-700', 'text-white', 'border-indigo-800');
+                        b.classList.add('bg-white', 'text-gray-600', 'border-gray-200', 'hover:bg-indigo-50');
+                    });
+                    btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-200', 'hover:bg-indigo-50');
+                    btn.classList.add('bg-indigo-700', 'text-white', 'border-indigo-800');
+                    renderMappingListForTab(groups);
+                });
+            });
+        }
+
+        const buildMappingCard = (docKey, index, course) => {
+            const courseJson = JSON.stringify(course).replace(/"/g, "\x26quot;");
+            return `
+                <div class="p-2 bg-indigo-50/50 border border-indigo-100 rounded-lg flex justify-between items-center">
+                    <div class="max-w-[70%]">
+                        <p class="font-bold text-indigo-950">${course.code}: ${course.title}</p>
+                        <p class="text-[9px] text-gray-400 truncate">Sem: ${docKey} | Tch: ${course.teacher}</p>
+                    </div>
+                    <div class="flex space-x-1 shrink-0 gap-1">
+                        <button onclick="openCourseEditModal('${docKey.replace(/'/g, "\\'")}', ${index}, ${courseJson})" class="text-blue-600 bg-white border border-blue-200 hover:bg-blue-600 hover:text-white px-1.5 py-0.5 rounded text-[10px] font-semibold"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteCourseMappingEntry('${docKey.replace(/'/g, "\\'")}', ${index})" class="text-red-600 bg-white border border-red-200 hover:bg-red-600 hover:text-white px-1.5 py-0.5 rounded text-[10px] font-semibold"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+        };
+
+        function renderMappingListForTab(groups) {
+            const listEl = document.getElementById('adminMappingList');
+            if (activeMappingTab === '__all__') {
+                const allCards = [];
+                Object.keys(groups).sort().forEach(key => {
+                    if (groups[key].length > 0) {
+                        allCards.push(`<div class="text-[10px] font-bold text-indigo-600 bg-indigo-50/80 p-1.5 rounded mt-1 first:mt-0">${key}</div>`);
+                        groups[key].forEach(item => allCards.push(buildMappingCard(item.docKey, item.index, item.course)));
+                    }
+                });
+                listEl.innerHTML = allCards.join('') || '<p class="text-gray-400 text-center py-2">No courses in mappings.</p>';
+            } else {
+                const items = groups[activeMappingTab] || [];
+                listEl.innerHTML = items.length
+                    ? items.map(item => buildMappingCard(item.docKey, item.index, item.course)).join('')
+                    : '<p class="text-gray-400 text-center py-2">No courses in this semester.</p>';
+            }
+        }
+
+        // কোর্স ম্যাপিং লিসেনার (এডিট ম্যানেজার প্যানেল) — semester tabbed view
         onSnapshot(collection(db, "course_mappings"), (snapshot) => {
             const adminMappingList = document.getElementById('adminMappingList');
+            const mappingTabsEl = document.getElementById('mappingSemesterTabs');
             let totalCourses = 0;
             if (snapshot.empty) {
                 document.getElementById('mappingCount').innerText = "0 courses";
+                mappingTabsEl.innerHTML = '';
                 adminMappingList.innerHTML = '<p class="text-gray-400 text-center py-2">No mappings created.</p>';
                 return;
             }
-            const rows = [];
+            // Group: groupKey → [{docKey, index, course}]
+            const groups = {};
             snapshot.forEach((docSnap) => {
                 const docKey = docSnap.id;
                 const courses = docSnap.data().courses || [];
-                totalCourses += courses.length;
+                if (!groups[docKey]) groups[docKey] = [];
                 courses.forEach((course, index) => {
-                    const courseJson = JSON.stringify(course).replace(/"/g, "\x26quot;");
-                    rows.push(`
-                        <div class="p-2 bg-indigo-50/50 border border-indigo-100 rounded-lg flex justify-between items-center">
-                            <div class="max-w-[70%]">
-                                <p class="font-bold text-indigo-950">${course.code}: ${course.title}</p>
-                                <p class="text-[9px] text-gray-400 truncate">Sem: ${docKey} | Tch: ${course.teacher}</p>
-                            </div>
-                            <div class="flex space-x-1 shrink-0 gap-1">
-                                <button onclick="openCourseEditModal('${docKey}', ${index}, ${courseJson})" class="text-blue-600 bg-white border border-blue-200 hover:bg-blue-600 hover:text-white px-1.5 py-0.5 rounded text-[10px] font-semibold"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteCourseMappingEntry('${docKey}', ${index})" class="text-red-600 bg-white border border-red-200 hover:bg-red-600 hover:text-white px-1.5 py-0.5 rounded text-[10px] font-semibold"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>`);
+                    groups[docKey].push({ docKey, index, course });
+                    totalCourses++;
                 });
             });
-            const semesterCount = snapshot.size;
+            cachedMappingGroups = groups;
+            // Reset active tab if current one no longer exists
+            if (activeMappingTab !== '__all__' && !groups[activeMappingTab]) {
+                activeMappingTab = '__all__';
+            }
+            const semesterCount = Object.keys(groups).length;
             const courseLabel = totalCourses === 1 ? "1 course" : `${totalCourses} courses`;
             const semLabel = semesterCount === 1 ? "1 semester" : `${semesterCount} semesters`;
             document.getElementById('mappingCount').innerText = `${courseLabel} · ${semLabel}`;
-            document.getElementById('mappingCount').title = "Courses listed below · semester keys in Firestore";
-            adminMappingList.innerHTML = rows.join("") || '<p class="text-gray-400 text-center py-2">No courses in mappings.</p>';
+            document.getElementById('mappingCount').title = "Click semester tabs below to filter";
+            renderMappingTabBar(groups);
+            renderMappingListForTab(groups);
         });
 
         onSnapshot(query(collection(db, "resources"), orderBy("createdAt", "desc")), (snapshot) => {
