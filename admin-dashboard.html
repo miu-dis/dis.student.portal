@@ -549,14 +549,16 @@
         onSnapshot(query(collection(db, "notices"), orderBy("createdAt", "desc")), (snapshot) => {
             const adminNoticeList = document.getElementById('adminNoticeList');
             document.getElementById('noticeCount').innerText = snapshot.size;
+            // Store notice contents in a Map to avoid inline onclick escaping issues
+            window._noticeContents = new Map();
             adminNoticeList.innerHTML = snapshot.docs.map(res => {
                 const content = res.data().content || '';
-                const escContent = content.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n');
+                window._noticeContents.set(res.id, content);
                 return `
                 <div class="flex justify-between items-start gap-2 p-2 bg-amber-50 border border-amber-200 rounded-lg">
                     <p class="max-w-[70%] text-[11px] leading-relaxed break-words line-clamp-4">${formatNoticeContent(content)}</p>
                     <div class="flex items-center gap-1 shrink-0">
-                        <button onclick="openNoticeEditModal('${res.id}', '${escContent}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2 py-0.5 rounded transition text-[10px] font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>
+                        <button onclick="openNoticeEditModal('${res.id}')" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-2 py-0.5 rounded transition text-[10px] font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>
                         <button onclick="deleteDataDocument('notices', '${res.id}')" class="text-red-600 h-6 w-6 hover:bg-red-600 hover:text-white rounded transition flex items-center justify-center"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 </div>`;
@@ -619,10 +621,12 @@
         };
 
         // ─── Notice Edit Modal ───
-        window.openNoticeEditModal = (id, rawContent) => {
+        window.openNoticeEditModal = (id) => {
             activeEditId = id;
             activeEditCollection = "notices";
-            const safeContent = String(rawContent).replace(/\\n/g, '\n').replace(/&/g, "\x26amp;").replace(/</g, "\x3C").replace(/>/g, "\x3E").replace(/"/g, "\x22");
+            const rawContent = window._noticeContents ? (window._noticeContents.get(id) || '') : '';
+            // Escape for safe embedding in innerHTML textarea content
+            const safeContent = String(rawContent).replace(/&/g, "\x26amp;").replace(/</g, "\x3C").replace(/>/g, "\x3E").replace(/"/g, "\x22");
             document.getElementById('modalFormContainer').innerHTML = `
                 <div class="space-y-3 text-xs">
                     <p class="font-bold text-amber-800">Editing Notice: ${id}</p>
