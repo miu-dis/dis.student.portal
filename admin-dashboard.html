@@ -385,7 +385,7 @@
             const tagLabel = isDaily ? "Daily" : "Permanent";
             const genderTag = data.gender ? ` | ${data.gender}` : "";
             const timeInfo = data.timeSlot ? ` | ${data.timeSlot}` : "";
-            const dataJson = JSON.stringify(data).replace(/"/g, '"');
+            const dataJson = JSON.stringify(data).replace(/"/g, "\x26quot;");
             return `
                 <div class="p-2.5 bg-slate-50 border rounded-lg flex flex-col gap-1.5 shadow-sm">
                     <div class="flex justify-between items-start gap-2">
@@ -462,7 +462,7 @@
                 const courses = docSnap.data().courses || [];
                 totalCourses += courses.length;
                 courses.forEach((course, index) => {
-                    const courseJson = JSON.stringify(course).replace(/"/g, '"');
+                    const courseJson = JSON.stringify(course).replace(/"/g, "\x26quot;");
                     rows.push(`
                         <div class="p-2 bg-indigo-50/50 border border-indigo-100 rounded-lg flex justify-between items-center">
                             <div class="max-w-[70%]">
@@ -664,8 +664,8 @@
             document.getElementById('modalFormContainer').innerHTML = `
                 <div class="space-y-3 text-xs">
                     <p class="font-bold text-purple-800">Resource ID: ${id}</p>
-                    <div><label class="font-bold text-gray-600">Title</label><input type="text" id="m_res_title" value="${(data.title || '').replace(/"/g, '"')}" class="w-full p-2 border rounded"></div>
-                    <div><label class="font-bold text-gray-600">Contributor</label><input type="text" id="m_res_author" value="${(data.author || '').replace(/"/g, '"')}" class="w-full p-2 border rounded"></div>
+                    <div><label class="font-bold text-gray-600">Title</label><input type="text" id="m_res_title" value="${(data.title || '').replace(/"/g, "\x26quot;")}" class="w-full p-2 border rounded"></div>
+                    <div><label class="font-bold text-gray-600">Contributor</label><input type="text" id="m_res_author" value="${(data.author || '').replace(/"/g, "\x26quot;")}" class="w-full p-2 border rounded"></div>
                     <div><label class="font-bold text-gray-600">Course Code</label><input type="text" id="m_res_code" value="${data.courseCode || ''}" class="w-full p-2 border rounded"></div>
                     <div><label class="font-bold text-gray-600">Semester Key</label><input type="text" id="m_res_sem" value="${data.semester || ''}" class="w-full p-2 border rounded"></div>
                     <div><label class="font-bold text-gray-600">Type</label>
