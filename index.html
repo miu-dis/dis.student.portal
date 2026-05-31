@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Islamic Studies Study Portal</title>
+    <title>Islamic Studies Student Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="assets/css/portal-ui.css">
@@ -61,7 +61,7 @@
         <div class="container mx-auto px-4 py-3 flex justify-between items-center gap-3">
             <div class="flex items-center space-x-3 gap-2 min-w-0">
                 <img src="assets/img/logo.png" alt="University Logo" class="h-10 w-auto ml-2 shrink-0">
-                <h1 id="navTitle" class="text-lg sm:text-xl font-bold tracking-wide truncate">DIS Study Portal</h1>
+                <h1 id="navTitle" class="text-lg sm:text-xl font-bold tracking-wide truncate">DIS Student Portal</h1>
             </div>
             <div class="flex items-center relative shrink-0">
                 <a href="login.html" id="btnNavLogin"
@@ -106,7 +106,7 @@
     <div id="homeMainContent">
         <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white py-8 text-center shadow-inner">
             <div class="container mx-auto px-4">
-                <h2 id="heroTitle" class="text-2xl md:text-3xl font-extrabold mb-2">Islamic Studies Study Portal</h2>
+                <h2 id="heroTitle" class="text-2xl md:text-3xl font-extrabold mb-2">Islamic Studies Student Portal</h2>
                 <p id="heroSubtitle" class="text-emerald-100 text-sm max-w-xl mx-auto">Academic Hub</p>
             </div>
         </header>
@@ -486,9 +486,9 @@
 
         const translations = {
             en: {
-                navTitle: "DIS Study Portal", btnNavLogin: "Login / Register", btnMyProfile: "My Profile", btnLogout: "Logout",
+                navTitle: "DIS Student Portal", btnNavLogin: "Login / Register", btnMyProfile: "My Profile", btnLogout: "Logout",
                 warningBanner: "⚠️ Profile incomplete! Please open My Profile and fill mandatory fields.",
-                heroTitle: "Islamic Studies Study Portal", heroSubtitle: "Open platform to share class notes and lectures.",
+                heroTitle: "Islamic Studies Student Portal", heroSubtitle: "Open platform to share class notes and lectures.",
                 lblNoticeBoard: "📢 Notice Board", lblDailyRoutine: "⏳ Daily Routine Update", lblPermanentRoutine: "📅 Permanent Weekly Schedule Board",
                 lblCourses: "Class Shared Resources Archive", lblSubTitleCourses: "Select year, trimester and session above to browse any semester.",
                 sat: "Saturday", sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", fri: "Friday", friWeekend: "Weekend",
@@ -523,9 +523,9 @@
                 alertOpenFileFailed: "Could not open file. Delete and upload again, or check Supabase Storage bucket."
             },
             bn: {
-                navTitle: "ডিআইএস স্টাডি পোর্টাল", btnNavLogin: "লগইন / রেজিস্টার", btnMyProfile: "আমার প্রোফাইল", btnLogout: "লগআউট",
+                navTitle: "ডিআইএস স্টুডেন্ট পোর্টাল", btnNavLogin: "লগইন / রেজিস্টার", btnMyProfile: "আমার প্রোফাইল", btnLogout: "লগআউট",
                 warningBanner: "⚠️ আপনার প্রোফাইল অসম্পূর্ণ! অনুগ্রহ করে 'আমার প্রোফাইল' বাটনে ক্লিক করে তথ্য পূরণ করুন।",
-                heroTitle: "ইসলামিক স্টাডিজ বিভাগ পোর্টাল", heroSubtitle: "সহপাঠীদের মাঝে ক্লাস নোট ও লেকচার শেয়ার করার উন্মুক্ত প্ল্যাটফর্ম।",
+                heroTitle: "ইসলামিক স্টাডিজ স্টুডেন্ট পোর্টাল", heroSubtitle: "সহপাঠীদের মাঝে ক্লাস নোট ও লেকচার শেয়ার করার উন্মুক্ত প্ল্যাটফর্ম।",
                 lblNoticeBoard: "📢 নোটিশ বোর্ড", lblDailyRoutine: "⏳ আজকের সাময়িক রুটিন", lblPermanentRoutine: "📅 স্থায়ী সাপ্তাহিক রুটিন বোর্ড",
                 lblCourses: "ক্লাস শেয়ারড রিসোর্স আর্কাইভ", lblSubTitleCourses: "উপরের বছর, ট্রাইমেস্টার ও সেশন সিলেক্ট করে যেকোনো সেমিস্টারের ফাইল দেখুন।",
                 sat: "শনিবার", sun: "রবিবার", mon: "সোমবার", tue: "মঙ্গলবার", wed: "বুধবার", fri: "শুক্রবার", friWeekend: "উইকেন্ড",
@@ -1518,6 +1518,8 @@
         });
         window.closeProfileModal = () => { if (isProfileIncomplete) { alert(window.portalT('alertProfileRequired')); return; } document.getElementById('profileModal').className = "fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50"; };
     </script>
+    <footer class="text-center py-6 text-xs text-gray-400 border-t border-gray-200 mt-8">© 2026 DIS Student Portal. All
+        rights reserved by Zubair Muhammad Zami.</footer>
 </body>
 
 </html>
