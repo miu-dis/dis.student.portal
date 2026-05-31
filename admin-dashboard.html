@@ -885,6 +885,8 @@
         window.deleteDataDocument = async (collectionName, id) => { if (confirm("Permanently delete live item?")) { try { await deleteDoc(doc(db, collectionName, id)); alert("Deleted!"); } catch (err) { alert(err.message); } } };
         document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => window.location.replace("./dept-gate-2026.html")); });
     </script>
+    <footer class="text-center py-6 text-xs text-gray-400 border-t border-gray-200 mt-8">© 2026 DIS Student Portal. All
+        rights reserved by Zubair Muhammad Zami.</footer>
 </body>
 
 </html>
